@@ -30,6 +30,16 @@ public class Location implements Serializable
 	}
 
 	/**
+	 * Copy constructor that copies from the other location.
+	 * @param other location to clone from.
+	 */
+	public Location(Location other)
+	{
+		this.row = other.row;
+		this.col = other.col;
+	}
+	
+	/**
 	 * Determines whether if this location is valid or not.
 	 * @return true for valid locations, false for invalid locations.
 	 */
@@ -71,6 +81,16 @@ public class Location implements Serializable
 	}
 
 	/**
+	 * Set this location to the values of the other location.
+	 * @param other location values to set to.
+	 */
+	public void setLocation(Location other)
+	{
+		this.row = other.row;
+		this.col = other.col;
+	}
+	
+	/**
 	 * @return a hashcode generated from the current position
 	 */
 	@Override
@@ -96,6 +116,8 @@ public class Location implements Serializable
 		if (getClass() != obj.getClass())
 			return false;
 		Location other = (Location) obj;
+		if (!other.isValidLocation() && !isValidLocation())
+			return true;
 		if (col != other.col)
 			return false;
 		if (row != other.row)

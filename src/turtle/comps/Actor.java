@@ -10,6 +10,12 @@ package turtle.comps;
 
 public abstract class Actor extends Component
 {
+	//Directions
+	public static final int NORTH = 0;
+	public static final int EAST = 1;
+	public static final int SOUTH = 2;
+	public static final int WEST = 3;
+	
 	//Some common dominance levels.
 	public static final DominanceLevel PLAYER = new DominanceLevel("Player", 0);
 	public static final DominanceLevel ENEMY = new DominanceLevel("Enemy", 100);
@@ -26,9 +32,36 @@ public abstract class Actor extends Component
 	public abstract boolean interact(Actor other);
 	
 	/**
-	 * Obtains the dominance level of the actor.
+	 * Obtains the dominance level of the actor in relation to another actor.
+	 * @param other other actor to compare with (or null for generally).
 	 * @return a dominance level of the actor.
 	 */
-	public abstract DominanceLevel getDominanceLevel();
+	public abstract DominanceLevel dominanceLevelFor(Actor other);
 	
+	/**
+	 * Moves this actor one space in specified direction. 
+	 * @param direction direction to move in.
+	 * @return true if successful, false otherwise.
+	 */
+	public boolean traverseDirection(int direction)
+	{
+		Grid parent = getParentGrid();
+		if (parent == null)
+			return false;
+		
+		Location loc = getHeadLocation();
+		int row = loc.getRow();
+		int col = loc.getColumn();
+		
+		switch (direction)
+		{
+		case NORTH: row--; break;
+		case EAST: col++; break;
+		case SOUTH: row++; break;
+		case WEST: col--; break;
+		default: return false;
+		}
+		
+		return parent.moveActor(this, row, col);
+	}
 }

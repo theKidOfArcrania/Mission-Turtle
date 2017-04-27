@@ -45,19 +45,12 @@ public abstract class Component extends Pane
 	}
 
 	/**
-	 * @return the trailing location of the actor 
+	 * Obtains the move speed of this component.
+	 * @return move speed in pixels per frame
 	 */
-	public Location getTrailingLocation()
+	public double getMoveSpeed()
 	{
-		return trailLoc;
-	}
-
-	/**
-	 * @param parent the new parent grid to set to
-	 */
-	public void setParentGrid(Grid parent)
-	{
-		this.parent = parent;
+		return MOVE_SPEED;
 	}
 
 	/**
@@ -70,43 +63,20 @@ public abstract class Component extends Pane
 	}
 
 	/**
-	 * Updates a frame of animation for a Component.
-	 * @return current frame number
+	 * @return the trailing location of the actor 
 	 */
-	public void updateFrame(long frame)
+	public Location getTrailingLocation()
 	{
-		if (parent != null)
-		{
-			int cellSize = parent.getCellSize();
-			int xPos = cellSize * headLoc.getColumn();
-			int yPos = cellSize * headLoc.getRow();
-			boolean validLocs = headLoc.isValidLocation() && trailLoc.isValidLocation();
-			if (xPos != getTranslateX() || yPos != getTranslateY())
-			{
-				//TODO: increment step.
-				
-			}
-		}
+		return trailLoc;
 	}
-	
+
 	/**
-	 * Obtains the move speed of this component.
-	 * @return move speed in pixels per frame
+	 * Determines whether if this component is moving.
+	 * @return true if moving, false if it is still
 	 */
-	public double getMoveSpeed()
+	public boolean isMoving()
 	{
-		return MOVE_SPEED;
-	}
-	
-	/**
-	 * Layouts the children (i.e. ImageView)
-	 * of this Component object
-	 */
-	@Override
-	protected void layoutChildren()
-	{
-		layoutInArea(img, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER, 
-				VPos.CENTER);
+		return !headLoc.equals(trailLoc);
 	}
 	
 	/**
@@ -116,6 +86,43 @@ public abstract class Component extends Pane
 	public void setImageFrame(int index)
 	{
 		img.setImage(DEFAULT_SET.frameAt(index));
+	}
+	
+	/**
+	 * @param parent the new parent grid to set to
+	 */
+	public void setParentGrid(Grid parent)
+	{
+		this.parent = parent;
+	}
+	
+	/**
+	 * Updates a frame of animation for a Component.
+	 * Note: Subclasses should ALWAYS call <code>super.updateFrame()</code>
+	 * in order that all the super classes get updated as well.
+	 * @return current frame number
+	 */
+	public void updateFrame(long frame)
+	{
+		if (parent != null)
+		{
+			boolean validLocs = headLoc.isValidLocation() && 
+					trailLoc.isValidLocation();
+			if (validLocs)
+			{
+				double speed = getMoveSpeed();
+				int cellSize = parent.getCellSize();
+				int xPos = cellSize * headLoc.getColumn();
+				int yPos = cellSize * headLoc.getRow();
+				if (xPos != getTranslateX())
+					setTranslateX(increment(getTranslateX(), xPos, speed));
+				if (yPos != getTranslateY())
+					setTranslateY(increment(getTranslateY(), yPos, speed));
+				
+				if (xPos == getTranslateX() && yPos == getTranslateY())
+					trailLoc.setLocation(headLoc);
+			}
+		}
 	}
 	
 	/**
@@ -131,9 +138,21 @@ public abstract class Component extends Pane
 			return to;
 		
 		double after = from + step;
-		if (after > to ^ from > to) 
-			return to; // Incremented pass the target.
+		if (after > to ^ from > to)
+			// Incremented pass the target.
+			return to; 
 		else
-			return from; 
+			return after;
+	}
+	
+	/**
+	 * Layouts the children (i.e. ImageView)
+	 * of this Component object
+	 */
+	@Override
+	protected void layoutChildren()
+	{
+		layoutInArea(img, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER, 
+				VPos.CENTER);
 	}
 }

@@ -12,7 +12,7 @@ package turtle.comps;
 
 import java.io.Serializable;
 
-public class DominanceLevel implements Serializable
+public class DominanceLevel implements Serializable, Comparable<DominanceLevel>
 {
 	private final String name;
 	private final int dominanceValue;
@@ -85,6 +85,16 @@ public class DominanceLevel implements Serializable
 	public String toString()
 	{
 		return "DominanceLevel [" + name + "] (" + dominanceValue + ")";
+	}
+
+	/**
+	 * Compares this DominanceLevel with other DominanceLevel.
+	 * @param other level to compare with
+	 */
+	@Override
+	public int compareTo(DominanceLevel other)
+	{
+		return dominanceValue - other.dominanceValue;
 	}
 	
 	

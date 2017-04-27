@@ -19,7 +19,7 @@ public class TileSet
 	 */
 	public Image frameAt(int index)
 	{
-		//TODO: implemntation here.
+		//TODO: implementation here.
 		return null;
 	}
 }
