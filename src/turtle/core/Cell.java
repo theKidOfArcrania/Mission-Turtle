@@ -1,4 +1,6 @@
 /**
+ * Cell.java
+ * 
  * Represents a immutable (mostly), immovable grid component, that falls
  * on the bottom layer of the grid.
  * 
@@ -7,7 +9,7 @@
  * Period: 2
  */
 
-package turtle.comps;
+package turtle.core;
 
 public abstract class Cell extends Component
 {

@@ -1,7 +1,12 @@
 /**
- * Represents a location of a Component. 
+ * Location.java
+ * 
+ * Represents a location of a Component.
+ * @author Henry Wang
+ * Date: 4/27/17
+ * Period: 2 
  */
-package turtle.comps;
+package turtle.core;
 
 import java.io.Serializable;
 

@@ -1,4 +1,6 @@
 /**
+ * DominanceLevel.java
+ * 
  * Represents a dominance level, which determines relative 
  * layer position of the actors and also which actor will
  * dominate the interaction of other actors.
@@ -8,7 +10,7 @@
  * Period: 2
  */
 
-package turtle.comps;
+package turtle.core;
 
 import java.io.Serializable;
 

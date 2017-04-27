@@ -1,4 +1,6 @@
 /**
+ * Actor.java
+ * 
  * Represents a movable/ interactable grid component that is readily mutable
  * 
  * @author Henry Wang
@@ -6,7 +8,7 @@
  * Period: 2 
  */
 
-package turtle.comps;
+package turtle.core;
 
 public abstract class Actor extends Component
 {

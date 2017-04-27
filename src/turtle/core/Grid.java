@@ -7,7 +7,7 @@
  * Period: 2
  */
 
-package turtle.comps;
+package turtle.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +19,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
+import turtle.comp.Player;
 
 public class Grid extends Pane
 {
@@ -55,6 +56,8 @@ public class Grid extends Pane
 	private Pane pnlBase;
 	private Pane pnlStage;
 	
+	private Player player;
+	
 	/**
 	 * Creates a new grid with the following dimensions
 	 * @param rows the number of rows
@@ -62,7 +65,7 @@ public class Grid extends Pane
 	 */
 	public Grid(int rows, int cols)
 	{
-		cellSize = DEF_CELL_SIZE;
+		cellSize = Component.DEFAULT_SET.getFrameSize();
 		this.rows = rows;
 		this.cols = cols;
 		
@@ -71,6 +74,7 @@ public class Grid extends Pane
 		
 		pnlBase = new ComponentPane();
 		pnlStage = new ComponentPane();
+		getChildren().addAll(pnlBase, pnlStage);
 	}
 	
 	/**
@@ -109,6 +113,15 @@ public class Grid extends Pane
 	public int getColumns()
 	{
 		return cols;
+	}
+	
+	/**
+	 * Gets the player object of this level.
+	 * @return the player.
+	 */
+	public Player getPlayer()
+	{
+		return player;
 	}
 	
 	/**
@@ -179,6 +192,8 @@ public class Grid extends Pane
 	 */
 	public boolean placeActor(Actor comp)
 	{
+		if (comp.getParentGrid() == null)
+			return false;
 		if (actorLocs.containsKey(comp))
 			return false;
 		
@@ -186,6 +201,10 @@ public class Grid extends Pane
 		boolean success = checkVisit(comp, loc.getRow(), loc.getColumn());
 		if (success)
 		{
+			if (comp instanceof Player)
+				player = (Player)comp;
+			
+			comp.setParentGrid(this);
 			comp.getTrailingLocation().setLocation(loc);
 			comp.setTranslateX(loc.getColumn() * cellSize);
 			comp.setTranslateY(loc.getRow() * cellSize);
@@ -213,6 +232,8 @@ public class Grid extends Pane
 	 */
 	public boolean placeCell(Cell comp)
 	{
+		if (comp.getParentGrid() == null)
+			return false;
 		if (pnlBase.getChildren().contains(comp))
 			return false;
 		
@@ -220,6 +241,7 @@ public class Grid extends Pane
 		if (base[loc.getRow()][loc.getColumn()] != null)
 			return false;
 		
+		comp.setParentGrid(this);
 		base[loc.getRow()][loc.getColumn()] = comp;
 		pnlBase.getChildren().add(comp);
 		return true;
@@ -234,6 +256,10 @@ public class Grid extends Pane
 	{
 		if (actorLocs.containsKey(comp))
 		{
+			if (comp == player)
+				player = null;
+			
+			comp.setParentGrid(null);
 			pnlStage.getChildren().remove(comp);
 			actorLocs.remove(comp);
 			return true;
@@ -255,6 +281,7 @@ public class Grid extends Pane
 		
 		if (getCellAt(loc) == comp)
 		{
+			comp.setParentGrid(null);
 			pnlBase.getChildren().remove(comp);
 			base[loc.getRow()][loc.getColumn()] = null;
 			return true;
@@ -279,6 +306,21 @@ public class Grid extends Pane
 			if (n instanceof Actor)
 				((Actor)n).updateFrame(frame);
 		}
+	}
+	
+	/**
+	 * Layouts all the children of this Grid.
+	 */
+	@Override
+	protected void layoutChildren()
+	{
+		double width = computePrefWidth(-1);
+		double height = computePrefHeight(-1);
+		layoutInArea(pnlBase, 0, 0, width, height, 0, HPos.CENTER, 
+				VPos.CENTER);
+		layoutInArea(pnlStage, 0, 0, width, height, 0, HPos.CENTER, 
+				VPos.CENTER);
+		
 	}
 	
 	/**

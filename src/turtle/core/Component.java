@@ -1,4 +1,6 @@
 /**
+ * Component.java
+ * 
  * Represents the abstract base of all grid components
  * that will be displayed on the Grid.
  * 
@@ -6,9 +8,12 @@
  * Date: 4/26/17
  * Period: 2
  */
-package turtle.comps;
+package turtle.core;
+
+import java.util.Map;
 
 import javafx.geometry.HPos;
+import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -34,8 +39,23 @@ public abstract class Component extends Pane
 		
 		headLoc = new Location();
 		trailLoc = new Location();
+		
+		img.setImage(DEFAULT_SET.getTileset());
+		img.setViewport(new Rectangle2D(0, 0, 0, 0));
 	}
 
+	/**
+	 * Changes any parameters (if any) associated with this component.
+	 * Any subclasses overriding this method is STRONLY advised to 
+	 * call <code>super.setParameters</code> (or any of such derivative)
+	 * in order that the parameters are set properly.
+	 * @param params parameters in a map to dynamically set attributes. 
+	 */
+	public void setParameters(Map<String, Object> params)
+	{
+		//Does nothing
+	}
+	
 	/**
 	 * @return the head location of the actor
 	 */
@@ -85,13 +105,15 @@ public abstract class Component extends Pane
 	 */
 	public void setImageFrame(int index)
 	{
-		img.setImage(DEFAULT_SET.frameAt(index));
+		img.setViewport(DEFAULT_SET.frameAt(index));
 	}
 	
 	/**
+	 * Sets a new parent grid. This should only be called internally
+	 * by Grid when this is added.
 	 * @param parent the new parent grid to set to
 	 */
-	public void setParentGrid(Grid parent)
+	protected void setParentGrid(Grid parent)
 	{
 		this.parent = parent;
 	}
