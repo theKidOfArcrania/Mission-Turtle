@@ -35,20 +35,25 @@ public class GridView extends Pane
 		rows = VIEW_ROWS;
 		cols = VIEW_COLS;
 		initGrid(init);
-		
-		int cellSize = init.getCellSize();
-		Rectangle clip = new Rectangle(0, 0, cellSize * cols, cellSize * rows);
-		setClip(clip);
 	}
 	
 	/**
 	 * Initializes this GridView with another grid,
 	 * cleaning up the previous grid's stuff.
 	 * @param grid the grid to initialize with.
+	 * @throws NullPointerException if grid is null.
 	 */
 	public void initGrid(Grid grid)
 	{
+		if (grid == null)
+			throw new NullPointerException();
+		
 		viewed = grid;
+		
+		int cellSize = grid.getCellSize();
+		Rectangle clip = new Rectangle(0, 0, cellSize * cols, cellSize * rows);
+		setClip(clip);
+		
 		getChildren().clear();
 		getChildren().add(grid);
 		layoutChildren();
