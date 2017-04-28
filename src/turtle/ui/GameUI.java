@@ -1,3 +1,12 @@
+/**
+ * GameUI.java
+ * 
+ * This displays the main game UI that the user will interact with.
+ * @author Henry Wang
+ * Date: 4/28/17
+ * Period: 2
+ */
+
 package turtle.ui;
 
 import javafx.animation.Transition;
@@ -7,16 +16,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import turtle.comp.Player;
+import turtle.core.Actor;
 import turtle.core.GridView;
 
 public class GameUI extends StackPane
 {
-	private static final Duration FRAME_DURATION = Duration.millis(10);
+	private static final Duration FRAME_DURATION = Duration.millis(20);
 	
 	/**
 	 * Runs the game timer, keep tracks of the game states each frame.
 	 * 
-	 * @author henry.wang.1
 	 */
 	private class GameTimer extends Transition
 	{
@@ -85,11 +94,30 @@ public class GameUI extends StackPane
 			@Override
 			public void handle(KeyEvent event)
 			{
+				int dir = -1;
+				
 				Player p = view.getPlayer();
 				switch (event.getCode())
 				{
 				case LEFT:
+				case A:
+					dir = Actor.WEST;
+					break;
+				case UP:
+				case W:
+					dir = Actor.NORTH;
+					break;
+				case RIGHT:
+				case D:
+					dir = Actor.EAST;
+					break;
+				case DOWN:
+				case S:
+					dir = Actor.SOUTH;
 				}
+				
+				if (dir != -1)
+					p.traverseDirection(dir);
 			}
 		});
 	}

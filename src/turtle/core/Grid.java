@@ -309,7 +309,12 @@ public class Grid extends Pane
 		for (Node n : pnlStage.getChildren())
 		{
 			if (n instanceof Actor)
-				((Actor)n).updateFrame(frame);
+			{
+				Actor a = (Actor)n;
+				a.updateFrame(frame);
+				if (a.isDead())
+					removeActor(a);
+			}
 		}
 	}
 	

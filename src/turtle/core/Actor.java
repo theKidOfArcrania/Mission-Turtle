@@ -12,6 +12,8 @@ package turtle.core;
 
 public abstract class Actor extends Component
 {
+	public static final int DYING_FRAMES = 10;
+	
 	//Directions
 	public static final int NORTH = 0;
 	public static final int EAST = 1;
@@ -23,6 +25,56 @@ public abstract class Actor extends Component
 	public static final DominanceLevel ENEMY = new DominanceLevel("Enemy", 100);
 	public static final DominanceLevel ITEM = new DominanceLevel("Item", 200);
 	public static final DominanceLevel FIXTURE = new DominanceLevel("Fixture", 300);
+	
+	private boolean dying;
+	private int dieFrame;
+	
+	/**
+	 * Constructs a new actor.
+	 */
+	public Actor()
+	{
+		dying = false;
+	}
+	
+	/**
+	 * Kills this actor (this sets a flag for this actor to be removed).
+	 * Any class can override this method to determine which items this
+	 * actor will die by (whether if it is immune to something).
+	 * 
+	 * @param attacker the thing that is killing this actor.
+	 * @return true if this actor died as a result of this call, false if
+	 * 		nothing changed.
+	 */
+	public boolean die(Component attacker)
+	{
+		if (isDying())
+			return false;
+		if (attacker instanceof Actor && ((Actor)attacker).isDying())
+			return false;
+		
+		dying = true;
+		dieFrame = 0;
+		return true;
+	}
+	
+	/**
+	 * Checks whether if this actor has been killed and is dying.
+	 * @return true if died, false if alive.
+	 */
+	public boolean isDying()
+	{
+		return dying;
+	}
+	
+	/**
+	 * Checks whether if this actor is dead and marked for removal.
+	 * @return true if dead, false if dying or alive.
+	 */
+	public boolean isDead()
+	{
+		return dieFrame >= DYING_FRAMES;
+	}
 	
 	/**
 	 * Executes an interaction with another actor.
@@ -65,5 +117,22 @@ public abstract class Actor extends Component
 		}
 		
 		return parent.moveActor(this, row, col);
+	}
+	
+	/**
+	 * Updates frames of actor. This particularly updates dying frames.
+	 * @param frame the frame number.
+	 */
+	@Override
+	public void updateFrame(long frame)
+	{
+		super.updateFrame(frame);
+		if (dying)
+		{
+			if (dieFrame < DYING_FRAMES)
+				dieFrame++;
+			setOpacity(1 - ((double)dieFrame / DYING_FRAMES)); 
+		}
+		
 	}
 }
