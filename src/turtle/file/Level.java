@@ -194,11 +194,15 @@ public class Level
 	 * @throws IllegalStateException if this is called on a level does not
 	 * 		load from file.
 	 * @throws IOException if the level file is corrupted.
+	 * @throws IllegalStateException if this level does not load from a file.
 	 */
 	public void loadLevel(RandomAccessFile raf) throws IOException
 	{
 		if (offset == -1)
 			throw new IllegalStateException("Not a level from file.");
+
+		if (loaded)
+			return;
 		
 		raf.seek(offset);
 		
@@ -219,6 +223,8 @@ public class Level
 			cells.add(readCompSpec(raf));
 		for (int i = 0; i < numActors; i++)
 			actors.add(readCompSpec(raf));
+		
+		loaded = true;
 	}
 	
 	/**
