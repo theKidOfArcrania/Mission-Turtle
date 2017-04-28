@@ -44,7 +44,7 @@ public class Grid extends Pane
 		}
 	}
 	
-	private static final int DEF_CELL_SIZE = 100;
+	public static final int DEF_CELL_SIZE = 100;
 	
 	private final int rows;
 	private final int cols;
@@ -66,6 +66,7 @@ public class Grid extends Pane
 	public Grid(int rows, int cols)
 	{
 		cellSize = Component.DEFAULT_SET.getFrameSize();
+		
 		this.rows = rows;
 		this.cols = cols;
 		
@@ -145,6 +146,10 @@ public class Grid extends Pane
 					residents.add(a);
 			}
 		}
+		
+		/**
+		 * Compares two actors in reverse dominance order.
+		 */
 		Collections.sort(residents, new Comparator<Actor>() 
 		{
 			/**

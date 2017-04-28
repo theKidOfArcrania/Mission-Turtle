@@ -41,20 +41,19 @@ public class GridView extends Pane
 	 * Initializes this GridView with another grid,
 	 * cleaning up the previous grid's stuff.
 	 * @param grid the grid to initialize with.
-	 * @throws NullPointerException if grid is null.
 	 */
 	public void initGrid(Grid grid)
 	{
-		if (grid == null)
-			throw new NullPointerException();
-		
 		viewed = grid;
+		getChildren().clear();
+		
+		if (grid == null)
+			return;
 		
 		int cellSize = grid.getCellSize();
 		Rectangle clip = new Rectangle(0, 0, cellSize * cols, cellSize * rows);
 		setClip(clip);
 		
-		getChildren().clear();
 		getChildren().add(grid);
 		layoutChildren();
 		updatePos();
@@ -81,6 +80,8 @@ public class GridView extends Pane
 	@Override
 	protected double computeMaxWidth(double height)
 	{
+		if (viewed == null)
+			return cols * Grid.DEF_CELL_SIZE;
 		return cols * viewed.getCellSize();
 	}
 	
@@ -92,6 +93,8 @@ public class GridView extends Pane
 	@Override
 	protected double computeMaxHeight(double width)
 	{
+		if (viewed == null)
+			return rows * Grid.DEF_CELL_SIZE;
 		return rows * viewed.getCellSize();
 	}
 	
@@ -103,6 +106,8 @@ public class GridView extends Pane
 	@Override
 	protected double computePrefWidth(double height)
 	{
+		if (viewed == null)
+			return cols * Grid.DEF_CELL_SIZE;
 		return cols * viewed.getCellSize();
 	}
 	
@@ -114,6 +119,8 @@ public class GridView extends Pane
 	@Override
 	protected double computePrefHeight(double width)
 	{
+		if (viewed == null)
+			return rows * Grid.DEF_CELL_SIZE;
 		return rows * viewed.getCellSize();
 	}
 	
@@ -125,6 +132,8 @@ public class GridView extends Pane
 	@Override
 	protected double computeMinWidth(double height)
 	{
+		if (viewed == null)
+			return cols * Grid.DEF_CELL_SIZE;
 		return cols * viewed.getCellSize();
 	}
 	
@@ -136,6 +145,8 @@ public class GridView extends Pane
 	@Override
 	protected double computeMinHeight(double width)
 	{
+		if (viewed == null)
+			return rows * Grid.DEF_CELL_SIZE;
 		return rows * viewed.getCellSize();
 	}
 	
@@ -145,6 +156,9 @@ public class GridView extends Pane
 	@Override
 	protected void layoutChildren()
 	{
+		if (viewed == null)
+			return;
+		
 		double width = cols * viewed.getCellSize();
 		double height = rows * viewed.getCellSize();
 		layoutInArea(viewed, 0, 0, width, height, 0, HPos.CENTER, VPos.CENTER);
@@ -169,6 +183,9 @@ public class GridView extends Pane
 	 */
 	private void updatePos()
 	{
+		if (viewed == null)
+			return;
+		
 		Player p = viewed.getPlayer();
 		if (p == null)
 			return;
@@ -178,5 +195,16 @@ public class GridView extends Pane
 				p.getTranslateX()));
 		viewed.setTranslateX(calcOffset(rows * cell, viewed.getHeight(), 
 				p.getTranslateY()));
+	}
+
+	/**
+	 * Delegate method that queries the interactable player.
+	 * @return the player of the grid contained inside this grid-view.
+	 */
+	public Player getPlayer()
+	{
+		if (viewed == null)
+			return null;
+		return viewed.getPlayer();
 	}
 }
