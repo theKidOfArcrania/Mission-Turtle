@@ -1,3 +1,13 @@
+/**
+ * LevelPack.java
+ * 
+ * This represents a collection of levels that could be stored to or loaded
+ * from a file. 
+ * 
+ * @author Henry Wang
+ * Date: 4/28/17
+ * Period: 2
+ */
 package turtle.file;
 
 import java.io.File;
@@ -72,8 +82,9 @@ public class LevelPack
 
 	/**
 	 * Saves the level pack into a file.
-	 * @param file
-	 * @throws IllegalStateException if LevelPack is loaded from file or if not all levels are loaded.
+	 * @param file the file to save to.
+	 * @throws IllegalStateException if LevelPack is loaded from file or 
+	 * 	if not all levels are loaded.
 	 */
 	public void savePack(File file) throws IOException
 	{
@@ -83,6 +94,27 @@ public class LevelPack
 			if (!lvl.isLoaded())
 				throw new IllegalStateException("Levels are not all loaded");
 		
+		RandomAccessFile raf = new RandomAccessFile(file, "w");
+		raf.writeInt(PACK_FILE_SIG);
+		raf.writeInt(VERSION_1);
+		raf.writeInt(levels.size());
+		
+		long levelOffsets = raf.getFilePointer();
+		raf.skipBytes(levels.size() * Long.BYTES);
+		raf.writeLong(levelPackID.getMostSignificantBits());
+		raf.writeLong(levelPackID.getLeastSignificantBits());
+		raf.writeUTF(name);
+		
+		long[] offsets = new long[levels.size()];
+		for (int i = 0; i < levels.size(); i++)
+		{
+			offsets[i] = raf.getFilePointer();
+			levels.get(i).saveLevel(raf);
+		}
+		
+		raf.seek(levelOffsets);
+		for (long off : offsets)
+			raf.writeLong(off);
 	}
 	
 	/**
@@ -92,7 +124,8 @@ public class LevelPack
 	public void setName(String name)
 	{
 		if (loadedMode)
-			throw new IllegalStateException("Level pack is read-only in load mode");
+			throw new IllegalStateException("Level pack is read-only in load "
+					+ "mode");
 		this.name = name;
 	}
 
@@ -100,7 +133,8 @@ public class LevelPack
 	 * Loads a level from file and returns it. 
 	 * @param index index of level to load.
 	 * @return the loaded level.
-	 * @throws IllegalStateException if this LevelPack does not load from a file.
+	 * @throws IllegalStateException if this LevelPack does not load from a 
+	 * 		file.
 	 */
 	public Level loadLevel(int index) throws IOException
 	{
@@ -116,7 +150,8 @@ public class LevelPack
 	
 	
 	/**
-	 * Obtains the level at the index (does not necessarily load it if not already loaded).
+	 * Obtains the level at the index (does not necessarily load it if not 
+	 * already loaded).
 	 * @param index the index of level to get.
 	 * @return the level at index.
 	 */
@@ -134,7 +169,8 @@ public class LevelPack
 	public void setLevel(int index, Level lvl)
 	{
 		if (loadedMode)
-			throw new IllegalStateException("Level pack is read-only in load mode");
+			throw new IllegalStateException("Level pack is read-only in load "
+					+ "mode");
 		levels.set(index, lvl);
 	}
 	
@@ -146,7 +182,8 @@ public class LevelPack
 	public void addLevel(Level lvl)
 	{
 		if (loadedMode)
-			throw new IllegalStateException("Level pack is read-only in load mode");
+			throw new IllegalStateException("Level pack is read-only in load "
+					+ "mode");
 		levels.add(lvl);
 	}
 	
@@ -158,7 +195,8 @@ public class LevelPack
 	public void removeLevel(int ind)
 	{
 		if (loadedMode)
-			throw new IllegalStateException("Level pack is read-only in load mode");
+			throw new IllegalStateException("Level pack is read-only in load "
+					+ "mode");
 		levels.remove(ind);
 	}
 }

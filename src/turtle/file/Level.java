@@ -17,8 +17,12 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import turtle.core.Actor;
+import turtle.core.Cell;
 import turtle.core.Component;
+import turtle.core.Grid;
 import turtle.core.Location;
+import turtle.core.TileSet;
 
 //TODO: load level into grid.
 public class Level
@@ -124,6 +128,20 @@ public class Level
 	}
 
 	/**
+	 * Creates the grid that is specified by this level data.
+	 * @return an interactable live Grid.
+	 */
+	public Grid createLevel()
+	{
+		Grid g = new Grid(rows, cols);
+		for (CompSpec spec : cells)
+			g.placeCell((Cell)spec.createComponent());
+		for (CompSpec spec : actors)
+			g.placeActor((Actor)spec.createComponent());
+		return g;
+	}
+	
+	/**
 	 * @param name the new level name
 	 * @throws IllegalStateException if level is not editable
 	 */
@@ -220,9 +238,9 @@ public class Level
 		int numCells = raf.readInt();
 		int numActors = raf.readInt();
 		for (int i = 0; i < numCells; i++)
-			cells.add(readCompSpec(raf));
+			cells.add(readCompSpec(raf, Cell.class));
 		for (int i = 0; i < numActors; i++)
-			actors.add(readCompSpec(raf));
+			actors.add(readCompSpec(raf, Actor.class));
 		
 		loaded = true;
 	}
@@ -258,15 +276,22 @@ public class Level
 	/**
 	 * Reads component specifications at the current location
 	 * @param raf the file to read from
+	 * @param expectedType the expected class type of this component.
 	 * @return a parsed component specification
+	 * @throws IOException if the component spec data is corrupted.
 	 */
-	private CompSpec readCompSpec(RandomAccessFile raf) throws IOException
+	private CompSpec readCompSpec(RandomAccessFile raf, 
+			Class<? extends Component> expectedType) throws IOException
 	{
 		Location loc = new Location(raf.readInt(), raf.readInt());
 		short compID = raf.readShort();
 		byte[] initData = new byte[raf.read()];
 		raf.read(initData);
-		return new CompSpec(Component.DEFAULT_SET, loc, compID, initData);
+		
+		TileSet ts = Component.DEFAULT_SET;
+		if (!expectedType.isAssignableFrom(ts.componentAt(compID)))
+			throw new IOException("Unexpected component type");
+		return new CompSpec(ts, loc, compID, initData);
 	}
 	
 	/**
