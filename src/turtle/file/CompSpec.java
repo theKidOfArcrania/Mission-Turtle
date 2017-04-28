@@ -21,23 +21,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 import turtle.core.Component;
+import turtle.core.Location;
 import turtle.core.TileSet;
 
 public class CompSpec
 {
 	private final TileSet tileset;
-	private final int slot;
+	private final Location loc;
+	private final short slot;
 	private final Map<String, Object> params;
 	
 	/**
 	 * Creates a CompSpec initialized with the component specifications
+	 * 
 	 * @param tileset the parent tileset associated with this comp spec.
+	 * @param loc the starting location of component.
 	 * @param slot the index slot specifying component type
 	 * @param params the map associated extra parameters of component.
 	 */
-	public CompSpec(TileSet tileset, int slot, Map<String, Object> params)
+	public CompSpec(TileSet tileset, Location loc, short slot, 
+			Map<String, Object> params)
 	{
 		this.tileset = tileset;
+		this.loc = loc;
 		this.slot = slot;
 		this.params = new HashMap<>(params);
 	}
@@ -45,15 +51,19 @@ public class CompSpec
 	/**
 	 * Creates a CompSpec initialized with the component specifications
 	 * and reads from parameter data
+	 * 
 	 * @param tileset the parent tileset associated with this comp spec.
+	 * @param loc the starting location of component.
 	 * @param slot the index slot specifying component type
 	 * @param data the serialized parameter data
 	 * @throws IOException if serialized parameter data is corrupted. 
 	 */
 	@SuppressWarnings("unchecked")
-	public CompSpec(TileSet tileset, int slot, byte[] data) throws IOException
+	public CompSpec(TileSet tileset, Location loc, short slot, byte[] data) 
+			throws IOException
 	{
 		this.tileset = tileset;
+		this.loc = loc;
 		this.slot = slot;
 		
 		try (ObjectInputStream ois = new ObjectInputStream(
@@ -84,6 +94,8 @@ public class CompSpec
 		{
 			Component c = clsComp.newInstance();
 			c.setParameters(params);
+			c.getHeadLocation().setLocation(loc);
+			c.getTrailingLocation().setLocation(loc);
 			return c;
 		} catch (InstantiationException | IllegalAccessException e)
 		{
@@ -94,9 +106,17 @@ public class CompSpec
 	}
 
 	/**
+	 * @return the location of component.
+	 */
+	public Location getLocation()
+	{
+		return loc;
+	}
+	
+	/**
 	 * @return the component slot index
 	 */
-	public int getSlot()
+	public short getSlot()
 	{
 		return slot;
 	}
