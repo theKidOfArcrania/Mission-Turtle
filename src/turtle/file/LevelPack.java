@@ -165,26 +165,38 @@ public class LevelPack
 	 * @param index the index of level to set
 	 * @param lvl the new level object to set to.
 	 * @throws IllegalStateException if this LevelPack loads from a file.
+	 * @throws IllegalArgumentException if this level already belongs to 
+	 * 		another level-pack.
 	 */
 	public void setLevel(int index, Level lvl)
 	{
 		if (loadedMode)
 			throw new IllegalStateException("Level pack is read-only in load "
-					+ "mode");
-		levels.set(index, lvl);
+					+ "mode.");
+		if (lvl.parent != null)
+			throw new IllegalArgumentException("This level already is in " +
+					"another level pack.");
+		levels.set(index, lvl).parent = null;
+		lvl.parent = this;
 	}
 	
 	/**
 	 * Adds a new level.
 	 * @param lvl the new level object to add.
 	 * @throws IllegalStateException if this LevelPack loads from a file.
+	 * @throws IllegalArgumentException if this level already belongs to 
+	 * 		another level-pack.
 	 */
 	public void addLevel(Level lvl)
 	{
 		if (loadedMode)
 			throw new IllegalStateException("Level pack is read-only in load "
 					+ "mode");
+		if (lvl.parent != null)
+			throw new IllegalArgumentException("This level already is in " +
+					"another level pack.");
 		levels.add(lvl);
+		lvl.parent = this;
 	}
 	
 	/**
@@ -197,6 +209,6 @@ public class LevelPack
 		if (loadedMode)
 			throw new IllegalStateException("Level pack is read-only in load "
 					+ "mode");
-		levels.remove(ind);
+		levels.remove(ind).parent = null;
 	}
 }

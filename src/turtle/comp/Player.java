@@ -10,11 +10,12 @@
 package turtle.comp;
 
 import turtle.core.Actor;
+import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
 public class Player extends Actor
 {
-
+	private Component msgSender;
 	private String msg;
 	
 	/**
@@ -42,11 +43,13 @@ public class Player extends Actor
 	}
 
 	/**
-	 * @return the message that the player should see now.
+	 * @return the message that the player should see now. Never returns null.
 	 * @see #setMessage(String)
 	 */
 	public String getMessage()
 	{
+		if (msg == null)
+			return "";
 		return msg;
 	}
 
@@ -56,12 +59,24 @@ public class Player extends Actor
 	 * will allow the user to read some information that might
 	 * help them along in the level. 
 	 * 
-	 * @param msg the new message to show the player
+	 * @param msg the new message to show the player.
+	 * @param sender the component sending the message.
 	 */
-	public void setMessage(String msg)
+	public void setMessage(String msg, Component sender)
 	{
 		this.msg = msg;
+		this.msgSender = sender;
 	}
 	
-	
+	/**
+	 * Resets message if the sender sent this message (i.e. it has not
+	 * already been overriden by someone else.
+	 * 
+	 * @param sender the component that sent the message
+	 */
+	public void resetMessage(Component sender)
+	{
+		if (msgSender == sender)
+			this.msg = null;
+	}
 }

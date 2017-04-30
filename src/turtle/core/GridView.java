@@ -13,14 +13,20 @@ package turtle.core;
 
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 import turtle.comp.Player;
 
 public class GridView extends Pane
 {
-	public static final int VIEW_ROWS = 10;
-	public static final int VIEW_COLS = 15;
+	private static final double CORNER_RADIUS = 5.0;
+	public static final int VIEW_ROWS = 8;
+	public static final int VIEW_COLS = 12;
 	
 	private Grid viewed;
 	private final int rows;
@@ -35,6 +41,11 @@ public class GridView extends Pane
 		rows = VIEW_ROWS;
 		cols = VIEW_COLS;
 		initGrid(init);
+		
+		LinearGradient grad = new LinearGradient(0, 0, 1, 1, true, null, 
+				new Stop(0, Color.LIGHTGRAY), new Stop(1, Color.GRAY));
+		setBackground(new Background(new BackgroundFill(grad, 
+        		null, null)));
 	}
 	
 	/**
@@ -47,14 +58,17 @@ public class GridView extends Pane
 		viewed = grid;
 		getChildren().clear();
 		
-		if (grid == null)
-			return;
+		int cellSize = Grid.DEF_CELL_SIZE;
+		if (grid != null)
+			cellSize = grid.getCellSize();
 		
-		int cellSize = grid.getCellSize();
 		Rectangle clip = new Rectangle(0, 0, cellSize * cols, cellSize * rows);
+		clip.setArcHeight(CORNER_RADIUS);
+		clip.setArcWidth(CORNER_RADIUS);
 		setClip(clip);
 		
-		getChildren().add(grid);
+		if (grid != null)
+			getChildren().add(grid);
 		layoutChildren();
 		updatePos();
 	}

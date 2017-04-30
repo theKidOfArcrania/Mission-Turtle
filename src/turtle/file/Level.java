@@ -17,14 +17,8 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import turtle.core.Actor;
-import turtle.core.Cell;
-import turtle.core.Component;
-import turtle.core.Grid;
-import turtle.core.Location;
-import turtle.core.TileSet;
+import turtle.core.*;
 
-//TODO: load level into grid.
 public class Level
 {
 	private boolean loaded;
@@ -40,22 +34,8 @@ public class Level
 	private ArrayList<CompSpec> cells = new ArrayList<>();
 	private ArrayList<CompSpec> actors = new ArrayList<>();
 	
-	/**
-	 * Constructs a new blank level, that can be edited and saved.
-	 * @param name the name of this level.
-	 * @param rows the number of rows.
-	 * @param cols the number of columns.
-	 */
-	public Level(String name, int rows, int cols)
-	{
-		this.name = name;
-		this.rows = rows;
-		this.cols = cols;
-		this.loaded = true;
-		this.offset = -1;
-		this.foodReq = -1;
-		this.timeLimit = -1;
-	}
+	//Set by LevelPack.
+	LevelPack parent; 
 	
 	/**
 	 * Constructs a new level from a file offset pointing to level.
@@ -66,29 +46,44 @@ public class Level
 	{
 		if (offset < 0)
 			throw new IllegalArgumentException("Negative file offset");
+		this.parent = null;
 		this.offset = offset;
 		this.rows = -1;
 		this.cols = -1;
-		this.foodReq = -1;
+		this.foodReq = 0;
 		this.timeLimit = -1;
 	}
 	
 	/**
-	 * Determines whether if this level object is editable or not.
-	 * @return true if editable, false if read-only.
+	 * Constructs a new blank level, that can be edited and saved.
+	 * @param name the name of this level.
+	 * @param rows the number of rows.
+	 * @param cols the number of columns.
 	 */
-	public boolean isEditable()
+	public Level(String name, int rows, int cols)
 	{
-		return offset == -1;
+		this.parent = null;
+		this.name = name;
+		this.rows = rows;
+		this.cols = cols;
+		this.loaded = true;
+		this.offset = -1;
+		this.foodReq = 0;
+		this.timeLimit = -1;
 	}
 	
 	/**
-	 * Determines whether if this level object has already been loaded.
-	 * @return true if loaded, false if it is not loaded.
+	 * Creates the grid that is specified by this level data.
+	 * @return an interactable live Grid.
 	 */
-	public boolean isLoaded()
+	public Grid createLevel()
 	{
-		return loaded;
+		Grid g = new Grid(rows, cols);
+		for (CompSpec spec : cells)
+			g.placeCell((Cell)spec.createComponent());
+		for (CompSpec spec : actors)
+			g.placeActor((Actor)spec.createComponent());
+		return g;
 	}
 	
 	/**
@@ -120,36 +115,43 @@ public class Level
 	}
 	
 	/**
+	 * @return the number of cols
+	 */
+	public int getCols()
+	{
+		return cols;
+	}
+	
+	/**
+	 * @return the food requirement count
+	 */
+	public int getFoodRequirement()
+	{
+		return foodReq;
+	}
+
+	/**
+	 * @return the parent level pack
+	 */
+	public LevelPack getPack()
+	{
+		return parent;
+	}
+	
+	/**
 	 * @return the current level name
 	 */
 	public String getName()
 	{
 		return name;
 	}
-
-	/**
-	 * Creates the grid that is specified by this level data.
-	 * @return an interactable live Grid.
-	 */
-	public Grid createLevel()
-	{
-		Grid g = new Grid(rows, cols);
-		for (CompSpec spec : cells)
-			g.placeCell((Cell)spec.createComponent());
-		for (CompSpec spec : actors)
-			g.placeActor((Actor)spec.createComponent());
-		return g;
-	}
 	
 	/**
-	 * @param name the new level name
-	 * @throws IllegalStateException if level is not editable
+	 * @return the number of rows
 	 */
-	public void setName(String name)
+	public int getRows()
 	{
-		if (!isEditable())
-			throw new IllegalStateException("Level is not editable!");
-		this.name = name;
+		return rows;
 	}
 
 	/**
@@ -161,49 +163,21 @@ public class Level
 	}
 
 	/**
-	 * @param timeLimit the new time limit
-	 * @throws IllegalStateException if level is not editable
+	 * Determines whether if this level object is editable or not.
+	 * @return true if editable, false if read-only.
 	 */
-	public void setTimeLimit(int timeLimit)
+	public boolean isEditable()
 	{
-		if (!isEditable())
-			throw new IllegalStateException("Level is not editable!");
-		this.timeLimit = timeLimit;
+		return offset == -1;
 	}
 
 	/**
-	 * @return the food requirement count
+	 * Determines whether if this level object has already been loaded.
+	 * @return true if loaded, false if it is not loaded.
 	 */
-	public int getFoodRequirement()
+	public boolean isLoaded()
 	{
-		return foodReq;
-	}
-
-	/**
-	 * @param foodReq the new food requirement count
-	 * @throws IllegalStateException if level is not editable
-	 */
-	public void setFoodReqirement(int foodReq)
-	{
-		if (!isEditable())
-			throw new IllegalStateException("Level is not editable!");
-		this.foodReq = foodReq;
-	}
-
-	/**
-	 * @return the number of rows
-	 */
-	public int getRows()
-	{
-		return rows;
-	}
-
-	/**
-	 * @return the number of cols
-	 */
-	public int getCols()
-	{
-		return cols;
+		return loaded;
 	}
 
 	/**
@@ -244,7 +218,7 @@ public class Level
 		
 		loaded = true;
 	}
-	
+
 	/**
 	 * Stores the level at the current position in file.
 	 * @param raf the file to write to.
@@ -271,6 +245,46 @@ public class Level
 			writeCompSpec(raf, spec);
 		for (CompSpec spec : actors)
 			writeCompSpec(raf, spec);
+	}
+
+	/**
+	 * @param foodReq the new food requirement count
+	 * @throws IllegalStateException if level is not editable
+	 * @throws IllegalArgumentException if new food count is negative.
+	 */
+	public void setFoodReqirement(int foodReq)
+	{
+		if (!isEditable())
+			throw new IllegalStateException("Level is not editable!");
+		if (foodReq < 0)
+			throw new IllegalArgumentException("Food requirement must be " 
+					+ "non-negative");
+		this.foodReq = foodReq;
+	}
+
+	/**
+	 * @param name the new level name
+	 * @throws IllegalStateException if level is not editable
+	 */
+	public void setName(String name)
+	{
+		if (!isEditable())
+			throw new IllegalStateException("Level is not editable!");
+		this.name = name;
+	}
+	
+	/**
+	 * @param timeLimit the new time limit
+	 * @throws IllegalStateException if level is not editable
+	 * @throws IllegalArgumentException if time limit is not positive or -1.
+	 */
+	public void setTimeLimit(int timeLimit)
+	{
+		if (!isEditable())
+			throw new IllegalStateException("Level is not editable!");
+		if (timeLimit == 0 || timeLimit < -1)
+			throw new IllegalArgumentException("Illegal time value");
+		this.timeLimit = timeLimit;
 	}
 	
 	/**
@@ -299,7 +313,8 @@ public class Level
 	 * @param raf the file to write to
 	 * @param component specification to write
 	 */
-	private void writeCompSpec(RandomAccessFile raf, CompSpec spec) throws IOException
+	private void writeCompSpec(RandomAccessFile raf, CompSpec spec) throws 
+		IOException
 	{
 		Location loc = spec.getLocation();
 		raf.write(loc.getRow());
