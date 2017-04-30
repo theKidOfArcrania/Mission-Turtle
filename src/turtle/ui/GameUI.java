@@ -18,32 +18,25 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 import turtle.comp.Player;
 import turtle.core.Actor;
 import turtle.core.GridView;
 import turtle.file.Level;
 
+import static turtle.ui.GameMenuUI.ID_EXIT;
+import static turtle.ui.GameMenuUI.ID_MAINMENU;
+import static turtle.ui.GameMenuUI.ID_RESTART;
+import static turtle.ui.GameMenuUI.ID_RESUME;
+
 public class GameUI extends VBox
 {
 
-	private static final Color DARKGRAY = Color.web("#505050");
-	
-	private static final double DEF_FONT_SIZE = 18.0;
+	private static final double SEMI_TRANS_ALPHA = .5;
 
-	private static final double GAP_INSET = 5.0;
-	private static final double LARGE_GAP_INSET = 20.0;
-	private static final double FRAME_WIDTH = 10.0;
-
-	private static final Duration FRAME_DURATION = Duration.millis(20);
-
-	private static final int SECS_IN_MIN = 60;
-
-	private static final Duration FADE_DURATION = Duration.seconds(.5);
-	
 	/**
 	 * Runs the game timer, keep tracks of the game states each frame.
 	 */
@@ -69,11 +62,14 @@ public class GameUI extends VBox
 		public void interpolate(double frac)
 		{
 			if (frac == 1)
-			{
-				//Next frame
+			{ //Next frame
 				Player p = view.getPlayer();
 				view.updateFrame(frame);
+				
+				if (timeLeft != -1 && frame % FRAME_PER_SEC == 0)
+					timeLeft--;
 				updateUI();
+				
 				if (p.isDead())
 					stop(); //TODO: stop game and drop curtains.
 				frame++;
@@ -91,34 +87,52 @@ public class GameUI extends VBox
 		}
 	}
 	
+	private static final Color DARKGRAY = Color.web("#505050");
+
+	private static final double GAP_INSET = 5.0;
+	private static final double LARGE_GAP_INSET = 20.0;
+	private static final double FRAME_WIDTH = 10.0;
+
+	private static final Duration FRAME_DURATION = Duration.millis(20);
+	private static final int FRAME_PER_SEC = 50;
+	private static final int SECS_IN_MIN = 60;
+	private static final Duration FADE_DURATION = Duration.seconds(.5);
+	
 	/* UI elements */
 	private HBox pnlBar;
     private Label lblPackName;
     private Label lblLevelName;
     private Label lblMenu;
     private StackPane pnlFrame;
+    private StackPane pnlMenuBack;
     private HBox pnlStatus;
     private StackPane pnlMessagePanel;
     private Label lblFood;
     private Label lblTime;
     private Label lblMsg;
+    
+    private GameMenuUI pnlMenuDialog;
 	
     /* Game-related stuff */
 	private final GridView view;
 	private final GameTimer runner;
-	private boolean started;
 	
 	private int foodLeft;
-	private int timeLeft; 
+	private int timeLeft;
+	
+	private boolean started;
+	private boolean paused;
 	
 	/**
 	 * Creates a new GameUI and initializes UI.
 	 */
 	public GameUI()
 	{
+		pnlMenuDialog = new GameMenuUI(this);
 		view = new GridView(null);
 		runner = new GameTimer();
 		started = false;
+		paused = false;
 		
 		foodLeft = 0;
 		timeLeft = -1;
@@ -138,6 +152,9 @@ public class GameUI extends VBox
 			@Override
 			public void handle(KeyEvent event)
 			{
+				if (paused)
+					return;
+				
 				int dir = -1;
 				
 				Player p = view.getPlayer();
@@ -158,26 +175,131 @@ public class GameUI extends VBox
 				case DOWN:
 				case S:
 					dir = Actor.SOUTH;
+					break;
+				case SPACE:
+					startGame();
 				}
 				
-				//TODO: start game when player makes first move.
 				if (dir != -1)
+				{
+					startGame();
 					p.traverseDirection(dir);
+				}
+				
 			}
 		});
-	} 
-	
-	/**
-	 * Starts the game play, unpausing the game timer (if it hasn't
-	 * already started).
-	 */
-	public void startGame()
-	{
-		if (!started)
-			runner.play();
-		started = true;
 	}
 	
+	/**
+	 * Handles the different actions a user clicks on the menu. Should 
+	 * only be internally called by GameMenuUI.
+	 * 
+	 * @param id the id of action
+	 */
+	void handleGameMenu(int id)
+	{
+		//TODO: actions here.
+		switch (id)
+		{
+			case ID_RESUME:
+				break;
+			case ID_RESTART:
+				break;
+			case ID_MAINMENU:
+				break;
+			case ID_EXIT:
+				break;
+			default:
+				return;
+		}
+		
+		resumeGame();
+		pnlMenuBack.setVisible(false);
+	}
+	
+	/**
+	 * Initializes the top bar UI, contains the level name, and also menu
+	 * button.
+	 */
+	private void initBarUI()
+	{
+		pnlBar = new HBox();
+		
+		lblPackName = new Label("[Level Pack]:");
+		lblPackName.getStyleClass().add("bold");
+        HBox.setMargin(lblPackName, new Insets(0, GAP_INSET, 0, GAP_INSET));
+
+        lblLevelName = new Label("[Level name]");
+
+        Pane spacing = new Pane();
+        HBox.setHgrow(spacing, Priority.ALWAYS);
+
+        //TODO: menu button.
+        lblMenu = new Label("Menu");
+        lblMenu.getStyleClass().add("lbutton");
+        lblMenu.setPadding(new Insets(0, GAP_INSET, 0, GAP_INSET));
+        HBox.setMargin(lblMenu, new Insets(0, GAP_INSET, 0, GAP_INSET));
+        
+        /** Handler called when user clicks menu button. */
+        lblMenu.setOnMouseClicked(new EventHandler<MouseEvent>()
+		{
+
+        	/**
+        	 * Shows the game menu dialog when the user clicks button.
+        	 * @param event the associated event with click.
+        	 */
+			@Override
+			public void handle(MouseEvent event)
+			{
+				pauseGame();
+				pnlMenuBack.setVisible(true);
+			}
+		});
+        
+        pnlBar.getChildren().addAll(lblPackName, lblLevelName, spacing, 
+        		lblMenu);
+	}
+	
+	/**
+	 * Initializes the game view UI area. (Has grid view).
+	 */
+	private void initGameView()
+	{
+        StackPane.setMargin(view, new Insets(FRAME_WIDTH));
+        view.setEffect(new DropShadow());
+        
+        pnlMenuBack = new StackPane();
+        pnlMenuBack.setBackground(new Background(new BackgroundFill(
+        		Color.grayRgb(0, SEMI_TRANS_ALPHA), null, null)));
+        pnlMenuBack.setVisible(false);
+        pnlMenuBack.getChildren().add(pnlMenuDialog);
+        
+        /** Exits menu dialog when clicked */
+        pnlMenuBack.setOnMouseClicked(new EventHandler<MouseEvent>()
+		{
+
+        	/** 
+        	 * Exits menu dialog as if user clicked "Resume"
+        	 * @param event associated mouse click event object
+        	 */
+			@Override
+			public void handle(MouseEvent event)
+			{
+				handleGameMenu(ID_RESUME);
+			}
+        	
+		});
+        
+        pnlFrame = new StackPane();
+        VBox.setVgrow(pnlFrame, javafx.scene.layout.Priority.ALWAYS);
+        pnlFrame.setBackground(new Background(new BackgroundFill(DARKGRAY, 
+        		null, null)));
+        pnlFrame.setEffect(new InnerShadow());
+        pnlFrame.getChildren().addAll(view, pnlMenuBack);
+        
+        
+	}
+
 	/**
 	 * Initializes this Game UI with the level.
 	 * @param lvl the level to initialize with.
@@ -197,36 +319,6 @@ public class GameUI extends VBox
 		
 		updateUI();
 	}
-	
-	/**
-	 * Initializes UI for GameUI
-	 */
-	private void initUI()
-	{
-		initBarUI();
-        initGameView();
-        initStatusUI();
-        
-        setBackground(new Background(new BackgroundFill(Color.BLACK, 
-        		null, null)));
-        getChildren().addAll(pnlBar, pnlFrame, pnlStatus);
-	}
-	
-	/**
-	 * Initializes the game view UI area. (Has grid view).
-	 */
-	private void initGameView()
-	{
-        StackPane.setMargin(view, new Insets(FRAME_WIDTH));
-        view.setEffect(new DropShadow());
-        
-        pnlFrame = new StackPane();
-        VBox.setVgrow(pnlFrame, javafx.scene.layout.Priority.ALWAYS);
-        pnlFrame.setBackground(new Background(new BackgroundFill(DARKGRAY, 
-        		null, null)));
-        pnlFrame.setEffect(new InnerShadow());
-        pnlFrame.getChildren().add(view);
-	}
 
 	/**
 	 * Initializes the status bar UI, containing user status information.
@@ -239,97 +331,35 @@ public class GameUI extends VBox
         HBox.setHgrow(pnlMessagePanel, javafx.scene.layout.Priority.ALWAYS);
         
         Label lblLabelFood = new Label("Food Left:");
-        lblLabelFood.setTextFill(javafx.scene.paint.Color.WHITE);
-        lblLabelFood.setFont(new Font("System Bold", DEF_FONT_SIZE));
+        lblLabelFood.getStyleClass().add("bold");
 
         lblFood = new Label("0000000000");
-        lblFood.setTextFill(javafx.scene.paint.Color.WHITE);
-        lblFood.setFont(new Font(DEF_FONT_SIZE));
         HBox.setMargin(lblFood, new Insets(0, GAP_INSET, 0, GAP_INSET));
 
         Pane spacing = new Pane();
-        HBox.setHgrow(spacing, javafx.scene.layout.Priority.NEVER);
+        HBox.setHgrow(spacing, Priority.NEVER);
         spacing.setPrefHeight(0);
         spacing.setPrefWidth(LARGE_GAP_INSET);
 
         Label lblLabelTime = new Label("Time Left:");
-        lblLabelTime.setTextFill(javafx.scene.paint.Color.WHITE);
-        lblLabelTime.setFont(new Font("System Bold", DEF_FONT_SIZE));
+        lblLabelTime.getStyleClass().add("bold");
 
         lblTime = new Label("--:--");
-        lblTime.setTextFill(javafx.scene.paint.Color.WHITE);
-        lblTime.setFont(new Font(DEF_FONT_SIZE));
         lblTime.setPadding(new Insets(0, GAP_INSET, 0, GAP_INSET));
         pnlStatus.getChildren().addAll(pnlMessagePanel, lblLabelFood, lblFood,
         		spacing, lblLabelTime, lblTime);
 	}
-
-	/**
-	 * Initializes the top bar UI, contains the level name, and also menu
-	 * button.
-	 */
-	private void initBarUI()
-	{
-		pnlBar = new HBox();
-		
-		lblPackName = new Label("[Level Pack]:");
-        lblPackName.setTextFill(javafx.scene.paint.Color.WHITE);
-        lblPackName.setFont(new Font("System Bold", DEF_FONT_SIZE));
-        HBox.setMargin(lblPackName, new Insets(0, GAP_INSET, 0, GAP_INSET));
-
-        lblLevelName = new Label("[Level name]");
-        lblLevelName.setTextFill(javafx.scene.paint.Color.WHITE);
-        lblLevelName.setFont(new Font(DEF_FONT_SIZE));
-
-        Pane spacing = new Pane();
-        HBox.setHgrow(spacing, javafx.scene.layout.Priority.ALWAYS);
-
-        //TODO: menu button.
-        lblMenu = new Label("Menu");
-        lblMenu.setTextFill(javafx.scene.paint.Color.WHITE);
-        lblMenu.setFont(new Font(DEF_FONT_SIZE));
-        HBox.setMargin(lblMenu, new Insets(0, GAP_INSET, 0, GAP_INSET));
-        
-        pnlBar.getChildren().addAll(lblPackName, lblLevelName, spacing, 
-        		lblMenu);
-	}
 	
 	/**
-	 * Update the dynamic parts of this UI to reflect the game status.
+	 * Initializes UI for GameUI
 	 */
-	private void updateUI()
+	private void initUI()
 	{
-		lblFood.setText(String.format("%010d", foodLeft));
-		
-		if (timeLeft == -1)
-			lblTime.setText("--:--");
-		else
-		{
-			int min = timeLeft / SECS_IN_MIN;
-			int sec = timeLeft % SECS_IN_MIN;
-			lblTime.setText(String.format("%02d:%02d", min, sec));
-		}
-		
-		Player p = view.getPlayer();
-		String msg = "";
-		
-		if (p != null)
-			msg = p.getMessage();
-		
-		if (!lblMsg.getText().equals(msg))
-		{
-			if (lblMsg != null)
-			{
-				messageEdit(false, lblMsg);
-				lblMsg = null;
-			}
-			if (!msg.isEmpty())
-			{
-				lblMsg = new Label(msg);
-				lblMsg.setFont(new Font("System Italic", DEF_FONT_SIZE));
-				messageEdit(true, lblMsg);
-			}
-		}
+		initBarUI();
+        initGameView();
+        initStatusUI();
+        
+        getChildren().addAll(pnlBar, pnlFrame, pnlStatus);
 	}
 	
 	/**
@@ -367,6 +397,79 @@ public class GameUI extends VBox
 					fade.setOnFinished(null); //Prevent memory leakage.
 				}
 			});
+		}
+	}
+	
+	/**
+	 * Pauses the game. Does nothing if it already is paused
+	 * or if game hasn't started.
+	 */
+	private void pauseGame()
+	{
+		if (paused || !started)
+			return;
+		runner.pause();
+		paused = true;
+	}
+	
+	/**
+	 * Resumes the game after a pause. Does nothing if it 
+	 * already is unpaused, or if game hasn't started.
+	 */
+	private void resumeGame()
+	{
+		if (!paused || !started)
+			return;
+		runner.play();
+		paused = false;
+	}
+	
+	/**
+	 * Starts the game play and the game timer (if it hasn't
+	 * already started).
+	 */
+	private void startGame()
+	{
+		if (!started)
+			runner.play();
+		started = true;
+	}
+	
+	/**
+	 * Update the dynamic parts of this UI to reflect the game status.
+	 */
+	private void updateUI()
+	{
+		lblFood.setText(String.format("%010d", foodLeft));
+		
+		if (timeLeft == -1)
+			lblTime.setText("--:--");
+		else
+		{
+			int min = timeLeft / SECS_IN_MIN;
+			int sec = timeLeft % SECS_IN_MIN;
+			lblTime.setText(String.format("%02d:%02d", min, sec));
+		}
+		
+		Player p = view.getPlayer();
+		String msg = "";
+		
+		if (p != null)
+			msg = p.getMessage();
+		
+		if (!lblMsg.getText().equals(msg))
+		{
+			if (lblMsg != null)
+			{
+				messageEdit(false, lblMsg);
+				lblMsg = null;
+			}
+			if (!msg.isEmpty())
+			{
+				lblMsg = new Label(msg);
+				lblMsg.getStyleClass().add("italic");
+				messageEdit(true, lblMsg);
+			}
 		}
 	}
 }

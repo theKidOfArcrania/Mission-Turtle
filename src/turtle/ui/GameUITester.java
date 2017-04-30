@@ -26,9 +26,12 @@ public class GameUITester extends Application
 	{
 		GameUI gui = new GameUI();
 		Scene s = new Scene(gui);
+		s.getStylesheets().add("/turtle/ui/styles.css");
 		
 		primaryStage.setScene(s);
+		primaryStage.setResizable(false);
 		primaryStage.show();
+		
 	}
 
 }
