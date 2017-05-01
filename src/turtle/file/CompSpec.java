@@ -66,18 +66,25 @@ public class CompSpec
 		this.loc = loc;
 		this.slot = slot;
 		
-		try (ObjectInputStream ois = new ObjectInputStream(
-				new ByteArrayInputStream(data)))
+		if (data != null && data.length > 0)
 		{
-			Object o = ois.readObject();
-			if (o instanceof Map)
-				this.params = new HashMap<>((Map<String, Object>)o);
-			else
-				throw new IOException("Corrupted params data");
+			try (ObjectInputStream ois = new ObjectInputStream(
+					new ByteArrayInputStream(data)))
+			{
+				Object o = ois.readObject();
+				if (o instanceof Map)
+					this.params = new HashMap<>((Map<String, Object>)o);
+				else
+					throw new IOException("Corrupted params data");
+			}
+			catch (ClassNotFoundException e)
+			{
+				throw new IOException(e);
+			}
 		}
-		catch (ClassNotFoundException e)
+		else
 		{
-			throw new IOException(e);
+			this.params = new HashMap<>();
 		}
 	}
 	

@@ -9,6 +9,11 @@
 
 package turtle.ui;
 
+import static turtle.ui.GameMenuUI.ID_EXIT;
+import static turtle.ui.GameMenuUI.ID_MAINMENU;
+import static turtle.ui.GameMenuUI.ID_RESTART;
+import static turtle.ui.GameMenuUI.ID_RESUME;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.Transition;
 import javafx.event.ActionEvent;
@@ -19,18 +24,20 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import turtle.comp.Player;
 import turtle.core.Actor;
 import turtle.core.GridView;
 import turtle.file.Level;
-
-import static turtle.ui.GameMenuUI.ID_EXIT;
-import static turtle.ui.GameMenuUI.ID_MAINMENU;
-import static turtle.ui.GameMenuUI.ID_RESTART;
-import static turtle.ui.GameMenuUI.ID_RESUME;
+import turtle.file.LevelPack;
 
 public class GameUI extends VBox
 {
@@ -66,7 +73,7 @@ public class GameUI extends VBox
 				Player p = view.getPlayer();
 				view.updateFrame(frame);
 				
-				if (timeLeft != -1 && frame % FRAME_PER_SEC == 0)
+				if (timeLeft != -1 && frame % FRAMES_PER_SEC == 0)
 					timeLeft--;
 				updateUI();
 				
@@ -93,8 +100,9 @@ public class GameUI extends VBox
 	private static final double LARGE_GAP_INSET = 20.0;
 	private static final double FRAME_WIDTH = 10.0;
 
-	private static final Duration FRAME_DURATION = Duration.millis(20);
-	private static final int FRAME_PER_SEC = 50;
+	private static final int FRAMES_PER_SEC = 50;
+	private static final Duration FRAME_DURATION = Duration.seconds(1.0 / 
+			FRAMES_PER_SEC);
 	private static final int SECS_IN_MIN = 60;
 	private static final Duration FADE_DURATION = Duration.seconds(.5);
 	
@@ -114,6 +122,7 @@ public class GameUI extends VBox
     private GameMenuUI pnlMenuDialog;
 	
     /* Game-related stuff */
+    private LevelPack currentPack;
 	private final GridView view;
 	private final GameTimer runner;
 	
@@ -188,6 +197,17 @@ public class GameUI extends VBox
 				
 			}
 		});
+	}
+	
+	/**
+	 * Initializes this GameUI with a level pack.
+	 * @param pck the pack to use.
+	 */
+	public void initLevelPack(LevelPack pck)
+	{
+		//TODO: load scores. start from chosen level.
+		currentPack = pck;
+		initLevel(currentPack.getLevel(0));
 	}
 	
 	/**
@@ -453,11 +473,17 @@ public class GameUI extends VBox
 		
 		Player p = view.getPlayer();
 		String msg = "";
+		String oldMsg = "";
 		
+		if (lblMsg != null)
+			oldMsg = lblMsg.getText();
+		if (oldMsg == null)
+			oldMsg = "";
 		if (p != null)
 			msg = p.getMessage();
 		
-		if (!lblMsg.getText().equals(msg))
+		
+		if (!oldMsg.equals(msg))
 		{
 			if (lblMsg != null)
 			{

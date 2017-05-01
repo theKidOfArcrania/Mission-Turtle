@@ -13,6 +13,7 @@ package turtle.core;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import turtle.comp.Player;
+import turtle.comp.TestCell;
 
 public class TileSet
 {
@@ -27,7 +28,7 @@ public class TileSet
 	{
 		tileset = new Image(ClassLoader.getSystemResourceAsStream(
 				"tileset.png"));
-		compIndex = new Class[]{Player.class};
+		compIndex = new Class[]{TestCell.class, Player.class};
 		//TODO: finish all component indexes.
 	}
 	

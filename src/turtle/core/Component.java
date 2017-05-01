@@ -20,30 +20,91 @@ import javafx.scene.layout.Pane;
 
 public abstract class Component extends Pane 
 {
+	public static final int DEF_ANIMATION_FRAME_CHANGE = 2;
+	
 	public static final double MOVE_SPEED = 10.0;
 	
 	public static final TileSet DEFAULT_SET = new TileSet();
 	
+	private final TileSet ts;
 	private final ImageView img;
 	private final Location headLoc;
 	private final Location trailLoc;
 	private Grid parent;
+	
+	private long curFrame;
+	
+	private long animationOffset;
+	private int[] imageFrames;
+	private int changeRate;
+	private boolean animationCycle;
 	
 	/**
 	 * Constructs a new component with the image background.
 	 */
 	protected Component()
 	{
+		ts = DEFAULT_SET;
+		
 		img = new ImageView();
 		this.getChildren().add(img);
 		
 		headLoc = new Location();
 		trailLoc = new Location();
 		
-		img.setImage(DEFAULT_SET.getTileset());
+		img.setImage(ts.getTileset());
 		img.setViewport(new Rectangle2D(0, 0, 0, 0));
+		
+		curFrame = 0;
+		animationOffset = -1;
+		imageFrames = null;
+		changeRate = -1;
 	}
 
+	/**
+	 * Animates component through a series of frames at the default
+	 * change rate (change once per 2 frames).
+	 * @param imageFrames the animation frames to animate through.
+	 * @param animationCycle true to cycle through frames, false to run once. 
+	 * @throws IndexOutOfBoundsException if any of the frame indexes are 
+	 * 		out of bounds.
+	 * @throws IllegalArgumentException if the changeRate is not positive.
+	 * @see #animateFrames(int[], boolean, int)
+	 */
+	public void animateFrames(int[] imageFrames, boolean animationCycle)
+	{
+		animateFrames(imageFrames, animationCycle, DEF_ANIMATION_FRAME_CHANGE);
+	}
+	
+	/**
+	 * Sets this component to animate through the frames indexes at a
+	 * specified change rate.
+	 * 
+	 * @param imageFrames the image frames to animate through.
+	 * @param animationCycle true to cycle through frames, false to run once. 
+	 * @param changeRate the number of frames to wait between frames.
+	 * @throws IndexOutOfBoundsException if any of the frame indexes are 
+	 * 		out of bounds.
+	 * @throws IllegalArgumentException if the changeRate is not positive.
+	 */
+	public void animateFrames(int[] imageFrames, boolean animationCycle, 
+			int changeRate)
+	{
+		//Test for index out of bounds.
+		for (int f : imageFrames)
+			ts.frameAt(f); 
+		
+		if (changeRate <= 0)
+			throw new IllegalArgumentException("changeRate must be positive.");
+		
+		animationOffset = curFrame;
+		this.animationCycle = animationCycle;
+		this.imageFrames = imageFrames;
+		this.changeRate = changeRate;
+		
+		img.setViewport(ts.frameAt(imageFrames[0]));
+	}
+	
 	/**
 	 * Changes any parameters (if any) associated with this component.
 	 * Any subclasses overriding this method is STRONLY advised to 
@@ -100,12 +161,17 @@ public abstract class Component extends Pane
 	}
 	
 	/**
-	 * Sets the image of this component to the given index.
+	 * Sets the image of this component to the given index and disables
+	 * any current animations.
 	 * @param index the index from the TileSet of frames.
+	 * @throws IndexOutOfBoundsException if image frame index is out of bounds.
 	 */
 	public void setImageFrame(int index)
 	{
-		img.setViewport(DEFAULT_SET.frameAt(index));
+		img.setViewport(ts.frameAt(index));
+		animationOffset = -1;
+		imageFrames = null;
+		changeRate = -1;
 	}
 	
 	/**
@@ -122,9 +188,44 @@ public abstract class Component extends Pane
 	 * Updates a frame of animation for a Component.
 	 * Note: Subclasses should ALWAYS call <code>super.updateFrame()</code>
 	 * in order that all the super classes get updated as well.
-	 * @return current frame number
+	 * @param frame current frame number
 	 */
 	public void updateFrame(long frame)
+	{
+		curFrame = frame;
+		updateAnimation(frame);
+		move();
+	}
+
+	/**
+	 * Updates the current image to step forward one frame if it is in a sequence
+	 * of animation.
+	 * @param frame the current frame number.
+	 */
+	private void updateAnimation(long frame)
+	{
+		if (animationOffset != -1 && (frame - animationOffset) % changeRate == 0)
+		{
+			int stepInd = (int)((frame - animationOffset) / changeRate);
+			if (animationCycle)
+			{
+				stepInd %= imageFrames.length;
+				img.setViewport(ts.frameAt(stepInd));
+			}
+			else
+			{
+				if (stepInd >= imageFrames.length - 1)
+					setImageFrame(imageFrames[imageFrames.length - 1]);
+				else
+					img.setViewport(ts.frameAt(stepInd));
+			}
+		}
+	}
+
+	/**
+	 * Moves this component one frame step in the direction it is moving if any.
+	 */
+	private void move()
 	{
 		if (parent != null)
 		{

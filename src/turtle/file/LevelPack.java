@@ -63,8 +63,9 @@ public class LevelPack
 	/**
 	 * Creates a new editable LevelPack, initially with no levels
 	 */
-	public LevelPack()
+	public LevelPack(String name)
 	{
+		this.name = name;
 		this.levelOffsets = null;
 		this.levelPackID = UUID.randomUUID();
 		this.levels = new ArrayList<>();
