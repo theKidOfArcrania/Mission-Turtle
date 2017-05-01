@@ -27,18 +27,15 @@ public class GameMenuUI extends VBox
 	public static final int ID_PAUSED = 0;
 	public static final int ID_RESUME = 1;
 	public static final int ID_RESTART = 2;
-	public static final int ID_MAINMENU = 3;
-	public static final int ID_EXIT = 4;
+	public static final int ID_LEVELSELECT = 3;
+	public static final int ID_MAINMENU = 4;
+	public static final int ID_EXIT = 5;
 	
 	private static final double BORDER = 2.0;
 	private static final Insets MARGIN_INSET = new Insets(0.0, 5, 5, 5);
 	
     private final Label lblTitle;
     private final Separator separator;
-    private final Label lblResume;
-    private final Label lblRestart;
-    private final Label lblMainMenu;
-    private final Label lblExit;
     
     private final GameUI parent;
     
@@ -50,17 +47,18 @@ public class GameMenuUI extends VBox
     	this.parent = parent;
     	
         lblTitle = createButton(ID_PAUSED, "Paused", false);
-        lblResume = createButton(ID_RESUME, "Resume", true);
-        lblRestart = createButton(ID_RESTART, "Restart Level", true);
-        lblMainMenu = createButton(ID_MAINMENU, "Main Menu", true);
-        lblExit = createButton(ID_EXIT, "Exit", true);
-
+        
 		separator = new Separator();
         separator.setStyle("-fx-background-color: WHITE;");
         VBox.setMargin(separator, MARGIN_INSET);
 
-        getChildren().addAll(lblTitle, separator, lblResume, lblRestart, 
-			lblMainMenu, lblExit);
+        getChildren().addAll(lblTitle, separator, 
+    		createButton(ID_RESUME, "Resume", true),
+    		createButton(ID_RESTART, "Restart Level", true),
+    		createButton(ID_LEVELSELECT, "Level Select", true),
+    		createButton(ID_MAINMENU, "Main Menu", true),
+    		createButton(ID_EXIT, "Exit", true)
+        );
 		
         setBackground(new Background(new BackgroundFill(Color.BLACK, 
         		null, null)));

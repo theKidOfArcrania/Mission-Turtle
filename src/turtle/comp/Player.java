@@ -17,6 +17,7 @@ public class Player extends Actor
 {
 	private Component msgSender;
 	private String msg;
+	private boolean winner;
 	
 	/**
 	 * Interacts with other actors. This does nothing since every actor
@@ -41,10 +42,19 @@ public class Player extends Actor
 	{
 		return PLAYER;
 	}
-
+	
+	/**
+	 * Determines whether if player won the game.
+	 * @return true if player won, false if game is still running.
+	 */
+	public boolean isWinner()
+	{
+		return winner;
+	}
+	
 	/**
 	 * @return the message that the player should see now. Never returns null.
-	 * @see #setMessage(String)
+	 * @see #setMessage(String, Component)
 	 */
 	public String getMessage()
 	{
@@ -78,5 +88,13 @@ public class Player extends Actor
 	{
 		if (msgSender == sender)
 			this.msg = null;
+	}
+	
+	/**
+	 * Flags that the player has won the game.
+	 */
+	public void win()
+	{
+		winner = true;
 	}
 }

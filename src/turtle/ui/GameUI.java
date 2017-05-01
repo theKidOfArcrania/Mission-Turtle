@@ -9,11 +9,6 @@
 
 package turtle.ui;
 
-import static turtle.ui.GameMenuUI.ID_EXIT;
-import static turtle.ui.GameMenuUI.ID_MAINMENU;
-import static turtle.ui.GameMenuUI.ID_RESTART;
-import static turtle.ui.GameMenuUI.ID_RESUME;
-
 import javafx.animation.FadeTransition;
 import javafx.animation.Transition;
 import javafx.event.ActionEvent;
@@ -24,20 +19,17 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import turtle.comp.Player;
 import turtle.core.Actor;
+import turtle.core.Grid;
 import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
+
+import static turtle.ui.GameMenuUI.*;
 
 public class GameUI extends VBox
 {
@@ -61,24 +53,18 @@ public class GameUI extends VBox
 		}
 		
 		/**
-		 * Handles each frame tick of the animation timer.
+		 * Handles each frame tick of the game (at 50fps). Delegate 
+		 * method to {@link turtle.ui.GameUI#updateFrame(long)}.
 		 * @param frac double from 0 to 1 to determine relative position. 
 		 * 		When it is 1, we update frame counter.
 		 */
 		@Override
 		public void interpolate(double frac)
 		{
-			if (frac == 1)
-			{ //Next frame
-				Player p = view.getPlayer();
-				view.updateFrame(frame);
-				
-				if (timeLeft != -1 && frame % FRAMES_PER_SEC == 0)
-					timeLeft--;
-				updateUI();
-				
-				if (p.isDead())
-					stop(); //TODO: stop game and drop curtains.
+
+			if (frac == 1) // Next Frame
+			{
+				updateFrame(frame);
 				frame++;
 			}
 		}
@@ -148,6 +134,9 @@ public class GameUI extends VBox
 		
 		initUI();
 		
+		setFocusTraversable(true);
+		requestFocus();
+		
 		/**
 		 * Event handler that listens to all key presses that occurs.
 		 */
@@ -161,9 +150,6 @@ public class GameUI extends VBox
 			@Override
 			public void handle(KeyEvent event)
 			{
-				if (paused)
-					return;
-				
 				int dir = -1;
 				
 				Player p = view.getPlayer();
@@ -185,11 +171,21 @@ public class GameUI extends VBox
 				case S:
 					dir = Actor.SOUTH;
 					break;
+				case ESCAPE:
+				case PAUSE:
+					if (pnlMenuBack.isVisible())
+						handleGameMenu(ID_RESUME);
+					else
+					{
+						pauseGame();
+						pnlMenuBack.setVisible(true);
+					}
+					break;
 				case SPACE:
 					startGame();
 				}
 				
-				if (dir != -1)
+				if (dir != -1 && !paused && p != null)
 				{
 					startGame();
 					p.traverseDirection(dir);
@@ -225,6 +221,8 @@ public class GameUI extends VBox
 				break;
 			case ID_RESTART:
 				break;
+			case ID_LEVELSELECT:
+				break;
 			case ID_MAINMENU:
 				break;
 			case ID_EXIT:
@@ -254,7 +252,6 @@ public class GameUI extends VBox
         Pane spacing = new Pane();
         HBox.setHgrow(spacing, Priority.ALWAYS);
 
-        //TODO: menu button.
         lblMenu = new Label("Menu");
         lblMenu.getStyleClass().add("lbutton");
         lblMenu.setPadding(new Insets(0, GAP_INSET, 0, GAP_INSET));
@@ -323,7 +320,7 @@ public class GameUI extends VBox
 	/**
 	 * Initializes this Game UI with the level.
 	 * @param lvl the level to initialize with.
-	 * @throws NullPointerException if lvl is null.
+	 * @throws NullPointerException if <code>lvl</code> is null.
 	 */
 	private void initLevel(Level lvl)
 	{
@@ -335,7 +332,9 @@ public class GameUI extends VBox
 		else
 			lblPackName.setText(lvl.getPack().getName() + ":");
 		lblLevelName.setText(lvl.getName());
-		//TODO: update grid.
+		
+		Grid g = lvl.createLevel();
+		view.initGrid(g);
 		
 		updateUI();
 	}
@@ -456,6 +455,38 @@ public class GameUI extends VBox
 	}
 	
 	/**
+	 * Updates next frame of game. 
+	 * @param frame current frame count.
+	 */
+	private void updateFrame(long frame)
+	{
+		view.updateFrame(frame);
+		if (timeLeft != -1 && frame % FRAMES_PER_SEC == 0)
+			timeLeft--;
+		updateUI();
+		
+		//Check player game-status.
+		String status = null;
+		boolean success = false;
+		
+		Player p = view.getPlayer();
+		if (p.isWinner())
+		{
+			status = "You Win!";
+			success = true;
+		}
+		else if (p.isDead())
+			status = "You Died!";
+		else if (timeLeft == 0)
+			status = "Time's Up!";
+		
+		if (status != null)
+		{
+			//TODO: show level-end dialog and maybe advance to next level.
+		}
+	}
+	
+	/**
 	 * Update the dynamic parts of this UI to reflect the game status.
 	 */
 	private void updateUI()
@@ -481,7 +512,6 @@ public class GameUI extends VBox
 			oldMsg = "";
 		if (p != null)
 			msg = p.getMessage();
-		
 		
 		if (!oldMsg.equals(msg))
 		{

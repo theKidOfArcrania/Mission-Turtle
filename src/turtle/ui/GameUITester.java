@@ -39,6 +39,8 @@ public class GameUITester extends Application
 		primaryStage.setResizable(false);
 		primaryStage.show();
 		
+		gui.requestFocus();
+		
 		LevelPack pack = generateTestPack();
 		gui.initLevelPack(pack);
 	}

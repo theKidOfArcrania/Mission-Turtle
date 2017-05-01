@@ -12,11 +12,7 @@
 
 package turtle.file;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,7 +100,8 @@ public class CompSpec
 			c.getHeadLocation().setLocation(loc);
 			c.getTrailingLocation().setLocation(loc);
 			return c;
-		} catch (InstantiationException | IllegalAccessException e)
+		} 
+		catch (InstantiationException | IllegalAccessException e)
 		{
 			e.printStackTrace();
 			throw new IllegalStateException("No no-arg constructor found");
