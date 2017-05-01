@@ -9,11 +9,7 @@
 
 package turtle.core;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -75,6 +71,7 @@ public class Grid extends Pane
 		
 		pnlBase = new ComponentPane();
 		pnlStage = new ComponentPane();
+		
 		getChildren().addAll(pnlBase, pnlStage);
 	}
 	
@@ -197,10 +194,11 @@ public class Grid extends Pane
 	 */
 	public boolean placeActor(Actor comp)
 	{
-		if (comp.getParentGrid() == null)
+		if (comp.getParentGrid() != null)
 			return false;
 		if (actorLocs.containsKey(comp))
 			return false;
+		
 		
 		Location loc = comp.getHeadLocation();
 		boolean success = checkVisit(comp, loc.getRow(), loc.getColumn());
@@ -216,15 +214,18 @@ public class Grid extends Pane
 			
 			List<Node> children = pnlStage.getChildren();
 			DominanceLevel test = comp.dominanceLevelFor(null);
-			for (int i = 0; i < children.size(); i++)
+			
+			int insertInd;
+			for (insertInd = 0; insertInd < children.size(); insertInd++)
 			{
-				if (children.get(i) instanceof Actor)
+				if (children.get(insertInd) instanceof Actor)
 				{
-					Actor child = (Actor) children.get(i);
+					Actor child = (Actor) children.get(insertInd);
 					if (child.dominanceLevelFor(null).compareTo(test) > 0)
 						break;
 				}
 			}
+			children.add(insertInd, comp);
 			actorLocs.put(comp, loc);
 		}
 		return success;
@@ -237,7 +238,7 @@ public class Grid extends Pane
 	 */
 	public boolean placeCell(Cell comp)
 	{
-		if (comp.getParentGrid() == null)
+		if (comp.getParentGrid() != null)
 			return false;
 		if (pnlBase.getChildren().contains(comp))
 			return false;
@@ -247,6 +248,10 @@ public class Grid extends Pane
 			return false;
 		
 		comp.setParentGrid(this);
+		comp.getTrailingLocation().setLocation(loc);
+		comp.setTranslateX(loc.getColumn() * cellSize);
+		comp.setTranslateY(loc.getRow() * cellSize);
+		
 		base[loc.getRow()][loc.getColumn()] = comp;
 		pnlBase.getChildren().add(comp);
 		return true;
@@ -324,13 +329,13 @@ public class Grid extends Pane
 	@Override
 	protected void layoutChildren()
 	{
-		double width = computePrefWidth(-1);
-		double height = computePrefHeight(-1);
+		double width = cellSize * cols;
+		double height = cellSize * rows;
+		
 		layoutInArea(pnlBase, 0, 0, width, height, 0, HPos.CENTER, 
 				VPos.CENTER);
 		layoutInArea(pnlStage, 0, 0, width, height, 0, HPos.CENTER, 
 				VPos.CENTER);
-		
 	}
 	
 	/**
@@ -359,6 +364,9 @@ public class Grid extends Pane
 		List<Actor> residents = getResidents(visitor, row, col);
 		for (Actor res : residents)
 		{
+			if (res == visitor)
+				continue;
+			
 			boolean result;
 			if (visitor.dominanceLevelFor(res).compareTo(
 					res.dominanceLevelFor(visitor)) >= 0)
@@ -368,6 +376,9 @@ public class Grid extends Pane
 			if (!result)
 				return false;
 		}
+		
+		visitor.getHeadLocation().setLocation(row, col);
+		
 		return true;
 	}
 	
@@ -380,6 +391,6 @@ public class Grid extends Pane
 	 */
 	private boolean isValidLocation(int row, int col)
 	{
-		return row >= 0 && col >= 0 && row < cellSize && col < cellSize;
+		return row >= 0 && col >= 0 && row < rows && col < cols;
 	}
 }

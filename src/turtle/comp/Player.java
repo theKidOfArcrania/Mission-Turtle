@@ -19,6 +19,11 @@ public class Player extends Actor
 	private String msg;
 	private boolean winner;
 	
+	public Player()
+	{
+		setImageFrame(3);
+	}
+	
 	/**
 	 * Interacts with other actors. This does nothing since every actor
 	 * should dominate over player.

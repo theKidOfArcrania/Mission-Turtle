@@ -108,6 +108,8 @@ public class GameUI extends VBox
     private GameMenuUI pnlMenuDialog;
 	
     /* Game-related stuff */
+    private int moveDir;
+    
     private LevelPack currentPack;
 	private final GridView view;
 	private final GameTimer runner;
@@ -131,6 +133,7 @@ public class GameUI extends VBox
 		
 		foodLeft = 0;
 		timeLeft = -1;
+		moveDir = -1;
 		
 		initUI();
 		
@@ -150,26 +153,24 @@ public class GameUI extends VBox
 			@Override
 			public void handle(KeyEvent event)
 			{
-				int dir = -1;
 				
-				Player p = view.getPlayer();
 				switch (event.getCode())
 				{
 				case LEFT:
 				case A:
-					dir = Actor.WEST;
+					moveDir = Actor.WEST;
 					break;
 				case UP:
 				case W:
-					dir = Actor.NORTH;
+					moveDir = Actor.NORTH;
 					break;
 				case RIGHT:
 				case D:
-					dir = Actor.EAST;
+					moveDir = Actor.EAST;
 					break;
 				case DOWN:
 				case S:
-					dir = Actor.SOUTH;
+					moveDir = Actor.SOUTH;
 					break;
 				case ESCAPE:
 				case PAUSE:
@@ -185,12 +186,9 @@ public class GameUI extends VBox
 					startGame();
 				}
 				
-				if (dir != -1 && !paused && p != null)
-				{
+				Player p = view.getPlayer();
+				if (moveDir != -1 && p != null)
 					startGame();
-					p.traverseDirection(dir);
-				}
-				
 			}
 		});
 	}
@@ -460,6 +458,15 @@ public class GameUI extends VBox
 	 */
 	private void updateFrame(long frame)
 	{
+		//Move player.
+		Player p = view.getPlayer();
+		if (moveDir != -1 && !p.isMoving())
+		{
+			p.traverseDirection(moveDir);
+			moveDir = -1;
+		}
+		
+		//Update grid stuff.
 		view.updateFrame(frame);
 		if (timeLeft != -1 && frame % FRAMES_PER_SEC == 0)
 			timeLeft--;
@@ -469,7 +476,6 @@ public class GameUI extends VBox
 		String status = null;
 		boolean success = false;
 		
-		Player p = view.getPlayer();
 		if (p.isWinner())
 		{
 			status = "You Win!";

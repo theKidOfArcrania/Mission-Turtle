@@ -129,6 +129,17 @@ public class Location implements Serializable
 			return false;
 		return true;
 	}
+
+	/**
+	 * Sets the location to a new row/column
+	 * @param row the row to move to.
+	 * @param col the column to move to.
+	 */
+	public void setLocation(int row, int col)
+	{
+		this.row = row;
+		this.col = col;
+	}
 	
 	
 }

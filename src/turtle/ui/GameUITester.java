@@ -43,6 +43,7 @@ public class GameUITester extends Application
 		
 		LevelPack pack = generateTestPack();
 		gui.initLevelPack(pack);
+		
 	}
 
 	/**
@@ -54,8 +55,11 @@ public class GameUITester extends Application
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", 20, 20);
 		
-		test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 0), (short)0, new HashMap<>()));
+		for (int r = 0; r < 20; r++)
+			for (int c = 0; c < 20; c++)
+				test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+						new Location(r, c), (short)0, new HashMap<>()));				
+		
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 1), (short)1, new HashMap<>()));
 		testPack.addLevel(test);

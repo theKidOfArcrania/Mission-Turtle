@@ -205,10 +205,10 @@ public class GridView extends Pane
 			return;
 		
 		double cell = viewed.getCellSize();
-		viewed.setTranslateX(calcOffset(cols * cell, viewed.getWidth(), 
-				p.getTranslateX()));
-		viewed.setTranslateX(calcOffset(rows * cell, viewed.getHeight(), 
-				p.getTranslateY()));
+		viewed.setTranslateX(-calcOffset(viewed.getWidth(), 
+				viewed.getColumns() * cell, p.getTranslateX()));
+		viewed.setTranslateY(-calcOffset(viewed.getHeight(), 
+				viewed.getRows() * cell,  p.getTranslateY()));
 	}
 
 	/**

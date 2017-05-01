@@ -210,14 +210,14 @@ public abstract class Component extends Pane
 			if (animationCycle)
 			{
 				stepInd %= imageFrames.length;
-				img.setViewport(ts.frameAt(stepInd));
+				img.setViewport(ts.frameAt(imageFrames[stepInd]));
 			}
 			else
 			{
 				if (stepInd >= imageFrames.length - 1)
 					setImageFrame(imageFrames[imageFrames.length - 1]);
 				else
-					img.setViewport(ts.frameAt(stepInd));
+					img.setViewport(ts.frameAt(imageFrames[stepInd]));
 			}
 		}
 	}
@@ -254,12 +254,17 @@ public abstract class Component extends Pane
 	 * @param to the goal value to achieve
 	 * @param step the increment value per step
 	 * @return the next value to increment to.
+	 * @throws IllegalArgumentException if step is zero.
 	 */
 	private double increment(double from, double to, double step)
 	{
+		if (step == 0)
+			throw new IllegalArgumentException("Step must be non-zero.");
 		if (from == to)
 			return to;
-		
+		if (from < to ^ step > 0)
+			return increment(from, to, -step);
+			
 		double after = from + step;
 		if (after > to ^ from > to)
 			// Incremented pass the target.

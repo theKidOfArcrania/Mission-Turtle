@@ -17,12 +17,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import turtle.core.Actor;
-import turtle.core.Cell;
-import turtle.core.Component;
-import turtle.core.Grid;
-import turtle.core.Location;
-import turtle.core.TileSet;
+import turtle.core.*;
 
 public class Level
 {
@@ -84,7 +79,6 @@ public class Level
 	public Grid createLevel()
 	{
 		Grid g = new Grid(rows, cols);
-		System.out.println("HELLO");
 		for (CompSpec spec : cells)
 			g.placeCell((Cell)spec.createComponent());
 		for (CompSpec spec : actors)
