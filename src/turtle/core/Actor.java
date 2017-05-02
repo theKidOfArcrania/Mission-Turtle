@@ -27,6 +27,7 @@ public abstract class Actor extends Component
 	public static final DominanceLevel FIXTURE = new DominanceLevel("Fixture", 300);
 	
 	private boolean dying;
+	private boolean dead;
 	private int dieFrame;
 	
 	/**
@@ -73,7 +74,7 @@ public abstract class Actor extends Component
 	 */
 	public boolean isDead()
 	{
-		return dieFrame >= DYING_FRAMES;
+		return dead;
 	}
 	
 	/**
@@ -129,10 +130,22 @@ public abstract class Actor extends Component
 		super.updateFrame(frame);
 		if (dying)
 		{
-			if (dieFrame < DYING_FRAMES)
-				dieFrame++;
-			setOpacity(1 - ((double)dieFrame / DYING_FRAMES)); 
+			if (dyingFrame(dieFrame))
+				dead = true;
+			dieFrame++;
 		}
 		
+	}
+	
+	/**
+	 * Handles the dying frames. By default this makes the actor lighter and 
+	 * lighter until it disappears.
+	 * @param dieFrame the current dying frame number.
+	 * @return true if this actor is now "dead", false if it is still dying.
+	 */
+	protected boolean dyingFrame(long dieFrame)
+	{
+		setOpacity(1 - ((double)dieFrame / DYING_FRAMES));
+		return dieFrame >= DYING_FRAMES;
 	}
 }

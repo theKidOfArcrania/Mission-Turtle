@@ -20,7 +20,7 @@ import javafx.scene.layout.Pane;
 
 public abstract class Component extends Pane 
 {
-	public static final int DEF_ANIMATION_FRAME_CHANGE = 2;
+	public static final int DEF_ANIMATION_FRAME_CHANGE = 4;
 	
 	public static final double MOVE_SPEED = 10.0;
 	
@@ -63,7 +63,7 @@ public abstract class Component extends Pane
 
 	/**
 	 * Animates component through a series of frames at the default
-	 * change rate (change once per 2 frames).
+	 * change rate (change once per 4 frames).
 	 * @param imageFrames the animation frames to animate through.
 	 * @param animationCycle true to cycle through frames, false to run once. 
 	 * @throws IndexOutOfBoundsException if any of the frame indexes are 

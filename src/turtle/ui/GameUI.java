@@ -306,7 +306,7 @@ public class GameUI extends VBox
 		});
         
         pnlFrame = new StackPane();
-        VBox.setVgrow(pnlFrame, javafx.scene.layout.Priority.ALWAYS);
+        setVgrow(pnlFrame, javafx.scene.layout.Priority.ALWAYS);
         pnlFrame.setBackground(new Background(new BackgroundFill(DARKGRAY, 
         		null, null)));
         pnlFrame.setEffect(new InnerShadow());
