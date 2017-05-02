@@ -8,7 +8,7 @@ public class TestCell extends Cell
 	private static final int SHUFFLE = 50;
 	public TestCell()
 	{
-		int[] arr = {12,13,14,15,16};
+		int[] arr = {35,36,37,38};
 //		for (int i = 0; i < SHUFFLE; i++)
 //		{
 //			int a = (int)(Math.random() * arr.length);
@@ -18,6 +18,9 @@ public class TestCell extends Cell
 //			arr[b] = tmp;
 //		}
 		animateFrames(arr, true);
+		
+		//setRotate((int)(Math.random() * 4) * 90);
+		//TODO: have set heading in Actor.
 	}
 	
 	@Override
