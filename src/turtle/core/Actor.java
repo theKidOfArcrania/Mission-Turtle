@@ -20,6 +20,8 @@ public abstract class Actor extends Component
 	public static final int SOUTH = 2;
 	public static final int WEST = 3;
 	
+	private static final int RIGHT_ANGLE = 90;
+	
 	//Some common dominance levels.
 	public static final DominanceLevel PLAYER = new DominanceLevel("Player", 0);
 	public static final DominanceLevel ENEMY = new DominanceLevel("Enemy", 100);
@@ -29,6 +31,7 @@ public abstract class Actor extends Component
 	private boolean dying;
 	private boolean dead;
 	private int dieFrame;
+	private int heading;
 	
 	/**
 	 * Constructs a new actor.
@@ -59,6 +62,28 @@ public abstract class Actor extends Component
 		return true;
 	}
 	
+	/**
+	 * @return the current direction heading
+	 */
+	public int getHeading()
+	{
+		return heading;
+	}
+
+	/**
+	 * This sets the direction the actor is facing, and also rotates the
+	 * actor to that direction.
+	 * @param heading the new direction heading to set
+	 * @throws IllegalArgumentException if a illegal direction is given.
+	 */
+	public void setHeading(int heading)
+	{
+		if (heading < NORTH || heading > WEST)
+			throw new IllegalArgumentException("Illegal direction");
+		setRotate(heading * RIGHT_ANGLE);
+		this.heading = heading;
+	}
+
 	/**
 	 * Checks whether if this actor has been killed and is dying.
 	 * @return true if died, false if alive.

@@ -462,6 +462,7 @@ public class GameUI extends VBox
 		Player p = view.getPlayer();
 		if (moveDir != -1 && !p.isMoving())
 		{
+			p.setHeading(moveDir);
 			p.traverseDirection(moveDir);
 			moveDir = -1;
 		}

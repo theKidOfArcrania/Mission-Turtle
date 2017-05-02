@@ -18,10 +18,13 @@ public class Player extends Actor
 	private Component msgSender;
 	private String msg;
 	private boolean winner;
+	private boolean moving;
 	
 	public Player()
 	{
-		setImageFrame(3);
+		winner = false;
+		moving = false;
+		setImageFrame(40);
 	}
 	
 	/**
@@ -95,6 +98,26 @@ public class Player extends Actor
 			this.msg = null;
 	}
 	
+	/**
+	 * Updates frame of component. This changes the turtle animations from moving
+	 * and not moving whenever it is moving or not.
+	 * @param frame frame number
+	 */
+	@Override
+	public void updateFrame(long frame)
+	{
+		super.updateFrame(frame);
+		if (moving ^ isMoving())
+		{
+			moving = !moving;
+			if (moving)
+				animateFrames(new int[] {41,42,43,40}, true);
+			else
+				setImageFrame(40);
+		}
+		
+	}
+
 	/**
 	 * Flags that the player has won the game.
 	 */

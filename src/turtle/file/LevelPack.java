@@ -95,13 +95,14 @@ public class LevelPack
 			if (!lvl.isLoaded())
 				throw new IllegalStateException("Levels are not all loaded");
 		
-		RandomAccessFile raf = new RandomAccessFile(file, "w");
+		RandomAccessFile raf = new RandomAccessFile(file, "rw");
 		raf.writeInt(PACK_FILE_SIG);
 		raf.writeInt(VERSION_1);
 		raf.writeInt(levels.size());
 		
 		long levelOffsets = raf.getFilePointer();
-		raf.skipBytes(levels.size() * Long.BYTES);
+		for (int i = 0; i < levels.size(); i++)
+			raf.writeLong(0);
 		raf.writeLong(levelPackID.getMostSignificantBits());
 		raf.writeLong(levelPackID.getLeastSignificantBits());
 		raf.writeUTF(name);
