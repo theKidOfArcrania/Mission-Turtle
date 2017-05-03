@@ -9,6 +9,8 @@
 
 package turtle.comp;
 
+import java.util.ArrayList;
+
 import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
@@ -23,6 +25,8 @@ public class Player extends Actor
 	private boolean winner;
 	private boolean moving;
 	
+	private final ArrayList<Item> pocket;
+	
 	/**
 	 * Constructs a new player.
 	 */
@@ -31,18 +35,39 @@ public class Player extends Actor
 		winner = false;
 		moving = false;
 		setImageFrame(FRAME_STILL);
+		pocket = new ArrayList<>();
 	}
 	
 	/**
-	 * Interacts with other actors. This does nothing since every actor
-	 * should dominate over player.
-	 * @param other other actor to compare with.
-	 * @return always true.
+	 * Adds a new item to the player. This will currently only accept 
+	 * keys. 
+	 * @param itm the item to add.
+	 * @return true if this item is collected, false if it is not.
+	 */
+	public boolean collectItem(Item itm)
+	{
+		if (itm instanceof Key)
+		{
+			pocket.add(itm);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Kills this actor (this sets a flag for this actor to be removed).
+	 * This overrides it to be immune to water. 
+	 * 
+	 * @param attacker the thing that is killing this actor.
+	 * @return true if this actor died as a result of this call, false if
+	 * 		nothing changed.
 	 */
 	@Override
-	public boolean interact(Actor other)
+	public boolean die(Component attacker)
 	{
-		return true;
+		if (attacker instanceof Water)
+			return false;
+		return super.die(attacker);
 	}
 
 	/**
@@ -58,15 +83,6 @@ public class Player extends Actor
 	}
 	
 	/**
-	 * Determines whether if player won the game.
-	 * @return true if player won, false if game is still running.
-	 */
-	public boolean isWinner()
-	{
-		return winner;
-	}
-	
-	/**
 	 * @return the message that the player should see now. Never returns null.
 	 * @see #setMessage(String, Component)
 	 */
@@ -76,7 +92,40 @@ public class Player extends Actor
 			return "";
 		return msg;
 	}
+	
+	/**
+	 * Interacts with other actors. This does nothing since every actor
+	 * should dominate over player.
+	 * @param other other actor to compare with.
+	 * @return always true.
+	 */
+	@Override
+	public boolean interact(Actor other)
+	{
+		return true;
+	}
+	
+	/**
+	 * Determines whether if player won the game.
+	 * @return true if player won, false if game is still running.
+	 */
+	public boolean isWinner()
+	{
+		return winner;
+	}
 
+	/**
+	 * Resets message if the sender sent this message (i.e. it has not
+	 * already been overriden by someone else.
+	 * 
+	 * @param sender the component that sent the message
+	 */
+	public void resetMessage(Component sender)
+	{
+		if (msgSender == sender)
+			this.msg = null;
+	}
+	
 	/**
 	 * This is set as a flag so that the UI will then be able
 	 * to go and display this message to the player. This mechanism
@@ -90,18 +139,6 @@ public class Player extends Actor
 	{
 		this.msg = msg;
 		this.msgSender = sender;
-	}
-	
-	/**
-	 * Resets message if the sender sent this message (i.e. it has not
-	 * already been overriden by someone else.
-	 * 
-	 * @param sender the component that sent the message
-	 */
-	public void resetMessage(Component sender)
-	{
-		if (msgSender == sender)
-			this.msg = null;
 	}
 	
 	/**
