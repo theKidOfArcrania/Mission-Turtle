@@ -1,7 +1,9 @@
 /**
  * Actor.java
  * 
- * Represents a movable/ interactable grid component that is readily mutable
+ * Represents a movable/ interactable grid component that is readily mutable.
+ * The biggest difference between an actor and a cell is that actors are transparent
+ * having an ability to show through the bottom cell layer. 
  * 
  * @author Henry Wang
  * Date: 4/26/17

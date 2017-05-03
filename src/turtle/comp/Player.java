@@ -15,16 +15,22 @@ import turtle.core.DominanceLevel;
 
 public class Player extends Actor
 {
+	private static final int FRAME_STILL = 40;
+	private static final int[] FRAME_ANIMATE = {41,42,43,40};
+	
 	private Component msgSender;
 	private String msg;
 	private boolean winner;
 	private boolean moving;
 	
+	/**
+	 * Constructs a new player.
+	 */
 	public Player()
 	{
 		winner = false;
 		moving = false;
-		setImageFrame(40);
+		setImageFrame(FRAME_STILL);
 	}
 	
 	/**
@@ -111,9 +117,9 @@ public class Player extends Actor
 		{
 			moving = !moving;
 			if (moving)
-				animateFrames(new int[] {41,42,43,40}, true);
+				animateFrames(FRAME_ANIMATE, true);
 			else
-				setImageFrame(40);
+				setImageFrame(FRAME_STILL);
 		}
 		
 	}
