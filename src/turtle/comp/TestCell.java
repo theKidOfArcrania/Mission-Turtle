@@ -5,6 +5,7 @@ import turtle.core.Cell;
 
 public class TestCell extends Cell
 {
+	public static final int DEFAULT_IMAGE = 51;
 	private static final int SHUFFLE = 50;
 	public TestCell()
 	{
@@ -19,7 +20,7 @@ public class TestCell extends Cell
 //		}
 //		animateFrames(arr, true);
 		
-		setImageFrame(50);
+		setImageFrame(51);
 		
 		//setRotate((int)(Math.random() * 4) * 90);
 	}

@@ -23,6 +23,9 @@ import turtle.file.LevelPack;
 public class GameUITester extends Application
 {
 
+	private static final short COMP_IND_WATER = (short)3;
+	private static final short COMP_IND_PLAYER = (short)9;
+
 	public static void main(String[] args)
 	{
 		Application.launch(args);
@@ -58,10 +61,10 @@ public class GameUITester extends Application
 		for (int r = 0; r < 20; r++)
 			for (int c = 0; c < 20; c++)
 				test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-						new Location(r, c), (short)0, new HashMap<>()));				
+						new Location(r, c), COMP_IND_WATER, new HashMap<>()));				
 		
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 1), (short)1, new HashMap<>()));
+				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
 		testPack.addLevel(test);
 		
 		return testPack;

@@ -16,6 +16,8 @@ import turtle.core.DominanceLevel;
 
 public class Hint extends Actor
 {
+	public static final int DEFAULT_IMAGE = -1; //TODO: get image index 
+			
 	private String message;
 	private Player playerRead;
 	

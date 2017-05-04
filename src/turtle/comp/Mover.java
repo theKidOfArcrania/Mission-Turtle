@@ -62,6 +62,7 @@ public abstract class Mover extends Actor
 	/**
 	 * Obtains the vector the player is pushing against this mover at, based 
 	 * on the player's relative position to this mover.
+	 * 
 	 * @return directionals 0 to 3, or -1 if there is no vector.
 	 */
 	protected int getPlayerVector()

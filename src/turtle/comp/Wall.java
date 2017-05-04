@@ -15,6 +15,8 @@ import turtle.core.Cell;
 
 public class Wall extends Cell
 {
+	public static final int DEFAULT_IMAGE = 51;
+	
 	private static final int WALL_IMAGE = 51;
 	
 	/**

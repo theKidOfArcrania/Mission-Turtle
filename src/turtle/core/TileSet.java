@@ -12,11 +12,15 @@ package turtle.core;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
-import turtle.comp.Player;
-import turtle.comp.TestCell;
+import turtle.comp.*;
 
 public class TileSet
 {
+	private static final Class<Component>[] DEF_COMPS = new Class[] {Door.class, 
+			TestCell.class, TestCell.class, Water.class, Fire.class,
+			TestCell.class, TestCell.class, TestCell.class, TestCell.class,
+			Player.class, Key.class}; 
+	
 	private static final int FRAME_SIZE = 100;
 	private static final int FRAME_ROWS = 16;
 	private static final int FRAME_COLS = 16;
@@ -28,7 +32,7 @@ public class TileSet
 	{
 		tileset = new Image(ClassLoader.getSystemResourceAsStream(
 				"tileset.png"));
-		compIndex = new Class[]{TestCell.class, Player.class};
+		compIndex = DEF_COMPS;
 		//TODO: finish all component indexes.
 	}
 	
