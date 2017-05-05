@@ -18,6 +18,7 @@ import turtle.core.DominanceLevel;
 
 public class Player extends Actor
 {
+	public static final int DEFAULT_IMAGE = 40;
 	private static final int FRAME_STILL = 40;
 	private static final int[] FRAME_ANIMATE = {41,42,43,40};
 	
