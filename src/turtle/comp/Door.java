@@ -22,14 +22,14 @@ public class Door extends Actor
 	public static final int DEFAULT_IMAGE = 0;
 	private static final int LOCK_OFFSET_IMAGE = 0;
 	
-	private Color color;
+	private ColorType color;
 	
 	/**
 	 * Constructs a new door, defaulting to the RED color.
 	 */
 	public Door()
 	{
-		setColor(Color.RED);
+		setColor(ColorType.RED);
 	}
 	
 	/**
@@ -89,7 +89,7 @@ public class Door extends Actor
 	/**
 	 * @return the color of this door
 	 */
-	public Color getColor()
+	public ColorType getColor()
 	{
 		return color;
 	}
@@ -99,7 +99,7 @@ public class Door extends Actor
 	 * @param color the new color to set for this door
 	 * @throws NullPointerException if the color supplied is null.
 	 */
-	public void setColor(Color color)
+	public void setColor(ColorType color)
 	{
 		if (color == null)
 			throw new NullPointerException();
@@ -131,7 +131,7 @@ public class Door extends Actor
 		Object val = params.get("message");
 		if (val != null && val instanceof Integer)
 		{
-			Color colors[] = Color.values();
+			ColorType colors[] = ColorType.values();
 			int ind = (Integer)val;
 			if (ind >= 0 && ind < colors.length)
 				setColor(colors[ind]);

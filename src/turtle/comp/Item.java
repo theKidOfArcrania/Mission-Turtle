@@ -12,7 +12,7 @@ package turtle.comp;
 import turtle.core.Actor;
 import turtle.core.DominanceLevel;
 
-public class Item extends Actor
+public abstract class Item extends Actor
 {
 
 	/**
@@ -45,4 +45,16 @@ public class Item extends Actor
 		return ITEM;
 	}
 
+	/**
+	 * Checks whether if this item is identical as another.
+	 * @param other other item to compare with
+	 * @return true if both items are identical
+	 */
+	public abstract boolean identical(Item other);
+
+	/**
+	 * Obtains the index of the image to display as an item.
+	 * @return the index of image as item.
+	 */
+	public abstract int getItemImage();
 }

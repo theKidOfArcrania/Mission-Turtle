@@ -18,7 +18,7 @@ public class Key extends Item
 	public static final int DEFAULT_IMAGE = 45;
 	private static final int KEY_OFFSET_IMAGE = 45;
 	
-	private Color color;
+	private ColorType color;
 
 	/**
 	 * Constructs a new Key by initializing UI. It will
@@ -26,13 +26,13 @@ public class Key extends Item
 	 */
 	public Key()
 	{
-		setColor(Color.RED);
+		setColor(ColorType.RED);
 	}
 	
 	/**
 	 * @return the color of this key
 	 */
-	public Color getColor()
+	public ColorType getColor()
 	{
 		return color;
 	}
@@ -42,7 +42,7 @@ public class Key extends Item
 	 * @param color the new color to set for this key
 	 * @throws NullPointerException if the color supplied is null.
 	 */
-	public void setColor(Color color)
+	public void setColor(ColorType color)
 	{
 		if (color == null)
 			throw new NullPointerException();
@@ -74,11 +74,30 @@ public class Key extends Item
 		Object val = params.get("message");
 		if (val != null && val instanceof Integer)
 		{
-			Color colors[] = Color.values();
+			ColorType colors[] = ColorType.values();
 			int ind = (Integer)val;
 			if (ind >= 0 && ind < colors.length)
 				setColor(colors[ind]);
 		}
+	}
+
+	/**
+	 * Checks whether if this item is identical as another. This will
+	 * say true if other item is key and has same color.
+	 * 
+	 * @param other other item to compare with
+	 * @return true if both items are identical
+	 */
+	@Override
+	public boolean identical(Item other)
+	{
+		return other instanceof Key && ((Key)other).getColor() == color;
+	}
+
+	@Override
+	public int getItemImage()
+	{
+		return color.getImageFrame(KEY_OFFSET_IMAGE);
 	}
 
 }

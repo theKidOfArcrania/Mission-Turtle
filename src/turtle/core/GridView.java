@@ -24,9 +24,11 @@ import turtle.comp.Player;
 
 public class GridView extends Pane
 {
-	private static final double CORNER_RADIUS = 5.0;
 	public static final int VIEW_ROWS = 8;
 	public static final int VIEW_COLS = 12;
+	
+	private static final double INTERNAL_PADDING = 20;
+	private static final double CORNER_RADIUS = 5.0;
 	
 	private Grid viewed;
 	private final int rows;
@@ -42,9 +44,9 @@ public class GridView extends Pane
 		cols = VIEW_COLS;
 		initGrid(init);
 		
-		LinearGradient grad = new LinearGradient(0, 0, 1, 1, true, null, 
-				new Stop(0, Color.LIGHTGRAY), new Stop(1, Color.GRAY));
-		setBackground(new Background(new BackgroundFill(grad, 
+		//LinearGradient grad = new LinearGradient(0, 0, 1, 1, true, null, 
+		//		new Stop(0, Color.LIGHTGRAY), new Stop(1, Color.GRAY));
+		setBackground(new Background(new BackgroundFill(Color.GRAY, 
         		null, null)));
 	}
 	
@@ -197,7 +199,8 @@ public class GridView extends Pane
 	private double calcOffset(double viewSize, double maxSize, double point)
 	{
 		double off = point - viewSize / 2;
-		return Math.min(Math.max(0, off), maxSize - viewSize);
+		return Math.min(Math.max(-INTERNAL_PADDING, off), 
+				(maxSize + INTERNAL_PADDING) - viewSize);
 	}
 	
 	/**

@@ -114,7 +114,6 @@ public class GameUI extends VBox
 	private final GridView view;
 	private final GameTimer runner;
 	
-	private int foodLeft;
 	private int timeLeft;
 	
 	private boolean started;
@@ -131,7 +130,6 @@ public class GameUI extends VBox
 		started = false;
 		paused = false;
 		
-		foodLeft = 0;
 		timeLeft = -1;
 		moveDir = -1;
 		
@@ -150,6 +148,7 @@ public class GameUI extends VBox
 			 * @param event an event object describing the key event that 
 			 *   occurred.
 			 */
+			@SuppressWarnings("incomplete-switch")
 			@Override
 			public void handle(KeyEvent event)
 			{
@@ -330,7 +329,6 @@ public class GameUI extends VBox
 	 */
 	private void initLevel(Level lvl)
 	{
-		foodLeft = lvl.getFoodRequirement();
 		timeLeft = lvl.getTimeLimit();
 		
 		if (lvl.getPack() == null)
@@ -508,7 +506,7 @@ public class GameUI extends VBox
 	 */
 	private void updateUI()
 	{
-		lblFood.setText(String.format("%010d", foodLeft));
+		lblFood.setText(String.format("%010d", view.getGrid().getFoodRequirement()));
 		
 		if (timeLeft == -1)
 			lblTime.setText("--:--");

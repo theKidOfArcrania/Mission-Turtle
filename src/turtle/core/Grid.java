@@ -54,6 +54,8 @@ public class Grid extends Pane
 	
 	private Player player;
 	
+	private int foodLeft;
+	
 	/**
 	 * Creates a new grid with the following dimensions
 	 * @param rows the number of rows
@@ -65,6 +67,7 @@ public class Grid extends Pane
 		
 		this.rows = rows;
 		this.cols = cols;
+		foodLeft = 0;
 		
 		base = new Cell[rows][cols];
 		actorLocs = new HashMap<>();
@@ -165,6 +168,32 @@ public class Grid extends Pane
 			
 		});
 		return residents;
+	}
+	
+	/**
+	 * @return the amount of food requirements left.
+	 */
+	public int getFoodRequirement()
+	{
+		return foodLeft; 
+	}
+	
+	/**
+	 * @param foodLeft new amount of food to collect
+	 */
+	public void setFoodRequirement(int foodLeft)
+	{
+		this.foodLeft = foodLeft;
+	}
+	
+	/**
+	 * Increment the amount of food by one unit, and thus the amount of
+	 * food requirement is decremented.
+	 */
+	public void incrementFood()
+	{
+		if (foodLeft > 0)
+			foodLeft--;
 	}
 	
 	/**

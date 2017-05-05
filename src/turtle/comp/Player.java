@@ -12,13 +12,21 @@ package turtle.comp;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.scene.transform.Rotate;
 import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
 public class Player extends Actor
-{
+{	
+
+	private static final double ITEM_RADIUS = .65;
+
 	public static final int DEFAULT_IMAGE = 40;
+
+	private static final double SEMI_TRANSPARENT = .5;
 	private static final int FRAME_STILL = 40;
 	private static final int[] FRAME_ANIMATE = {41,42,43,40};
 	
@@ -28,6 +36,8 @@ public class Player extends Actor
 	private boolean moving;
 	
 	private final ArrayList<Item> pocket;
+	private final ArrayList<ItemSlot> slots;
+	private double itemOpacity;
 	
 	/**
 	 * Constructs a new player.
@@ -38,6 +48,28 @@ public class Player extends Actor
 		moving = false;
 		setImageFrame(FRAME_STILL);
 		pocket = new ArrayList<>();
+		slots = new ArrayList<>();
+		
+		itemOpacity = SEMI_TRANSPARENT;
+		
+		/**
+		 * Changes transparency of the item slots to lower whenever the user
+		 * is directly hovering his mouse over turtle.
+		 */
+		hoverProperty().addListener(new InvalidationListener()
+		{
+			
+			@Override
+			public void invalidated(Observable observable)
+			{
+				if (isHover())
+					itemOpacity = 1;
+				else
+					itemOpacity = SEMI_TRANSPARENT;
+				for (ItemSlot slot : slots)
+					slot.setOpacity(itemOpacity);
+			}
+		});
 	}
 	
 	/**
@@ -51,6 +83,29 @@ public class Player extends Actor
 		if (itm instanceof Key)
 		{
 			pocket.add(itm);
+			for (ItemSlot slot : slots)
+			{
+				if (slot.addItem(itm))
+					return true;
+			}
+			
+			ItemSlot newSlot = new ItemSlot();
+			newSlot.addItem(itm);
+			
+			Rotate negateRotate = new Rotate(0, Rotate.Z_AXIS);
+			negateRotate.angleProperty().bind(rotateProperty().negate());
+			negateRotate.pivotXProperty().bind(widthProperty().divide(2)
+					.subtract(newSlot.translateXProperty()));
+			negateRotate.pivotYProperty().bind(heightProperty().divide(2)
+					.subtract(newSlot.translateYProperty()));
+			newSlot.getTransforms().add(negateRotate);
+
+			newSlot.setOpacity(itemOpacity);
+			
+			slots.add(newSlot);
+			getChildren().add(newSlot);
+			layoutSlots();
+			
 			return true;
 		}
 		return false;
@@ -189,5 +244,20 @@ public class Player extends Actor
 	public void win()
 	{
 		winner = true;
+	}
+	
+	/**
+	 * Layouts all the current player items within a radius circle around the player.
+	 */
+	private void layoutSlots()
+	{
+		double radius = getTileSet().getFrameSize() * ITEM_RADIUS;
+		double step = 2 * Math.PI / slots.size();
+		for (int i = 0; i < slots.size(); i++)
+		{
+			ItemSlot slot = slots.get(i);
+			slot.setTranslateX(radius * Math.sin(i * step));
+			slot.setTranslateY(radius * -Math.cos(i * step));
+		}
 	}
 }

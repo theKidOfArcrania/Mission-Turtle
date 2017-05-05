@@ -12,7 +12,7 @@
 
 package turtle.comp;
 
-public enum Color
+public enum ColorType
 {
 	YELLOW, ORANGE, RED, PURPLE, BLUE, GREEN;
 	

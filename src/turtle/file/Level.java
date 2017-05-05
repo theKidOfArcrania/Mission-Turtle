@@ -83,6 +83,7 @@ public class Level
 			g.placeCell((Cell)spec.createComponent());
 		for (CompSpec spec : actors)
 			g.placeActor((Actor)spec.createComponent());
+		g.setFoodRequirement(foodReq);
 		return g;
 	}
 	
@@ -252,7 +253,7 @@ public class Level
 	 * @throws IllegalStateException if level is not editable
 	 * @throws IllegalArgumentException if new food count is negative.
 	 */
-	public void setFoodReqirement(int foodReq)
+	public void setFoodRequirement(int foodReq)
 	{
 		if (!isEditable())
 			throw new IllegalStateException("Level is not editable!");

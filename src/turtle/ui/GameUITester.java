@@ -14,9 +14,12 @@ import java.util.HashMap;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import turtle.comp.ColorType;
 import turtle.comp.Fire;
+import turtle.comp.Key;
 import turtle.comp.Water;
 import turtle.core.Component;
+import turtle.core.Grid;
 import turtle.core.Location;
 import turtle.file.CompSpec;
 import turtle.file.Level;
@@ -49,8 +52,10 @@ public class GameUITester extends Application
 		
 		LevelPack pack = generateTestPack();
 		gui.initLevelPack(pack);
-		((Water)gui.getGridView().getGrid().getCellAt(0, 0)).transformToSand();
-		((Fire)gui.getGridView().getGrid().getCellAt(5, 0)).transformToSand();
+		
+		Grid lvl = gui.getGridView().getGrid();
+		((Water)lvl.getCellAt(0, 0)).transformToSand();
+		((Fire)lvl.getCellAt(6, 0)).transformToSand();
 	}
 
 	/**
@@ -65,7 +70,7 @@ public class GameUITester extends Application
 		for (int r = 0; r < 20; r++)
 			for (int c = 0; c < 20; c++)
 			{
-				if (r == 5)
+				if (r == 6)
 					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 							new Location(r, c), COMP_IND_FIRE, new HashMap<>()));
 				else
