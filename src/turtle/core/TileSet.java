@@ -40,7 +40,7 @@ public class TileSet
 	 * Gets all the frames of this tile-set.
 	 * @return the image tile-set.
 	 */
-	public Image getTileset()
+	public Image getImageset()
 	{
 		return tileset;
 	}

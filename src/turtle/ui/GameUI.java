@@ -194,6 +194,14 @@ public class GameUI extends VBox
 	}
 	
 	/**
+	 * @return the grid view displayed by this game UI.
+	 */
+	public GridView getGridView()
+	{
+		return view;
+	}
+	
+	/**
 	 * Initializes this GameUI with a level pack.
 	 * @param pck the pack to use.
 	 */
@@ -490,6 +498,8 @@ public class GameUI extends VBox
 		if (status != null)
 		{
 			//TODO: show level-end dialog and maybe advance to next level.
+			System.out.println(status);
+			System.exit(1);
 		}
 	}
 	

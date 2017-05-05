@@ -25,6 +25,8 @@ public abstract class Actor extends Component
 	private static final int RIGHT_ANGLE = 90;
 	
 	//Some common dominance levels.
+	public static final DominanceLevel TOP = new DominanceLevel("Top", -200);
+	public static final DominanceLevel FLOATING = new DominanceLevel("Floating", -100);
 	public static final DominanceLevel PLAYER = new DominanceLevel("Player", 0);
 	public static final DominanceLevel ENEMY = new DominanceLevel("Enemy", 100);
 	public static final DominanceLevel ITEM = new DominanceLevel("Item", 200);

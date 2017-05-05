@@ -12,9 +12,7 @@ package turtle.core;
 
 import java.util.Map;
 
-import javafx.geometry.HPos;
 import javafx.geometry.Rectangle2D;
-import javafx.geometry.VPos;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
@@ -23,6 +21,7 @@ public abstract class Component extends Pane
 	public static final int DEF_ANIMATION_FRAME_CHANGE = 4;
 	
 	public static final double MOVE_SPEED = 10.0;
+	public static final double SMALL = .0001;
 	
 	public static final TileSet DEFAULT_SET = new TileSet();
 	
@@ -52,8 +51,8 @@ public abstract class Component extends Pane
 		headLoc = new Location();
 		trailLoc = new Location();
 		
-		img.setImage(ts.getTileset());
-		img.setViewport(new Rectangle2D(0, 0, 0, 0));
+		img.setImage(ts.getImageset());
+		img.setViewport(new Rectangle2D(0, 0, SMALL, SMALL));
 		
 		curFrame = 0;
 		animationOffset = -1;
@@ -143,6 +142,14 @@ public abstract class Component extends Pane
 		return parent;
 	}
 
+	/**
+	 * @return the current tileset used by component
+	 */
+	public TileSet getTileSet()
+	{
+		return ts;
+	}
+	
 	/**
 	 * @return the trailing location of the actor 
 	 */
@@ -271,16 +278,5 @@ public abstract class Component extends Pane
 			return to; 
 		else
 			return after;
-	}
-	
-	/**
-	 * Layouts the children (i.e. ImageView)
-	 * of this Component object
-	 */
-	@Override
-	protected void layoutChildren()
-	{
-		layoutInArea(img, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER, 
-				VPos.CENTER);
 	}
 }

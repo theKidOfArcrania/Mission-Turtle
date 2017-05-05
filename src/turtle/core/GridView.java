@@ -74,6 +74,14 @@ public class GridView extends Pane
 	}
 	
 	/**
+	 * @return the grid viewed by this grid-view.
+	 */
+	public Grid getGrid()
+	{
+		return viewed;
+	}
+	
+	/**
 	 * Updates a frame, propagating it to grid.
 	 * @param frame the frame number
 	 */

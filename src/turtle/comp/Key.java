@@ -16,7 +16,6 @@ import java.util.Map;
 public class Key extends Item
 {
 	public static final int DEFAULT_IMAGE = 45;
-	
 	private static final int KEY_OFFSET_IMAGE = 45;
 	
 	private Color color;
@@ -52,7 +51,7 @@ public class Key extends Item
 	}
 
 	/**
-	 * Sets a series of parameters for this hint tile. This
+	 * Sets a series of parameters for this key actor. This
 	 * class has one parameter attribute that has functionality:
 	 * <table>
 	 *   <tr>

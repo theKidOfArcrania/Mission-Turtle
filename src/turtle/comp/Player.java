@@ -10,6 +10,7 @@
 package turtle.comp;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 import turtle.core.Actor;
 import turtle.core.Component;
@@ -52,6 +53,26 @@ public class Player extends Actor
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Finds an item and removes the first such match for the player to use.
+	 * @param usable a function used to identify which item is usable.
+	 * @return the first item, or null if it cannot be found.
+	 */
+	public Item useItem(Predicate<Item> usable)
+	{
+		Item found = null;
+		for (Item itm : pocket)
+			if (usable.test(itm))
+			{
+				found = itm;
+				break;
+			}
+		
+		if (found != null)
+			pocket.remove(found);
+		return found;
 	}
 	
 	/**

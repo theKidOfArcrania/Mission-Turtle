@@ -305,13 +305,17 @@ public class Grid extends Pane
 	 */
 	public void updateFrame(long frame)
 	{
-		for (Node n : pnlBase.getChildren())
+		//Avoid concurrency issues.
+		List<Node> base = new ArrayList<>(pnlBase.getChildren());
+		List<Node> stage = new ArrayList<>(pnlStage.getChildren());
+		
+		for (Node n : base)
 		{
 			if (n instanceof Cell)
 				((Cell)n).updateFrame(frame);
 		}
 		
-		for (Node n : pnlStage.getChildren())
+		for (Node n : stage)
 		{
 			if (n instanceof Actor)
 			{

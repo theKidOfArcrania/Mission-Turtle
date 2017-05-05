@@ -14,6 +14,8 @@ import java.util.HashMap;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import turtle.comp.Fire;
+import turtle.comp.Water;
 import turtle.core.Component;
 import turtle.core.Location;
 import turtle.file.CompSpec;
@@ -23,6 +25,7 @@ import turtle.file.LevelPack;
 public class GameUITester extends Application
 {
 
+	private static final short COMP_IND_FIRE = (short)4;
 	private static final short COMP_IND_WATER = (short)3;
 	private static final short COMP_IND_PLAYER = (short)9;
 
@@ -46,7 +49,8 @@ public class GameUITester extends Application
 		
 		LevelPack pack = generateTestPack();
 		gui.initLevelPack(pack);
-		
+		((Water)gui.getGridView().getGrid().getCellAt(0, 0)).transformToSand();
+		((Fire)gui.getGridView().getGrid().getCellAt(5, 0)).transformToSand();
 	}
 
 	/**
@@ -60,8 +64,14 @@ public class GameUITester extends Application
 		
 		for (int r = 0; r < 20; r++)
 			for (int c = 0; c < 20; c++)
-				test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-						new Location(r, c), COMP_IND_WATER, new HashMap<>()));				
+			{
+				if (r == 5)
+					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+							new Location(r, c), COMP_IND_FIRE, new HashMap<>()));
+				else
+					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+							new Location(r, c), COMP_IND_WATER, new HashMap<>()));
+			}
 		
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));

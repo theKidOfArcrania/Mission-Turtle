@@ -16,7 +16,6 @@ import turtle.core.Location;
 
 public abstract class Mover extends Actor
 {
-	private static final DominanceLevel TOP = new DominanceLevel("TOP", -100);
 
 	/**
 	 * Executes an interaction with another actor. This will move in the
@@ -54,7 +53,7 @@ public abstract class Mover extends Actor
 	public DominanceLevel dominanceLevelFor(Actor other)
 	{
 		if (other == null)
-			return TOP;
+			return FLOATING;
 		else
 			return FIXTURE;
 	}

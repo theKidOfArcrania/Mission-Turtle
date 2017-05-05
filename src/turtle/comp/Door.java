@@ -11,25 +11,131 @@
 
 package turtle.comp;
 
+import java.util.Map;
+import java.util.function.Predicate;
+
 import turtle.core.Actor;
 import turtle.core.DominanceLevel;
 
 public class Door extends Actor
 {
 	public static final int DEFAULT_IMAGE = 0;
+	private static final int LOCK_OFFSET_IMAGE = 0;
 	
+	private Color color;
+	
+	/**
+	 * Constructs a new door, defaulting to the RED color.
+	 */
+	public Door()
+	{
+		setColor(Color.RED);
+	}
+	
+	/**
+	 * Executes an interaction with another actor. This will only
+	 * allow the pass if an actor has a color-matching key. This 
+	 * will subsequently take away that key used to open this door.
+	 * 
+	 * @param other the other actor to interact with.
+	 * @return true if the other actor can pass into location
+	 *         false if other actor is prohibited to pass.
+	 */
 	@Override
 	public boolean interact(Actor other)
 	{
-		// TODO Auto-generated method stub
+		if (other instanceof Player)
+		{
+			/**
+			 * Searches for a key that matches this color.
+			 */
+			Item itm = ((Player)other).useItem(new Predicate<Item>()
+			{
+				
+				/**
+				 * Tests whether if this item will be usable to this door.
+				 * @param t the item to test.
+				 * @return true if it works, false if it doesn't.
+				 */
+				@Override
+				public boolean test(Item t)
+				{
+					return t instanceof Key && ((Key)t).getColor() == getColor();
+				}
+			});
+			return itm != null;
+		}
 		return false;
 	}
 
+	/**
+	 * Obtains the dominance level of the actor in relation to another actor.
+	 * This will be high on the dominance level since it is a fixture. However
+	 * like {@link Mover}, it should actually be located near the top of 
+	 * z-order. So for ordering, it returns a low dominance level.
+	 * 
+	 * @param other other actor to compare with (or null for generally).
+	 * @return a dominance level of the actor.
+	 */
 	@Override
 	public DominanceLevel dominanceLevelFor(Actor other)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if (other == null)
+			return FLOATING;
+		else
+			return FIXTURE;
+	}
+
+	/**
+	 * @return the color of this door
+	 */
+	public Color getColor()
+	{
+		return color;
+	}
+
+
+	/**
+	 * @param color the new color to set for this door
+	 * @throws NullPointerException if the color supplied is null.
+	 */
+	public void setColor(Color color)
+	{
+		if (color == null)
+			throw new NullPointerException();
+		setImageFrame(color.getImageFrame(LOCK_OFFSET_IMAGE));
+		this.color = color;
+	}
+
+	/**
+	 * Sets a series of parameters for this door. This
+	 * class has one parameter attribute that has functionality:
+	 * <table>
+	 *   <tr>
+	 *     <th>Name</th>
+	 *     <th>Type</th>
+	 *     <th>Description</th>
+	 *   </tr>
+	 *   <tr>
+	 *     <td><code>color</code></td>
+	 *     <td><code>int</code></td>
+	 *     <td>This sets the color index (0-based) of this door.</td>
+	 *   </tr>
+	 * </table>
+	 * @param params the parameter object.
+	 */
+	@Override
+	public void setParameters(Map<String, Object> params)
+	{
+		super.setParameters(params);
+		Object val = params.get("message");
+		if (val != null && val instanceof Integer)
+		{
+			Color colors[] = Color.values();
+			int ind = (Integer)val;
+			if (ind >= 0 && ind < colors.length)
+				setColor(colors[ind]);
+		}
 	}
 
 }
