@@ -9,6 +9,8 @@
 
 package turtle.ui;
 
+import java.util.EnumMap;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.Transition;
 import javafx.event.ActionEvent;
@@ -17,6 +19,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -33,7 +36,9 @@ import static turtle.ui.GameMenuUI.*;
 
 public class GameUI extends VBox
 {
-
+	private static final int ACTION_START = -1;
+	private static final int ACTION_PAUSE = -2;
+	
 	private static final double SEMI_TRANS_ALPHA = .5;
 
 	/**
@@ -108,7 +113,8 @@ public class GameUI extends VBox
     private GameMenuUI pnlMenuDialog;
 	
     /* Game-related stuff */
-    private int moveDir;
+    private int dirPrevPressed;
+    private boolean[] moving;
     
     private LevelPack currentPack;
 	private final GridView view;
@@ -118,6 +124,8 @@ public class GameUI extends VBox
 	
 	private boolean started;
 	private boolean paused;
+	
+	private EnumMap<KeyCode, Integer> mappedKeys;
 	
 	/**
 	 * Creates a new GameUI and initializes UI.
@@ -131,7 +139,10 @@ public class GameUI extends VBox
 		paused = false;
 		
 		timeLeft = -1;
-		moveDir = -1;
+		moving = new boolean[Actor.WEST + 1];
+		
+		mappedKeys = new EnumMap<>(KeyCode.class);
+		mapKeys();
 		
 		initUI();
 		
@@ -139,9 +150,9 @@ public class GameUI extends VBox
 		requestFocus();
 		
 		/**
-		 * Event handler that listens to all key presses that occurs.
+		 * Event handler that listens to all key events that occurs.
 		 */
-		addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>()
+		addEventFilter(KeyEvent.ANY, new EventHandler<KeyEvent>()
 		{
 			/**
 			 * Called when a key event occurs.
@@ -152,42 +163,7 @@ public class GameUI extends VBox
 			@Override
 			public void handle(KeyEvent event)
 			{
-				
-				switch (event.getCode())
-				{
-				case LEFT:
-				case A:
-					moveDir = Actor.WEST;
-					break;
-				case UP:
-				case W:
-					moveDir = Actor.NORTH;
-					break;
-				case RIGHT:
-				case D:
-					moveDir = Actor.EAST;
-					break;
-				case DOWN:
-				case S:
-					moveDir = Actor.SOUTH;
-					break;
-				case ESCAPE:
-				case PAUSE:
-					if (pnlMenuBack.isVisible())
-						handleGameMenu(ID_RESUME);
-					else
-					{
-						pauseGame();
-						pnlMenuBack.setVisible(true);
-					}
-					break;
-				case SPACE:
-					startGame();
-				}
-				
-				Player p = view.getPlayer();
-				if (moveDir != -1 && p != null)
-					startGame();
+				handleKey(event);
 			}
 		});
 	}
@@ -238,6 +214,48 @@ public class GameUI extends VBox
 		
 		resumeGame();
 		pnlMenuBack.setVisible(false);
+	}
+	
+	/**
+	 * Called whenever a key event occurs.
+	 * @param event an event object describing the key event that 
+	 *   occurred.
+	 */
+	private void handleKey(KeyEvent event)
+	{
+		if (event.getEventType() == KeyEvent.KEY_TYPED)
+			return;
+		if (!mappedKeys.containsKey(event.getCode()))
+			return;
+		
+		boolean keyDown = event.getEventType() == KeyEvent.KEY_PRESSED;
+		int action = mappedKeys.get(event.getCode());
+		if (action >= 0)
+		{
+			moving[action] = keyDown;
+			if (keyDown)
+				dirPrevPressed = action;
+		}
+		else
+		{
+			switch (action)
+			{
+			case ACTION_PAUSE:
+				if (!keyDown)
+					return;
+				if (pnlMenuBack.isVisible())
+					handleGameMenu(ID_RESUME);
+				else
+				{
+					pauseGame();
+					pnlMenuBack.setVisible(true);
+				}
+				return;
+			case ACTION_START:
+			}
+		}
+		
+		startGame();
 	}
 	
 	/**
@@ -386,6 +404,24 @@ public class GameUI extends VBox
 	}
 	
 	/**
+	 * Makes all the key mappings to function id.
+	 */
+	private void mapKeys()
+	{
+		mappedKeys.put(KeyCode.LEFT, Actor.WEST);
+		mappedKeys.put(KeyCode.A, Actor.WEST);
+		mappedKeys.put(KeyCode.UP, Actor.NORTH);
+		mappedKeys.put(KeyCode.W, Actor.NORTH);
+		mappedKeys.put(KeyCode.RIGHT, Actor.EAST);
+		mappedKeys.put(KeyCode.D, Actor.EAST);
+		mappedKeys.put(KeyCode.DOWN, Actor.SOUTH);
+		mappedKeys.put(KeyCode.S, Actor.SOUTH);
+		mappedKeys.put(KeyCode.ESCAPE, ACTION_PAUSE);
+		mappedKeys.put(KeyCode.PAUSE, ACTION_PAUSE);
+		mappedKeys.put(KeyCode.SPACE, ACTION_START);
+	}
+	
+	/**
 	 * Edits the message panel so that the message will fade in or fade out.
 	 * This either adds or removes a message label.
 	 * 
@@ -465,6 +501,21 @@ public class GameUI extends VBox
 	private void updateFrame(long frame)
 	{
 		//Move player.
+		int moveDir = -1;
+		if (moving[dirPrevPressed])
+			moveDir = dirPrevPressed;
+		else
+		{
+			for (int dir = 0; dir < moving.length; dir++)
+			{
+				if (moving[dir])
+				{
+					moveDir = dir;
+					break;
+				}
+			}
+		}
+		
 		Player p = view.getPlayer();
 		if (moveDir != -1 && !p.isMoving())
 		{
@@ -479,7 +530,15 @@ public class GameUI extends VBox
 			timeLeft--;
 		updateUI();
 		
-		//Check player game-status.
+		checkPlayerStatus(p);
+	}
+
+	/**
+	 * Checks player's current game status (whether if player won or lost).
+	 * @param p the player to check status against.
+	 */
+	private void checkPlayerStatus(Player p)
+	{
 		String status = null;
 		boolean success = false;
 		

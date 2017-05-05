@@ -14,11 +14,18 @@ import java.util.*;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import turtle.comp.Player;
 
 public class Grid extends Pane
 {
+	public static final int DEF_CELL_SIZE = 100;
+	
+	private static final Color SHADOW_COLOR = Color.web("#101010");
+	private static final double SHADOW_RADIUS = 20;
+	
 	/**
 	 * Manages a list of maze components and lays them out with appropriate
 	 * sizes and locations. 
@@ -39,8 +46,6 @@ public class Grid extends Pane
 			}
 		}
 	}
-	
-	public static final int DEF_CELL_SIZE = 100;
 	
 	private final int rows;
 	private final int cols;
@@ -74,6 +79,8 @@ public class Grid extends Pane
 		
 		pnlBase = new ComponentPane();
 		pnlStage = new ComponentPane();
+		
+		setEffect(new DropShadow(SHADOW_RADIUS, SHADOW_COLOR));
 		
 		getChildren().addAll(pnlBase, pnlStage);
 	}

@@ -7,6 +7,12 @@
 	-fx-background: black;
 }
 
+/* Small font-size */
+.small
+{
+	-fx-font-size: 12px;
+}
+
 /* Make sure all our font colors are white */
 .label
 {

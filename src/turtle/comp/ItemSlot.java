@@ -24,6 +24,8 @@ import turtle.core.TileSet;
 
 public class ItemSlot extends Pane
 {
+	private static final int SHADOW_RADIUS = 10;
+	private static final double SHADOW_SPREAD = .8;
 	private static final double HIGHLIGHT_SPREAD = .6;
 	private static final int HIGHLIGHT_RADIUS = 30;
 
@@ -46,8 +48,13 @@ public class ItemSlot extends Pane
 		itemRep.setFitHeight(ITEM_SIZE);
 		
 		number = new Label();
+		number.getStyleClass().add("small");
 		
-		this.getChildren().add(itemRep);
+		DropShadow shadow = new DropShadow(SHADOW_RADIUS, Color.BLACK);
+		shadow.setSpread(SHADOW_SPREAD);
+		number.setEffect(shadow);
+		
+		this.getChildren().addAll(itemRep, number);
 		
 		DropShadow highlight = new DropShadow(HIGHLIGHT_RADIUS, Color.WHITE);
 		highlight.setSpread(HIGHLIGHT_SPREAD);
@@ -108,6 +115,12 @@ public class ItemSlot extends Pane
 	{
 		double width = getWidth();
 		double height = getHeight();
+		double numWidth = number.prefWidth(-1);
+		double numHeight = number.prefHeight(-1);
+		
 		layoutInArea(itemRep, 0, 0, width, height, 0, HPos.CENTER, VPos.CENTER);
+		layoutInArea(number, (width + ITEM_SIZE - numWidth) / 2, 
+				(height + ITEM_SIZE - numHeight) / 2, numWidth, numHeight, 0, 
+				HPos.CENTER, VPos.CENTER);
 	}
 }

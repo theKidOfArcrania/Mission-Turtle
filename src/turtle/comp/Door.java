@@ -128,7 +128,7 @@ public class Door extends Actor
 	public void setParameters(Map<String, Object> params)
 	{
 		super.setParameters(params);
-		Object val = params.get("message");
+		Object val = params.get("color");
 		if (val != null && val instanceof Integer)
 		{
 			ColorType colors[] = ColorType.values();

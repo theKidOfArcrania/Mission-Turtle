@@ -16,8 +16,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import turtle.comp.ColorType;
 import turtle.comp.Fire;
-import turtle.comp.Key;
-import turtle.comp.Water;
 import turtle.core.Component;
 import turtle.core.Grid;
 import turtle.core.Location;
@@ -28,15 +26,20 @@ import turtle.file.LevelPack;
 public class GameUITester extends Application
 {
 
-	private static final short COMP_IND_FIRE = (short)4;
 	private static final short COMP_IND_WATER = (short)3;
+	private static final short COMP_IND_FIRE = (short)4;
 	private static final short COMP_IND_PLAYER = (short)9;
-
+	private static final short COMP_IND_KEY = (short)10;
+	
 	public static void main(String[] args)
 	{
 		Application.launch(args);
 	}
 
+	/**
+	 * Starts the main application
+	 * @param primaryStage the primary window that will first start up.
+	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
@@ -54,7 +57,7 @@ public class GameUITester extends Application
 		gui.initLevelPack(pack);
 		
 		Grid lvl = gui.getGridView().getGrid();
-		((Water)lvl.getCellAt(0, 0)).transformToSand();
+		//((Fire)lvl.getCellAt(0, 0)).transformToSand();
 		((Fire)lvl.getCellAt(6, 0)).transformToSand();
 	}
 
@@ -70,12 +73,22 @@ public class GameUITester extends Application
 		for (int r = 0; r < 20; r++)
 			for (int c = 0; c < 20; c++)
 			{
-				if (r == 6)
+				if (r % 6 == 0 && r > 0)
 					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 							new Location(r, c), COMP_IND_FIRE, new HashMap<>()));
 				else
 					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 							new Location(r, c), COMP_IND_WATER, new HashMap<>()));
+				
+				HashMap<String, Object> params = new HashMap<>();
+				if (Math.random() < .2)
+				{
+					params.put("color", (int)(Math.random() * ColorType.values()
+							.length));
+					test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+							new Location(r, c), COMP_IND_KEY, params));
+				}
+				
 			}
 		
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 

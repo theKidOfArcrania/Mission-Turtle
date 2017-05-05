@@ -10,6 +10,7 @@
 package turtle.comp;
 
 import turtle.core.Actor;
+import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
 public abstract class Item extends Actor
@@ -27,10 +28,24 @@ public abstract class Item extends Actor
 		{
 			Player p = (Player)other;
 			p.collectItem(this);
+			getParentGrid().removeActor(this);
 		}
 		return true;
 	}
 
+	/**
+	 * Overrides dying so that it doesn't die from anything,
+	 * as this is a fixture.
+	 * 
+	 * @param attacker the component who is attacking.
+	 * @return false always since it doesn't die.
+	 */
+	@Override
+	public boolean die(Component attacker)
+	{
+		return false;
+	}
+	
 	/**
 	 * Obtains the dominance level of the actor in relation to another actor.
 	 * This will always return ITEM, so it is pretty on the dominance level

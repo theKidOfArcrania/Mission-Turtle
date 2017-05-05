@@ -37,7 +37,6 @@ public class Key extends Item
 		return color;
 	}
 
-
 	/**
 	 * @param color the new color to set for this key
 	 * @throws NullPointerException if the color supplied is null.
@@ -71,7 +70,7 @@ public class Key extends Item
 	public void setParameters(Map<String, Object> params)
 	{
 		super.setParameters(params);
-		Object val = params.get("message");
+		Object val = params.get("color");
 		if (val != null && val instanceof Integer)
 		{
 			ColorType colors[] = ColorType.values();

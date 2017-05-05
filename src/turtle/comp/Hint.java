@@ -12,6 +12,7 @@ package turtle.comp;
 import java.util.Map;
 
 import turtle.core.Actor;
+import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
 public class Hint extends Actor
@@ -28,6 +29,19 @@ public class Hint extends Actor
 		message = "";
 	}
 
+	/**
+	 * Overrides dying so that it doesn't die from anything,
+	 * as this is a fixture.
+	 * 
+	 * @param attacker the component who is attacking.
+	 * @return false always since it doesn't die.
+	 */
+	@Override
+	public boolean die(Component attacker)
+	{
+		return false;
+	}
+	
 	/**
 	 * @return the message this hint will tell.
 	 */
