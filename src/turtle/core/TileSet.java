@@ -17,7 +17,7 @@ import turtle.comp.*;
 public class TileSet
 {
 	private static final Class<Component>[] DEF_COMPS = new Class[] {Door.class, 
-			TestCell.class, TestCell.class, Water.class, Fire.class,
+			TestCell.class, TestCell.class, Water.class, Exit.class, Fire.class,
 			TestCell.class, TestCell.class, TestCell.class, TestCell.class,
 			Player.class, Key.class}; 
 	

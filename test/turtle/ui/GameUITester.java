@@ -27,9 +27,10 @@ public class GameUITester extends Application
 {
 
 	private static final short COMP_IND_WATER = (short)3;
-	private static final short COMP_IND_FIRE = (short)4;
-	private static final short COMP_IND_PLAYER = (short)9;
-	private static final short COMP_IND_KEY = (short)10;
+	private static final short COMP_IND_EXIT = (short)4;
+	private static final short COMP_IND_FIRE = (short)5;
+	private static final short COMP_IND_PLAYER = (short)10;
+	private static final short COMP_IND_KEY = (short)11;
 	
 	public static void main(String[] args)
 	{
@@ -69,6 +70,9 @@ public class GameUITester extends Application
 	{
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", 20, 20);
+		
+		test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
 		
 		for (int r = 0; r < 20; r++)
 			for (int c = 0; c < 20; c++)
