@@ -1,11 +1,5 @@
 package turtle.ui;
 
-import static turtle.ui.GameMenuUI.ID_EXIT;
-import static turtle.ui.GameMenuUI.ID_LEVELSELECT;
-import static turtle.ui.GameMenuUI.ID_MAINMENU;
-import static turtle.ui.GameMenuUI.ID_RESTART;
-import static turtle.ui.GameMenuUI.ID_RESUME;
-
 import java.util.ArrayDeque;
 import java.util.EnumMap;
 
@@ -20,13 +14,7 @@ import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import turtle.comp.Player;
@@ -35,6 +23,8 @@ import turtle.core.Grid;
 import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
+
+import static turtle.ui.GameMenuUI.*;
 
 /**
  * GameUI.java
@@ -46,6 +36,7 @@ import turtle.file.LevelPack;
  */
 public class GameUI extends VBox
 {
+	private static final int FPS_UPDATE_RATE = 10;
 	private static final int ACTION_START = -1;
 	private static final int ACTION_PAUSE = -2;
 	
@@ -83,7 +74,6 @@ public class GameUI extends VBox
 		@Override
 		public void interpolate(double frac)
 		{
-
 			if (frac == 1) // Next Frame
 			{
 				long time = System.nanoTime();
@@ -97,7 +87,7 @@ public class GameUI extends VBox
 						fps += ftime * 1e-9;
 					fps = frameTimes.size() / fps;
 					this.fps = fps;
-					System.out.printf("%.9f\n", fps);
+					//System.out.printf("%.9f\n", fps);
 				}
 				prevTime = time;
 				updateFrame(frame);
@@ -138,6 +128,7 @@ public class GameUI extends VBox
 	
 	/* UI elements */
 	private HBox pnlBar;
+	private Label lblFps;
     private Label lblPackName;
     private Label lblLevelName;
     private Label lblMenu;
@@ -410,6 +401,11 @@ public class GameUI extends VBox
 	{
 		pnlStatus = new HBox();
 		
+		lblFps = new Label();
+		lblFps.getStyleClass().add("small");
+		lblFps.setMaxHeight(Double.MAX_VALUE);
+		HBox.setMargin(lblFps, new Insets(0, GAP_INSET, 0, GAP_INSET));
+		
 		pnlMessagePanel = new StackPane();
         HBox.setHgrow(pnlMessagePanel, javafx.scene.layout.Priority.ALWAYS);
         
@@ -429,7 +425,7 @@ public class GameUI extends VBox
 
         lblTime = new Label("--:--");
         lblTime.setPadding(new Insets(0, GAP_INSET, 0, GAP_INSET));
-        pnlStatus.getChildren().addAll(pnlMessagePanel, lblLabelFood, lblFood,
+        pnlStatus.getChildren().addAll(lblFps, pnlMessagePanel, lblLabelFood, lblFood,
         		spacing, lblLabelTime, lblTime);
 	}
 	
@@ -571,6 +567,8 @@ public class GameUI extends VBox
 		if (timeLeft != -1 && frame % FRAMES_PER_SEC == 0)
 			timeLeft--;
 		updateUI();
+		if (frame % FPS_UPDATE_RATE == 0)
+			lblFps.setText(String.format("Fps: %.3f", runner.getFps()));
 		
 		checkPlayerStatus(p);
 	}
