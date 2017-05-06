@@ -36,6 +36,8 @@ public abstract class Component extends Pane
 	
 	private long curFrame;
 	
+	private int currentImage;
+	
 	private long animationOffset;
 	private int[] imageFrames;
 	private int changeRate;
@@ -56,6 +58,7 @@ public abstract class Component extends Pane
 		
 		img.setImage(ts.getImageset());
 		img.setViewport(new Rectangle2D(0, 0, SMALL, SMALL));
+		currentImage = -1;
 		
 		curFrame = 0;
 		animationOffset = -1;
@@ -104,7 +107,7 @@ public abstract class Component extends Pane
 		this.imageFrames = imageFrames;
 		this.changeRate = changeRate;
 		
-		img.setViewport(ts.frameAt(imageFrames[0]));
+		setViewport(imageFrames[0]);
 	}
 	
 	/**
@@ -178,7 +181,7 @@ public abstract class Component extends Pane
 	 */
 	public void setImageFrame(int index)
 	{
-		img.setViewport(ts.frameAt(index));
+		setViewport(index);
 		animationOffset = -1;
 		imageFrames = null;
 		changeRate = -1;
@@ -220,14 +223,14 @@ public abstract class Component extends Pane
 			if (animationCycle)
 			{
 				stepInd %= imageFrames.length;
-				img.setViewport(ts.frameAt(imageFrames[stepInd]));
+				setViewport(imageFrames[stepInd]);
 			}
 			else
 			{
 				if (stepInd >= imageFrames.length - 1)
 					setImageFrame(imageFrames[imageFrames.length - 1]);
 				else
-					img.setViewport(ts.frameAt(imageFrames[stepInd]));
+					setViewport(imageFrames[stepInd]);
 			}
 		}
 	}
@@ -281,6 +284,20 @@ public abstract class Component extends Pane
 			return to; 
 		else
 			return after;
+	}
+	
+	/**
+	 * Internally sets the current image viewport to a specific frame.
+	 * This will avoid setting the viewport to the same index twice in a row
+	 * for performance reasons.
+	 * @param index the index of image frame
+	 */
+	private void setViewport(int index)
+	{
+		if (currentImage == index)
+			return;
+		img.setViewport(ts.frameAt(index));
+		currentImage = index;
 	}
 	
 	/**

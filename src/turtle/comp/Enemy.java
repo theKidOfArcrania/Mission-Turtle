@@ -28,7 +28,10 @@ public abstract class Enemy extends Actor
 	public boolean interact(Actor other)
 	{
 		if (other instanceof Player)
-			return ((Player)other).die(this);
+		{
+			((Player)other).die(this);
+			return true;
+		}
 		return false;
 	}
 	

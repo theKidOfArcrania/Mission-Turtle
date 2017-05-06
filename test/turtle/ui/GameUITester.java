@@ -29,8 +29,10 @@ public class GameUITester extends Application
 	private static final short COMP_IND_WATER = (short)3;
 	private static final short COMP_IND_EXIT = (short)4;
 	private static final short COMP_IND_FIRE = (short)5;
+	private static final short COMP_IND_SAND = (short)6;
 	private static final short COMP_IND_PLAYER = (short)10;
 	private static final short COMP_IND_KEY = (short)11;
+	private static final short COMP_IND_BIRD = (short)13;
 	
 	public static void main(String[] args)
 	{
@@ -80,6 +82,9 @@ public class GameUITester extends Application
 				if (r % 6 == 0 && r > 0)
 					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 							new Location(r, c), COMP_IND_FIRE, new HashMap<>()));
+				else if (r % 6 == 1)
+					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+							new Location(r, c), COMP_IND_SAND, new HashMap<>()));
 				else
 					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 							new Location(r, c), COMP_IND_WATER, new HashMap<>()));
@@ -95,6 +100,8 @@ public class GameUITester extends Application
 				
 			}
 		
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(1, 13), COMP_IND_BIRD, new HashMap<>()));
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
 		testPack.addLevel(test);
