@@ -567,16 +567,20 @@ public class GameUI extends VBox
 	 */
 	private void updateUI()
 	{
-		lblFood.setText(String.format("%010d", view.getGrid().getFoodRequirement()));
+		String newStr = String.format("%010d", view.getGrid().getFoodRequirement());
+		if (!newStr.equals(lblFood.getText()))
+			lblFood.setText(newStr);
 		
 		if (timeLeft == -1)
-			lblTime.setText("--:--");
+			newStr = "--:--";
 		else
 		{
 			int min = timeLeft / SECS_IN_MIN;
 			int sec = timeLeft % SECS_IN_MIN;
-			lblTime.setText(String.format("%02d:%02d", min, sec));
+			newStr = String.format("%02d:%02d", min, sec);
 		}
+		if (!newStr.equals(lblTime.getText()))
+			lblTime.setText(newStr);
 		
 		Player p = view.getPlayer();
 		String msg = "";
