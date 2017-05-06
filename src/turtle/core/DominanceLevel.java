@@ -1,3 +1,7 @@
+package turtle.core;
+
+import java.io.Serializable;
+
 /**
  * DominanceLevel.java
  * 
@@ -9,13 +13,10 @@
  * Date: 4/26/17
  * Period: 2
  */
-
-package turtle.core;
-
-import java.io.Serializable;
-
 public class DominanceLevel implements Serializable, Comparable<DominanceLevel>
 {
+	private static final long serialVersionUID = -9005711510568535181L;
+	
 	private final String name;
 	private final int dominanceValue;
 	
@@ -23,7 +24,7 @@ public class DominanceLevel implements Serializable, Comparable<DominanceLevel>
 	 * Constructs a new DominanceLevel based on a name and level 
 	 * of rank of dominance (higher numbers are more dominant).
 	 * @param name name of this dominance level (used for better display)
-	 * @param dominanceValue
+	 * @param dominanceValue the integer value that effectively determines level.
 	 */
 	public DominanceLevel(String name, int dominanceValue)
 	{

@@ -1,3 +1,13 @@
+package turtle.file;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import turtle.core.Component;
+import turtle.core.Location;
+import turtle.core.TileSet;
+
 /**
  * CompSpec.java
  * 
@@ -9,17 +19,6 @@
  * Date: 4/27/17
  * Period: 2
  */
-
-package turtle.file;
-
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-
-import turtle.core.Component;
-import turtle.core.Location;
-import turtle.core.TileSet;
-
 public class CompSpec
 {
 	private final TileSet tileset;
@@ -148,6 +147,7 @@ public class CompSpec
 	/**
 	 * Serializes all parameter values into binary data.
 	 * @return a byte array of binary data.
+	 * @throws IOException if unable to serialize data
 	 */
 	public byte[] storeParameters() throws IOException
 	{

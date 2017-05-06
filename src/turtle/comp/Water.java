@@ -1,3 +1,5 @@
+
+
 package turtle.comp;
 
 import javafx.geometry.Rectangle2D;
@@ -5,6 +7,15 @@ import javafx.scene.image.ImageView;
 import turtle.core.Actor;
 import turtle.core.Cell;
 
+/**
+ * Water.java
+ * 
+ * This embodies a cell of water, it is the safety zone of the player.
+ * 
+ * @author Henry Wang
+ * Date: 5/6/17
+ * Period: 2
+ */
 public class Water extends Cell
 {
 	public static final int DEFAULT_IMAGE = 12;
@@ -43,12 +54,22 @@ public class Water extends Cell
 		return true;
 	}
 	
+	/**
+	 * Transforms this water cell into sand (and animate it).
+	 */
 	public void transformToSand()
 	{
 		frameCount = 0;
 		transformTo(new Sand(), MAX_TRANSFORM);
 	}
 	
+	/**
+	 * Overrides the update frame method in order to animate the
+	 * transforming to sand frames (layered on top of water
+	 * animation).
+	 * 
+	 * @param frame the current frame number
+	 */
 	@Override
 	public void updateFrame(long frame)
 	{

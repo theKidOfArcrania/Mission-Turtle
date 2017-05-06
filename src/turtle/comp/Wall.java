@@ -1,3 +1,8 @@
+package turtle.comp;
+
+import turtle.core.Actor;
+import turtle.core.Cell;
+
 /**
  * Wall.java
  * This represents a static non-moving obstacle that denies access
@@ -7,12 +12,6 @@
  * Period: 2
  * Date: 5/3/17
  */
-
-package turtle.comp;
-
-import turtle.core.Actor;
-import turtle.core.Cell;
-
 public class Wall extends Cell
 {
 	public static final int DEFAULT_IMAGE = 51;

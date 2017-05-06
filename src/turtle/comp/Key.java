@@ -1,3 +1,7 @@
+package turtle.comp;
+
+import java.util.Map;
+
 /**
  * Key.java
  * 
@@ -8,11 +12,6 @@
  * Date: 5/3/17
  * Period: 2
  */
-
-package turtle.comp;
-
-import java.util.Map;
-
 public class Key extends Item
 {
 	public static final int DEFAULT_IMAGE = 45;
@@ -93,6 +92,10 @@ public class Key extends Item
 		return other instanceof Key && ((Key)other).getColor() == color;
 	}
 
+	/**
+	 * Obtains the index that should be displayed as item
+	 * @return index of image frame in tileset
+	 */
 	@Override
 	public int getItemImage()
 	{

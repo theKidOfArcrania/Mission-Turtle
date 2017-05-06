@@ -1,3 +1,5 @@
+package turtle.comp;
+
 /**
  * Color.java
  * 
@@ -9,9 +11,6 @@
  * Period: 2
  * Date: 5/3/17
  */
-
-package turtle.comp;
-
 public enum ColorType
 {
 	YELLOW, ORANGE, RED, PURPLE, BLUE, GREEN;

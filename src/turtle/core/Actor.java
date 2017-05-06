@@ -1,3 +1,5 @@
+package turtle.core;
+
 /**
  * Actor.java
  * 
@@ -9,9 +11,6 @@
  * Date: 4/26/17
  * Period: 2 
  */
-
-package turtle.core;
-
 public abstract class Actor extends Component
 {
 	public static final int DYING_FRAMES = 10;

@@ -1,12 +1,3 @@
-/**
- * Hint.java
- * 
- * When a player hovers under this actor, the player will be able to
- * receive a message. More specifically, this hint tile will trigger a 
- * hint flag in the player that will automatically disable after player
- * exits hint object.
- */
-
 package turtle.comp;
 
 import java.util.Map;
@@ -15,6 +6,18 @@ import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
+/**
+ * Hint.java
+ * 
+ * When a player hovers under this actor, the player will be able to
+ * receive a message. More specifically, this hint tile will trigger a 
+ * hint flag in the player that will automatically disable after player
+ * exits hint object.
+ * 
+ * @author Henry Wang
+ * Period: 2
+ * Date: 5/6/17
+ */
 public class Hint extends Actor
 {
 	public static final int DEFAULT_IMAGE = -1; //TODO: get image index 
@@ -22,6 +25,9 @@ public class Hint extends Actor
 	private String message;
 	private Player playerRead;
 	
+	/**
+	 * Creates a new Hint cell with blank message and initializes UI.
+	 */
 	public Hint()
 	{
 		// TODO: imagery

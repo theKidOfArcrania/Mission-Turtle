@@ -3,10 +3,22 @@ package turtle.comp;
 import turtle.core.Actor;
 import turtle.core.Cell;
 
+/**
+ * TestCell.java
+ * 
+ * This is used to test a number of different functions of a cell.
+ * 
+ * @author Henry
+ * Date: 5/6/17
+ * Period: 2
+ */
 public class TestCell extends Cell
 {
 	public static final int DEFAULT_IMAGE = 51;
-	private static final int SHUFFLE = 50;
+	
+	/**
+	 * Constructs a new TestCell.
+	 */
 	public TestCell()
 	{
 //		int[] arr = {18,19,20};
@@ -25,6 +37,11 @@ public class TestCell extends Cell
 		//setRotate((int)(Math.random() * 4) * 90);
 	}
 	
+	/**
+	 * Allows everything to pass cell, and logs pass.
+	 * @param visitor actor that visited.
+	 * @return true always to allow pass.
+	 */
 	@Override
 	public boolean pass(Actor visitor)
 	{

@@ -1,3 +1,8 @@
+package turtle.comp;
+
+import turtle.core.Actor;
+import turtle.core.Cell;
+
 /**
  * Sand.java
  * 
@@ -7,11 +12,6 @@
  * Date: 5/5/17
  * Period: 2
  */
-package turtle.comp;
-
-import turtle.core.Actor;
-import turtle.core.Cell;
-
 public class Sand extends Cell
 {
 

@@ -1,12 +1,3 @@
-/**
- * GameUITester.java
- * 
- * Ensures that the GameUI and its associate parts are working properly.
- * 
- * @author Henry Wang
- * Date: 4/29/17
- * Period: 2
- */
 package turtle.ui;
 
 import java.util.HashMap;
@@ -23,6 +14,15 @@ import turtle.file.CompSpec;
 import turtle.file.Level;
 import turtle.file.LevelPack;
 
+/**
+ * GameUITester.java
+ * 
+ * Ensures that the GameUI and its associate parts are working properly.
+ * 
+ * @author Henry Wang
+ * Date: 4/29/17
+ * Period: 2
+ */
 public class GameUITester extends Application
 {
 

@@ -1,12 +1,3 @@
-/**
- * Grid.java
- * 
- * Manages and displays all the grid components in the level.
- * @author Henry Wang
- * Date: 4/27/17
- * Period: 2
- */
-
 package turtle.core;
 
 import java.util.*;
@@ -19,6 +10,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import turtle.comp.Player;
 
+/**
+ * Grid.java
+ * 
+ * Manages and displays all the grid components in the level.
+ * @author Henry Wang
+ * Date: 4/27/17
+ * Period: 2
+ */
 public class Grid extends Pane
 {
 	public static final int DEF_CELL_SIZE = 100;

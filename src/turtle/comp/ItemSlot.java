@@ -1,14 +1,3 @@
-/**
- * ItemUI.java
- * 
- * This represents a single item slot representing a multiplicity of a type of
- * item. This is used by player to keep track of items.
- * 
- * @author Henry Wang
- * Date: 5/5/17
- * Period: 2
- */
-
 package turtle.comp;
 
 import java.util.ArrayList;
@@ -22,6 +11,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import turtle.core.TileSet;
 
+/**
+ * ItemUI.java
+ * 
+ * This represents a single item slot representing a multiplicity of a type of
+ * item. This is used by player to keep track of items.
+ * 
+ * @author Henry Wang
+ * Date: 5/5/17
+ * Period: 2
+ */
 public class ItemSlot extends Pane
 {
 	private static final int SHADOW_RADIUS = 10;

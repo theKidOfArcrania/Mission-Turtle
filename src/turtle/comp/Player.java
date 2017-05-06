@@ -1,12 +1,3 @@
-/**
- * Represents the player unit within the game. The player would directly
- * control this character within the game.
- * 
- * @author Henry Wang
- * Date: 4/28/17
- * Period: 2
- */
-
 package turtle.comp;
 
 import java.util.ArrayList;
@@ -19,12 +10,22 @@ import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
+/**
+ * Player.java
+ * 
+ * Represents the player unit within the game. The player would directly
+ * control this character within the game.
+ * 
+ * @author Henry Wang
+ * Date: 4/28/17
+ * Period: 2
+ */
 public class Player extends Actor
 {	
-
-	private static final double ITEM_RADIUS = .65;
-
+	
 	public static final int DEFAULT_IMAGE = 40;
+	
+	private static final double ITEM_RADIUS = .65;
 
 	private static final double SEMI_TRANSPARENT = .5;
 	private static final int FRAME_STILL = 40;

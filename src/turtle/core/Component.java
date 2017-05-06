@@ -1,13 +1,3 @@
-/**
- * Component.java
- * 
- * Represents the abstract base of all grid components
- * that will be displayed on the Grid.
- * 
- * @author Henry Wang
- * Date: 4/26/17
- * Period: 2
- */
 package turtle.core;
 
 import java.util.Map;
@@ -19,6 +9,16 @@ import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
+/**
+ * Component.java
+ * 
+ * Represents the abstract base of all grid components
+ * that will be displayed on the Grid.
+ * 
+ * @author Henry Wang
+ * Date: 4/26/17
+ * Period: 2
+ */
 public abstract class Component extends Pane 
 {
 	public static final int DEF_ANIMATION_FRAME_CHANGE = 4;

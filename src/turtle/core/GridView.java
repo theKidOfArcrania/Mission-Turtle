@@ -1,3 +1,14 @@
+package turtle.core;
+
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import turtle.comp.Player;
+
 /**
  * GridView.java
  * 
@@ -8,20 +19,6 @@
  * Date: 4/27/17
  * Period: 2
  */
-
-package turtle.core;
-
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Rectangle;
-import turtle.comp.Player;
-
 public class GridView extends Pane
 {
 	public static final int VIEW_ROWS = 8;

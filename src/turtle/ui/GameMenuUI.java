@@ -1,14 +1,3 @@
-/**
- * MenuUI.java
- * 
- * This is displayed to the user when the user clicks the menu button, which
- * gives the user an array of in-game options.
- * 
- * @author Henry Wang
- * Date: 4/30/17
- * Period: 2
- */
-
 package turtle.ui;
 
 import javafx.event.Event;
@@ -21,6 +10,16 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+/**
+ * MenuUI.java
+ * 
+ * This is displayed to the user when the user clicks the menu button, which
+ * gives the user an array of in-game options.
+ * 
+ * @author Henry Wang
+ * Date: 4/30/17
+ * Period: 2
+ */
 public class GameMenuUI extends VBox 
 {
 

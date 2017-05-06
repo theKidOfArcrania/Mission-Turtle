@@ -1,12 +1,3 @@
-/**
- * GameUI.java
- * 
- * This displays the main game UI that the user will interact with.
- * @author Henry Wang
- * Date: 4/28/17
- * Period: 2
- */
-
 package turtle.ui;
 
 import java.util.EnumMap;
@@ -34,6 +25,14 @@ import turtle.file.LevelPack;
 
 import static turtle.ui.GameMenuUI.*;
 
+/**
+ * GameUI.java
+ * 
+ * This displays the main game UI that the user will interact with.
+ * @author Henry Wang
+ * Date: 4/28/17
+ * Period: 2
+ */
 public class GameUI extends VBox
 {
 	private static final int ACTION_START = -1;
@@ -252,6 +251,9 @@ public class GameUI extends VBox
 				}
 				return;
 			case ACTION_START:
+				break;
+			default:
+				throw new InternalError("Should not happen!");
 			}
 		}
 		

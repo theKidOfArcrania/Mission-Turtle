@@ -1,3 +1,11 @@
+package turtle.comp;
+
+import java.util.Map;
+import java.util.function.Predicate;
+
+import turtle.core.Actor;
+import turtle.core.DominanceLevel;
+
 /**
  * Door.java
  * 
@@ -8,15 +16,6 @@
  * Period: 2
  * Date: 5/4/17
  */
-
-package turtle.comp;
-
-import java.util.Map;
-import java.util.function.Predicate;
-
-import turtle.core.Actor;
-import turtle.core.DominanceLevel;
-
 public class Door extends Actor
 {
 	public static final int DEFAULT_IMAGE = 0;

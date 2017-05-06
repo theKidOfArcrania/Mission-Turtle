@@ -1,3 +1,8 @@
+package turtle.comp;
+
+import turtle.core.Actor;
+import turtle.core.DominanceLevel;
+
 /**
  * Enemy.java
  * 
@@ -8,12 +13,6 @@
  * Period: 2
  * Date: 5/2/17
  */
-
-package turtle.comp;
-
-import turtle.core.Actor;
-import turtle.core.DominanceLevel;
-
 public abstract class Enemy extends Actor
 {
 

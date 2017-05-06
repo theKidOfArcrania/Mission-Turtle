@@ -1,3 +1,9 @@
+package turtle.comp;
+
+import turtle.core.Actor;
+import turtle.core.Component;
+import turtle.core.DominanceLevel;
+
 /**
  * Item.java
  * 
@@ -6,13 +12,6 @@
  * Period: 2
  * Date: 5/3/17
  */
-
-package turtle.comp;
-
-import turtle.core.Actor;
-import turtle.core.Component;
-import turtle.core.DominanceLevel;
-
 public abstract class Item extends Actor
 {
 

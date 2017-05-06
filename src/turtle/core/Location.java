@@ -1,3 +1,7 @@
+package turtle.core;
+
+import java.io.Serializable;
+
 /**
  * Location.java
  * 
@@ -6,12 +10,10 @@
  * Date: 4/27/17
  * Period: 2 
  */
-package turtle.core;
-
-import java.io.Serializable;
-
 public class Location implements Serializable
 {
+	private static final long serialVersionUID = -8522783415556204226L;
+	
 	private int row;
 	private int col;
 	

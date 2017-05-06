@@ -1,3 +1,12 @@
+package turtle.file;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
+
+import turtle.core.*;
+
 /**
  * Level.java
  * 
@@ -9,16 +18,6 @@
  * Period: 2
  * Date: 4/27/17 
  */
-
-package turtle.file;
-
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
-
-import turtle.core.*;
-
 public class Level
 {
 	private boolean loaded;
@@ -183,7 +182,7 @@ public class Level
 
 	/**
 	 * Loads a level from the file into memory.
-	 * @param raf
+	 * @param raf the file to load level from
 	 * @throws IllegalStateException if this is called on a level does not
 	 * 		load from file.
 	 * @throws IOException if the level file is corrupted.
@@ -223,6 +222,7 @@ public class Level
 	/**
 	 * Stores the level at the current position in file.
 	 * @param raf the file to write to.
+	 * @throws IOException if unable to write to file.
 	 * @throws IllegalStateException if level is not loaded yet.
 	 */
 	public void saveLevel(RandomAccessFile raf) throws IOException
@@ -312,7 +312,9 @@ public class Level
 	/**
 	 * Writes a component specification to the current location
 	 * @param raf the file to write to
+	 * @param spec the spec to write.
 	 * @param component specification to write
+	 * @throws IOException if unable to write to file.
 	 */
 	private void writeCompSpec(RandomAccessFile raf, CompSpec spec) throws 
 		IOException

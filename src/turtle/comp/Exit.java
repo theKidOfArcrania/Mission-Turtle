@@ -1,14 +1,17 @@
-/**
- * Exit.java
- * 
- * This is the spot
- */
-
 package turtle.comp;
 
 import turtle.core.Actor;
 import turtle.core.Cell;
 
+/**
+ * Exit.java
+ * 
+ * This is the spot where the player can exit and advance to next level.
+ * 
+ * @author Henry wang
+ * Period: 2
+ * Date: 5/6/17
+ */
 public class Exit extends Cell
 {
 	public static final int DEFAULT_IMAGE = 17;
@@ -16,11 +19,23 @@ public class Exit extends Cell
 	
 	private Player winner;
 	
+	/**
+	 * Creates a new exit spot.
+	 */
 	public Exit()
 	{
 		setImageFrame(EXIT_IMAGE);
 	}
 	
+	/**
+	 * Checks whether if actors can pass this cell.
+	 * This will not let any actors other than player from entering. 
+	 * When player has met food requirements, passing cell means the player
+	 * will win the game.
+	 * 
+	 * @param visitor the actor to visit cell
+	 * @return true to allow pass, false to deny pass.
+	 */
 	@Override
 	public boolean pass(Actor visitor)
 	{

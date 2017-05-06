@@ -1,3 +1,12 @@
+
+package turtle.file;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.UUID;
+
 /**
  * LevelPack.java
  * 
@@ -8,20 +17,10 @@
  * Date: 4/28/17
  * Period: 2
  */
-package turtle.file;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.UUID;
-
 public class LevelPack
 {
-	public static final int FIXED_HEADER_SIZE = 0x20;
-	
-	public static final int PACK_FILE_SIG = 0x014D544C; //0x01+'MTL'
-	public static final int VERSION_1 = 1;
+	private static final int PACK_FILE_SIG = 0x014D544C; //0x01+'MTL'
+	private static final int VERSION_1 = 1;
 	
 	private final boolean loadedMode;
 	
@@ -62,6 +61,7 @@ public class LevelPack
 	
 	/**
 	 * Creates a new editable LevelPack, initially with no levels
+	 * @param name the name of the level-pack to create with
 	 */
 	public LevelPack(String name)
 	{
@@ -84,6 +84,7 @@ public class LevelPack
 	/**
 	 * Saves the level pack into a file.
 	 * @param file the file to save to.
+	 * @throws IOException if unable to save to file.
 	 * @throws IllegalStateException if LevelPack is loaded from file or 
 	 * 	if not all levels are loaded.
 	 */
@@ -95,28 +96,30 @@ public class LevelPack
 			if (!lvl.isLoaded())
 				throw new IllegalStateException("Levels are not all loaded");
 		
-		RandomAccessFile raf = new RandomAccessFile(file, "rw");
-		raf.writeInt(PACK_FILE_SIG);
-		raf.writeInt(VERSION_1);
-		raf.writeInt(levels.size());
-		
-		long levelOffsets = raf.getFilePointer();
-		for (int i = 0; i < levels.size(); i++)
-			raf.writeLong(0);
-		raf.writeLong(levelPackID.getMostSignificantBits());
-		raf.writeLong(levelPackID.getLeastSignificantBits());
-		raf.writeUTF(name);
-		
-		long[] offsets = new long[levels.size()];
-		for (int i = 0; i < levels.size(); i++)
+		try (RandomAccessFile raf = new RandomAccessFile(file, "rw"))
 		{
-			offsets[i] = raf.getFilePointer();
-			levels.get(i).saveLevel(raf);
+			raf.writeInt(PACK_FILE_SIG);
+			raf.writeInt(VERSION_1);
+			raf.writeInt(levels.size());
+			
+			long levelOffsets = raf.getFilePointer();
+			for (int i = 0; i < levels.size(); i++)
+				raf.writeLong(0);
+			raf.writeLong(levelPackID.getMostSignificantBits());
+			raf.writeLong(levelPackID.getLeastSignificantBits());
+			raf.writeUTF(name);
+			
+			long[] offsets = new long[levels.size()];
+			for (int i = 0; i < levels.size(); i++)
+			{
+				offsets[i] = raf.getFilePointer();
+				levels.get(i).saveLevel(raf);
+			}
+			
+			raf.seek(levelOffsets);
+			for (long off : offsets)
+				raf.writeLong(off);
 		}
-		
-		raf.seek(levelOffsets);
-		for (long off : offsets)
-			raf.writeLong(off);
 	}
 	
 	/**
@@ -135,6 +138,7 @@ public class LevelPack
 	 * Loads a level from file and returns it. 
 	 * @param index index of level to load.
 	 * @return the loaded level.
+	 * @throws IOException if level fails to load from file.
 	 * @throws IllegalStateException if this LevelPack does not load from a 
 	 * 		file.
 	 */

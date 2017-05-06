@@ -1,3 +1,11 @@
+
+
+package turtle.core;
+
+import javafx.geometry.Rectangle2D;
+import javafx.scene.image.Image;
+import turtle.comp.*;
+
 /**
  * TileSet.java
  * 
@@ -7,32 +15,31 @@
  * Date: 4/26/17
  * Period: 2
  */
-
-package turtle.core;
-
-import javafx.geometry.Rectangle2D;
-import javafx.scene.image.Image;
-import turtle.comp.*;
-
 public class TileSet
 {
+	@SuppressWarnings("unchecked")
 	private static final Class<Component>[] DEF_COMPS = new Class[] {Door.class, 
 			TestCell.class, TestCell.class, Water.class, Exit.class, Fire.class,
 			TestCell.class, TestCell.class, TestCell.class, TestCell.class,
 			Player.class, Key.class}; 
 	
-	private static final int FRAME_SIZE = 100;
+	private static final int DEF_FRAME_SIZE = 100;
 	private static final int FRAME_ROWS = 16;
 	private static final int FRAME_COLS = 16;
 	
+	private int frameSize;
 	private Image tileset;
 	private Class<Component>[] compIndex;
 	
+	/**
+	 * Constructs a new default tile-set
+	 */
 	public TileSet()
 	{
 		tileset = new Image(ClassLoader.getSystemResourceAsStream(
 				"tileset.png"));
 		compIndex = DEF_COMPS;
+		frameSize = DEF_FRAME_SIZE;
 		//TODO: finish all component indexes.
 	}
 	
@@ -60,7 +67,7 @@ public class TileSet
 		if (index < 0 || row >= FRAME_ROWS)
 			throw new IndexOutOfBoundsException("" + index);
 		
-		double s = FRAME_SIZE;
+		double s = getFrameSize();
 		return new Rectangle2D(col * s, row * s, s, s);
 	}
 	
@@ -75,10 +82,10 @@ public class TileSet
 	}
 	
 	/**
-	 * @return the Frame size per image in this tile-set 
+	 * @return the frame size per image in this tile-set 
 	 */
 	public int getFrameSize()
 	{
-		return FRAME_SIZE;
+		return frameSize;
 	}
 }

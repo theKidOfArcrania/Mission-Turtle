@@ -1,3 +1,5 @@
+package turtle.core;
+
 /**
  * Cell.java
  * 
@@ -8,9 +10,6 @@
  * Date: 4/26/17
  * Period: 2
  */
-
-package turtle.core;
-
 public abstract class Cell extends Component
 {
 	private int frameTransform;
