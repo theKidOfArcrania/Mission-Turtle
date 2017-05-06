@@ -1,5 +1,12 @@
 package turtle.ui;
 
+import static turtle.ui.GameMenuUI.ID_EXIT;
+import static turtle.ui.GameMenuUI.ID_LEVELSELECT;
+import static turtle.ui.GameMenuUI.ID_MAINMENU;
+import static turtle.ui.GameMenuUI.ID_RESTART;
+import static turtle.ui.GameMenuUI.ID_RESUME;
+
+import java.util.ArrayDeque;
 import java.util.EnumMap;
 
 import javafx.animation.FadeTransition;
@@ -13,7 +20,13 @@ import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import turtle.comp.Player;
@@ -22,8 +35,6 @@ import turtle.core.Grid;
 import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
-
-import static turtle.ui.GameMenuUI.*;
 
 /**
  * GameUI.java
@@ -45,13 +56,20 @@ public class GameUI extends VBox
 	 */
 	private class GameTimer extends Transition
 	{
+		private static final int FRAME_SAMPLE = 100;
+		private long prevTime;
 		private long frame;
+		private ArrayDeque<Long> frameTimes;
+		private double fps;
 		
 		/**
 		 * Constructs a new GameTimer.
 		 */
 		public GameTimer(){
+			prevTime = -1;
 			frame = 0;
+			fps = 0;
+			frameTimes = new ArrayDeque<>(FRAME_SAMPLE);
 			setCycleCount(INDEFINITE);
 			setCycleDuration(FRAME_DURATION);
 		}
@@ -68,6 +86,20 @@ public class GameUI extends VBox
 
 			if (frac == 1) // Next Frame
 			{
+				long time = System.nanoTime();
+				if (prevTime != -1)
+				{
+					while (frameTimes.size() > FRAME_SAMPLE - 1)
+						frameTimes.remove();
+					frameTimes.add(time - prevTime);
+					double fps = 0;
+					for (long ftime : frameTimes)
+						fps += ftime * 1e-9;
+					fps = frameTimes.size() / fps;
+					this.fps = fps;
+					System.out.printf("%.9f\n", fps);
+				}
+				prevTime = time;
 				updateFrame(frame);
 				frame++;
 			}
@@ -81,6 +113,14 @@ public class GameUI extends VBox
 		{
 			super.stop();
 			frame = 0;
+		}
+		
+		/**
+		 * @return current frame-per-second value
+		 */
+		public double getFps()
+		{
+			return fps;
 		}
 	}
 	
