@@ -1,5 +1,6 @@
 package turtle.ui;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
 
@@ -235,7 +236,19 @@ public class GameUI extends VBox
 	{
 		//TODO: load scores. start from chosen level.
 		currentPack = pck;
-		initLevel(currentPack.getLevel(0));
+		try
+		{
+			currentPack.loadLevel(0);
+			initLevel(currentPack.getLevel(0));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			//TODO: tell user that level is corrupted.
+			System.out.println("Level data corrupted!");
+			System.exit(1);
+		}
+		
 	}
 	
 	/**

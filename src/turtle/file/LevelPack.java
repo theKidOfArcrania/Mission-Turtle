@@ -98,6 +98,8 @@ public class LevelPack
 		
 		try (RandomAccessFile raf = new RandomAccessFile(file, "rw"))
 		{
+			raf.setLength(0);
+			
 			raf.writeInt(PACK_FILE_SIG);
 			raf.writeInt(VERSION_1);
 			raf.writeInt(levels.size());

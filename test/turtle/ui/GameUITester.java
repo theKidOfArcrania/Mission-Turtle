@@ -1,13 +1,18 @@
 package turtle.ui;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.TreeMap;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import turtle.comp.ColorType;
 import turtle.core.Component;
-import turtle.core.Grid;
 import turtle.core.Location;
 import turtle.file.CompSpec;
 import turtle.file.Level;
@@ -49,6 +54,23 @@ public class GameUITester extends Application
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
+		Map<String, Method> tests = initializeTests();
+		System.out.println("Available tests: ");
+		for (String test : tests.keySet())
+			System.out.println("  -" + test);
+		
+		Method selected = null;
+		Scanner in = new Scanner(System.in);
+		while (selected == null)
+		{
+			System.out.printf("Enter a test to do: ");
+			String test = in.nextLine();
+			if (tests.containsKey(test))
+				selected = tests.get(test);
+			else
+				System.out.println("Invalid test: " + test + ". Try again.");
+		}
+		
 		GameUI gui = new GameUI();
 		Scene s = new Scene(gui);
 		s.getStylesheets().add("/turtle/ui/styles.css");
@@ -59,10 +81,29 @@ public class GameUITester extends Application
 		
 		gui.requestFocus();
 		
-		LevelPack pack = generateHintTest();
+		LevelPack pack = (LevelPack) selected.invoke(this);
 		gui.initLevelPack(pack);
-		
-		Grid lvl = gui.getGridView().getGrid();
+	}
+
+	/**
+	 * Initializes all the test methods found within this class.
+	 * @return a mapping of test names and methods.
+	 */
+	private Map<String, Method> initializeTests()
+	{
+		final String TEST_PREFIX = "test";
+		Map<String, Method> tests = new TreeMap<>();
+		for (Method mth : GameUITester.class.getDeclaredMethods())
+		{
+			if (mth.getName().startsWith(TEST_PREFIX) && 
+					mth.getParameterTypes().length == 0 &&
+					LevelPack.class.isAssignableFrom(mth.getReturnType()))
+			{
+				mth.setAccessible(true);
+				tests.put(mth.getName().substring(TEST_PREFIX.length()), mth);
+			}
+		}
+		return tests;
 	}
 
 	/**
@@ -72,7 +113,7 @@ public class GameUITester extends Application
 	 * 
 	 * @return a created level-pack.
 	 */
-	private LevelPack generateItemTimeTest()
+	private LevelPack testItemTimes()
 	{
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
@@ -122,7 +163,7 @@ public class GameUITester extends Application
 	 * Tests the enemies' movement patterns.
 	 * @return a level pack to test enemy patterns.
 	 */
-	private LevelPack generateEnemyTest()
+	private LevelPack testEnemies()
 	{
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
@@ -145,7 +186,7 @@ public class GameUITester extends Application
 	 * Generates test packs to test hint tiles.
 	 * @return
 	 */
-	private LevelPack generateHintTest()
+	private LevelPack testHints()
 	{
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
@@ -160,29 +201,23 @@ public class GameUITester extends Application
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 3), COMP_IND_HINT, params));
 		params.put("message", "Testing how long a string could be before " +
-				"these ellipse will show up!! Hmmm... maybe a little longer " +
-				"than I anticipate! Wait... where are the ellipses? Pretty " + 
-				"sure it's long enough for these '...'!!! Where is it? Okay " +
-				"now i'm worried! Where are they?");
+				"these ellipse will show up!! Hmmm, maybe a little longer " +
+				"than I anticipated! Wait? Where are the ellipses? Pretty " + 
+				"sure it's long enough for those '...'!!! Where is it? Okay " +
+				"now i'm worried! Where are they? Oh I miss you :(");
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 4), COMP_IND_HINT, params));
-		params.put("message", "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" );
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 5), COMP_IND_HINT, params));
 		
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
 		testPack.addLevel(test);
 		
 		return testPack;
+	}
+	
+	private LevelPack testLoading() throws IOException
+	{
+		return new LevelPack(new File("test.mtp"));
 	}
 	
 	/**

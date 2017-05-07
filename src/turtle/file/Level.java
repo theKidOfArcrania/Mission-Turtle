@@ -58,9 +58,13 @@ public class Level
 	 * @param name the name of this level.
 	 * @param rows the number of rows.
 	 * @param cols the number of columns.
+	 * @throws IllegalArgumentException if dimensions are not positive numbers.
 	 */
 	public Level(String name, int rows, int cols)
 	{
+		if (rows <= 0 || cols <= 0)
+			throw new IllegalArgumentException("Dimensions must be positive.");
+		
 		this.parent = null;
 		this.name = name;
 		this.rows = rows;
@@ -74,9 +78,13 @@ public class Level
 	/**
 	 * Creates the grid that is specified by this level data.
 	 * @return an interactable live Grid.
+	 * @throws IllegalStateException if level is not loaded yet.
 	 */
 	public Grid createLevel()
 	{
+		if (!isLoaded())
+			throw new IllegalStateException("Level has not been loaded yet.");
+		
 		Grid g = new Grid(rows, cols);
 		for (CompSpec spec : cells)
 			g.placeCell((Cell)spec.createComponent());
@@ -231,15 +239,15 @@ public class Level
 			throw new IllegalStateException("Not loaded yet.");
 		
 		//Write header.
-		raf.write(rows);
-		raf.write(cols);
+		raf.writeInt(rows);
+		raf.writeInt(cols);
 		
 		raf.writeUTF(name);
-		raf.write(foodReq);
-		raf.write(timeLimit);
+		raf.writeInt(foodReq);
+		raf.writeInt(timeLimit);
 		
-		raf.write(cells.size());
-		raf.write(actors.size());
+		raf.writeInt(cells.size());
+		raf.writeInt(actors.size());
 		
 		//Write comp-specs
 		for (CompSpec spec : cells)
@@ -300,7 +308,7 @@ public class Level
 	{
 		Location loc = new Location(raf.readInt(), raf.readInt());
 		short compID = raf.readShort();
-		byte[] initData = new byte[raf.read()];
+		byte[] initData = new byte[raf.readInt()];
 		raf.read(initData);
 		
 		TileSet ts = Component.DEFAULT_SET;
@@ -320,12 +328,12 @@ public class Level
 		IOException
 	{
 		Location loc = spec.getLocation();
-		raf.write(loc.getRow());
-		raf.write(loc.getColumn());
-		raf.write(spec.getSlot());
+		raf.writeInt(loc.getRow());
+		raf.writeInt(loc.getColumn());
+		raf.writeShort(spec.getSlot());
 		
 		byte[] initData = spec.storeParameters();
-		raf.write(initData.length);
+		raf.writeInt(initData.length);
 		raf.write(initData);
 	}
 }

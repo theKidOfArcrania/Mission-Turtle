@@ -151,6 +151,9 @@ public class CompSpec
 	 */
 	public byte[] storeParameters() throws IOException
 	{
+		if (params.isEmpty())
+			return new byte[0];
+		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (ObjectOutputStream oos = new ObjectOutputStream(baos))
 		{
