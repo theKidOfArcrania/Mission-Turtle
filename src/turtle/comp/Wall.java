@@ -14,8 +14,8 @@ import turtle.core.Cell;
  */
 public class Wall extends Cell
 {
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 51;
-	
 	private static final int WALL_IMAGE = 51;
 	
 	/**
@@ -39,4 +39,16 @@ public class Wall extends Cell
 		return false;
 	}
 
+	/**
+	 * Checks whether if a pass to this cell is ever possible. This
+	 * lets no one to pass this wall. It will block everything.
+	 * 
+	 * @param visitor the actor passing this cell
+	 * @return false always to prohibit such a move.
+	 */
+	@Override
+	public boolean checkPass(Actor visitor)
+	{
+		return false;
+	}
 }

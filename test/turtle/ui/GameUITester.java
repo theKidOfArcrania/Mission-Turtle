@@ -33,7 +33,9 @@ public class GameUITester extends Application
 	private static final short COMP_IND_PLAYER = (short)10;
 	private static final short COMP_IND_KEY = (short)11;
 	private static final short COMP_IND_BIRD = (short)13;
+	private static final short COMP_IND_FOOD = (short)14;
 	
+	@SuppressWarnings("javadoc")
 	public static void main(String[] args)
 	{
 		Application.launch(args);
@@ -73,6 +75,8 @@ public class GameUITester extends Application
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", 20, 20);
 		
+		test.setFoodRequirement(50);
+		test.setTimeLimit(50);
 		test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
 		
@@ -89,15 +93,20 @@ public class GameUITester extends Application
 					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 							new Location(r, c), COMP_IND_WATER, new HashMap<>()));
 				
-				HashMap<String, Object> params = new HashMap<>();
-				if (Math.random() < .2)
+				if (r % 6 != 1)
 				{
-					params.put("color", (int)(Math.random() * ColorType.values()
-							.length));
-					test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-							new Location(r, c), COMP_IND_KEY, params));
+					HashMap<String, Object> params = new HashMap<>();
+					if (Math.random() < .2)
+					{
+						params.put("color", (int)(Math.random() * ColorType.values()
+								.length));
+						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+								new Location(r, c), COMP_IND_KEY, params));
+					}
+					else if (Math.random() < .4 || c == 1)
+						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+								new Location(r, c), COMP_IND_FOOD, new HashMap<>()));
 				}
-				
 			}
 		
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 

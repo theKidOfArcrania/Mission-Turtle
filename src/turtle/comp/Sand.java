@@ -14,7 +14,7 @@ import turtle.core.Cell;
  */
 public class Sand extends Cell
 {
-
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 26;
 	private static final int SAND_IMAGE = 26;
 	
@@ -35,6 +35,19 @@ public class Sand extends Cell
 	 */
 	@Override
 	public boolean pass(Actor visitor)
+	{
+		return true;
+	}
+
+	/**
+	 * Checks whether if a pass to this cell is ever possible. This
+	 * lets everything to pass this sand.
+	 * 
+	 * @param visitor the visitor to check against.
+	 * @return true always to permit such a move.
+	 */
+	@Override
+	public boolean checkPass(Actor visitor)
 	{
 		return true;
 	}

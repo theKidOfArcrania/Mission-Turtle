@@ -1,6 +1,9 @@
 package turtle.core;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -20,7 +23,7 @@ import turtle.comp.Player;
  */
 public class Grid extends Pane
 {
-	public static final int DEF_CELL_SIZE = 100;
+	
 	
 	private static final Color SHADOW_COLOR = Color.web("#101010");
 	private static final double SHADOW_RADIUS = 20;
@@ -156,7 +159,7 @@ public class Grid extends Pane
 		/**
 		 * Compares two actors in reverse dominance order.
 		 */
-		Collections.sort(residents, new Comparator<Actor>() 
+		residents.sort(new Comparator<Actor>() 
 		{
 			/**
 			 * Compares each actor 
@@ -379,10 +382,10 @@ public class Grid extends Pane
 	
 	/**
 	 * Checks whether if the actor "visitor" can visit this 
-	 * location. It first checks for bounds issues, then
-	 * checks if the cell will permit, then whether if the 
-	 * actors will permit. If all is well, it will move the
-	 * actor.
+	 * location. It first checks for bounds issues. Then
+	 * it makes a preliminary check, then executes the 
+	 * visiting action. It always starts with the cell,
+	 * then moves up in actor dominance from highest to lowest
 	 * 
 	 * @param visitor the actor visitor that will move.
 	 * @param row row of the new location.
@@ -390,31 +393,45 @@ public class Grid extends Pane
 	 * @return true if the visit is permitted, false otherwise.
 	 */
 	private boolean checkVisit(Actor visitor, int row, int col)
-	{
+	{	
 		if (visitor.isMoving())
 			return false;
 		
 		if (!isValidLocation(row, col))
 			return false;
 		
-		if (base[row][col] != null && !base[row][col].pass(visitor))
+		if (base[row][col] != null && !base[row][col].checkPass(visitor))
 			return false;
 		
 		List<Actor> residents = getResidents(visitor, row, col);
-		for (Actor res : residents)
+		residents.remove(visitor);
+		
+		Actor[] master = new Actor[residents.size()];
+		Actor[] slave = new Actor[residents.size()];
+		for (int i = 0; i < residents.size(); i++)
 		{
-			if (res == visitor)
-				continue;
-			
-			boolean result;
+			Actor res = residents.get(i);
 			if (visitor.dominanceLevelFor(res).compareTo(
 					res.dominanceLevelFor(visitor)) >= 0)
-				result = visitor.interact(res);
+			{
+				master[i] = visitor;
+				slave[i] = res;
+			}
 			else
-				result = res.interact(visitor);
-			if (!result)
+			{
+				master[i] = res;
+				slave[i] = visitor;
+			}
+			if (!master[i].checkInteract(slave[i]))
 				return false;
 		}
+		
+		if (base[row][col] != null && !base[row][col].pass(visitor))
+			return false;
+		
+		for (int i = 0; i < residents.size(); i++)
+			if (!master[i].interact(slave[i]))
+				return false;
 		
 		visitor.getHeadLocation().setLocation(row, col);
 		

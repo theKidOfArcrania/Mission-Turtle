@@ -20,6 +20,7 @@ import turtle.core.DominanceLevel;
  */
 public class Hint extends Actor
 {
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = -1; //TODO: get image index 
 			
 	private String message;
@@ -112,6 +113,17 @@ public class Hint extends Actor
 		return true;
 	}
 
+	/**
+	 * Checks whether an interaction with another actor is possible.
+	 * This will always let actors pass through
+	 * 
+	 * @param other the other actor to interact with.
+	 * @return true to always allow others to enter.
+	 */
+	public boolean checkInteract(Actor other) {
+		return true;
+	}
+	
 	/**
 	 * Obtains dominance level for actor. This actor will always be
 	 * a fixture dominance, having a relatively high dominance level.

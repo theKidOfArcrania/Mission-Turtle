@@ -26,12 +26,23 @@ public abstract class Item extends Actor
 		if (other instanceof Player)
 		{
 			Player p = (Player)other;
-			p.collectItem(this);
-			getParentGrid().removeActor(this);
+			if (p.collectItem(this))
+				getParentGrid().removeActor(this);
 		}
 		return true;
 	}
 
+	/**
+	 * Checks whether an interaction with another actor is possible.
+	 * This will always let actors pass through
+	 * 
+	 * @param other the other actor to interact with.
+	 * @return true to always allow others to enter.
+	 */
+	public boolean checkInteract(Actor other) {
+		return true;
+	}
+	
 	/**
 	 * Overrides dying so that it doesn't die from anything,
 	 * as this is a fixture.

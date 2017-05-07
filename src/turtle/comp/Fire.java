@@ -14,6 +14,7 @@ import turtle.core.Cell;
  */
 public class Fire extends Cell
 {
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 18; 
 	private static final int[] ANIMATE_FRAMES = {18, 19, 20};
 	private static final int[] TRANSFORM_FRAMES = {19, 21, 22, 23, 24, 25, 26};
@@ -35,6 +36,19 @@ public class Fire extends Cell
 			randomized[b] = tmp;
 		}
 		animateFrames(randomized, true);
+	}
+	
+	/**
+	 * Checks whether if a pass to this cell is ever possible. Fire
+	 * will kill everything but it will first let it pass through.
+	 * 
+	 * @param visitor the actor passing this cell.
+	 * @return always returns true to allow visitor to pass cell
+	 */
+	@Override
+	public boolean checkPass(Actor visitor)
+	{
+		return true;
 	}
 	
 	/**

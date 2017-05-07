@@ -106,6 +106,17 @@ public abstract class Actor extends Component
 	}
 	
 	/**
+	 * Checks whether an interaction with another actor is possible.
+	 * This should suppress any actions done in the {@link #interact(Actor)}
+	 * method.
+	 * 
+	 * @param other the other actor to interact with.
+	 * @return true if the other actor can pass into location
+	 *         false if other actor is prohibited to pass.
+	 */
+	public abstract boolean checkInteract(Actor other);
+	
+	/**
 	 * Executes an interaction with another actor.
 	 * 
 	 * @param other the other actor to interact with.

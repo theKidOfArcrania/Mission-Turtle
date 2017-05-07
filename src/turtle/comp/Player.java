@@ -1,6 +1,8 @@
 package turtle.comp;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Predicate;
 
 import javafx.beans.InvalidationListener;
@@ -22,7 +24,7 @@ import turtle.core.DominanceLevel;
  */
 public class Player extends Actor
 {	
-	
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 40;
 	
 	private static final double ITEM_RADIUS = .65;
@@ -81,35 +83,45 @@ public class Player extends Actor
 	 */
 	public boolean collectItem(Item itm)
 	{
-		if (itm instanceof Key)
+		if (getParentGrid() == null)
+			return false;
+		
+		if (itm instanceof Food)
+			getParentGrid().incrementFood();
+		
+		pocket.add(itm);
+		for (ItemSlot slot : slots)
 		{
-			pocket.add(itm);
-			for (ItemSlot slot : slots)
-			{
-				if (slot.addItem(itm))
-					return true;
-			}
-			
-			ItemSlot newSlot = new ItemSlot();
-			newSlot.addItem(itm);
-			
-			Rotate negateRotate = new Rotate(0, Rotate.Z_AXIS);
-			negateRotate.angleProperty().bind(rotateProperty().negate());
-			negateRotate.pivotXProperty().bind(widthProperty().divide(2)
-					.subtract(newSlot.translateXProperty()));
-			negateRotate.pivotYProperty().bind(heightProperty().divide(2)
-					.subtract(newSlot.translateYProperty()));
-			newSlot.getTransforms().add(negateRotate);
-
-			newSlot.setOpacity(itemOpacity);
-			
-			slots.add(newSlot);
-			getChildren().add(newSlot);
-			layoutSlots();
-			
-			return true;
+			if (slot.addItem(itm))
+				return true;
 		}
-		return false;
+		
+		ItemSlot newSlot = new ItemSlot();
+		newSlot.addItem(itm);
+		
+		Rotate negateRotate = new Rotate(0, Rotate.Z_AXIS);
+		negateRotate.angleProperty().bind(rotateProperty().negate());
+		negateRotate.pivotXProperty().bind(widthProperty().divide(2)
+				.subtract(newSlot.translateXProperty()));
+		negateRotate.pivotYProperty().bind(heightProperty().divide(2)
+				.subtract(newSlot.translateYProperty()));
+		newSlot.getTransforms().add(negateRotate);
+
+		newSlot.setOpacity(itemOpacity);
+		
+		slots.add(newSlot);
+		getChildren().add(newSlot);
+		layoutSlots();
+		
+		return true;
+	}
+	
+	/**
+	 * @return a read-only list of items the user has stored.
+	 */
+	public List<Item> getPocket()
+	{
+		return Collections.unmodifiableList(pocket);
 	}
 	
 	/**
@@ -260,5 +272,16 @@ public class Player extends Actor
 			slot.setTranslateX(radius * Math.sin(i * step));
 			slot.setTranslateY(radius * -Math.cos(i * step));
 		}
+	}
+
+	/**
+	 * Checks whether an interaction with another actor is possible.
+	 * This will always let actors pass through
+	 * 
+	 * @param other the other actor to interact with.
+	 * @return true to always allow others to enter.
+	 */
+	public boolean checkInteract(Actor other) {
+		return true;
 	}
 }

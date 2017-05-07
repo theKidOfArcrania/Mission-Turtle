@@ -17,6 +17,17 @@ public abstract class Enemy extends Actor
 {
 
 	/**
+	 * Checks whether an interaction with another actor is possible.
+	 * This only let players go through.
+	 * 
+	 * @param other the other actor to interact with.
+	 * @return true to always allow interaction, false to deny interaction.
+	 */
+	public boolean checkInteract(Actor other) {
+		return true;
+	}
+	
+	/**
 	 * Interacts with other actors. By default, this will
 	 * kill the player (let player pass here), but to others,
 	 * it is a wall-like object.

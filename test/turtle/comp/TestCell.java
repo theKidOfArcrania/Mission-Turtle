@@ -14,6 +14,7 @@ import turtle.core.Cell;
  */
 public class TestCell extends Cell
 {
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 51;
 	
 	/**
@@ -44,6 +45,17 @@ public class TestCell extends Cell
 	 */
 	@Override
 	public boolean pass(Actor visitor)
+	{
+		return true;
+	}
+
+	/**
+	 * Allows everything to pass cell.
+	 * @param visitor actor that visited.
+	 * @return true always to allow pass.
+	 */
+	@Override
+	public boolean checkPass(Actor visitor)
 	{
 		return true;
 	}

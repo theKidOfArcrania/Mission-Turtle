@@ -18,6 +18,7 @@ import turtle.core.Cell;
  */
 public class Water extends Cell
 {
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 12;
 	
 	private static final int[] ANIMATION_FRAME = {12,13,14,15,16};
@@ -84,5 +85,18 @@ public class Water extends Cell
 			if (frameCount < MAX_TRANSFORM)
 				frameCount++;
 		}
+	}
+
+	/**
+	 * Checks whether if a pass to this cell is ever possible. Water
+	 * will kill everything but it will first let it pass through.
+	 * 
+	 * @param visitor the actor passing this cell.
+	 * @return always returns true to allow visitor to pass cell
+	 */
+	@Override
+	public boolean checkPass(Actor visitor)
+	{
+		return true;
 	}
 }

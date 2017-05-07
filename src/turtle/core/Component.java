@@ -21,12 +21,19 @@ import javafx.scene.layout.Pane;
  */
 public abstract class Component extends Pane 
 {
+	/** 
+	 * The default number of frames to wait to change one image in an 
+	 * animation sequence.
+	 */
 	public static final int DEF_ANIMATION_FRAME_CHANGE = 4;
 	
-	public static final double MOVE_SPEED = 10.0;
+	/** A very small number used to approximate zero.*/
 	public static final double SMALL = .0001;
 	
+	/** The default tile-set to use. */
 	public static final TileSet DEFAULT_SET = new TileSet();
+	
+	private  static final double MOVE_SPEED = 10.0;
 	
 	private final TileSet ts;
 	private final ImageView img;

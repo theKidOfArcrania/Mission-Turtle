@@ -14,6 +14,7 @@ import turtle.core.Location;
  */
 public class Bird extends Enemy
 {
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 52;
 	
 	private static final int BIRD_STILL_IMAGE = 52;

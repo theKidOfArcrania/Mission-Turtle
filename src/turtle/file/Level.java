@@ -33,7 +33,7 @@ public class Level
 	private ArrayList<CompSpec> cells = new ArrayList<>();
 	private ArrayList<CompSpec> actors = new ArrayList<>();
 	
-	//Set by LevelPack.
+	/** The parent level pack of this level. This is internally set by LevelPack */
 	LevelPack parent; 
 	
 	/**

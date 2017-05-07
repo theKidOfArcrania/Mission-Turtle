@@ -11,6 +11,7 @@ package turtle.comp;
  * Period: 2
  * Date: 5/3/17
  */
+@SuppressWarnings("javadoc")
 public enum ColorType
 {
 	YELLOW, ORANGE, RED, PURPLE, BLUE, GREEN;

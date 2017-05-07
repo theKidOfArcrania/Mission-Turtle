@@ -1,3 +1,10 @@
+package turtle.comp;
+
+import turtle.core.Actor;
+import turtle.core.DominanceLevel;
+import turtle.core.Grid;
+import turtle.core.Location;
+
 /**
  * Mover.java
  * 
@@ -6,14 +13,6 @@
  * Period: 2
  * Date: 5/2/17
  */
-
-package turtle.comp;
-
-import turtle.core.Actor;
-import turtle.core.DominanceLevel;
-import turtle.core.Grid;
-import turtle.core.Location;
-
 public abstract class Mover extends Actor
 {
 

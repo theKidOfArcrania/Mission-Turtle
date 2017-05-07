@@ -25,6 +25,15 @@ public abstract class Cell extends Component
 	}
 	
 	/**
+	 * Checks whether if a pass to this cell is ever possible. This
+	 * does a preliminary check without doing executing any actions
+	 * @param visitor the visitor to check against.
+	 * @return true if cell allows visitor to pass cell
+	 *         false if cell prohibits such a move. 
+	 */
+	public abstract boolean checkPass(Actor visitor);
+	
+	/**
 	 * Executes a pass when an visitor actor comes to this cell.
 	 * @param visitor the actor passing this cell
 	 * @return true if cell allows visitor to pass cell

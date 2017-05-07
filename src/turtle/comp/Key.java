@@ -14,6 +14,7 @@ import java.util.Map;
  */
 public class Key extends Item
 {
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 45;
 	private static final int KEY_OFFSET_IMAGE = 45;
 	

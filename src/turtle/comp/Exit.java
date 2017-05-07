@@ -14,6 +14,7 @@ import turtle.core.Cell;
  */
 public class Exit extends Cell
 {
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 17;
 	private static final int EXIT_IMAGE = 17;
 	
@@ -28,10 +29,9 @@ public class Exit extends Cell
 	}
 	
 	/**
-	 * Checks whether if actors can pass this cell.
-	 * This will not let any actors other than player from entering. 
-	 * When player has met food requirements, passing cell means the player
-	 * will win the game.
+	 * Executes an actor passing this cell. This will not let any actors 
+	 * other than player from entering. When player has met food requirements, 
+	 * passing cell means the player will win the game.
 	 * 
 	 * @param visitor the actor to visit cell
 	 * @return true to allow pass, false to deny pass.
@@ -60,5 +60,18 @@ public class Exit extends Cell
 		if (winner != null && winner.getTrailingLocation().equals(
 				getHeadLocation()))
 			winner.win();
+	}
+
+	/**
+	 * Checks whether if actors can pass this cell. This will not let 
+	 * any actors other than player from entering. 
+	 * 
+	 * @param visitor the actor to visit cell
+	 * @return true to allow pass, false to deny pass.
+	 */
+	@Override
+	public boolean checkPass(Actor visitor)
+	{
+		return visitor instanceof Player;
 	}
 }

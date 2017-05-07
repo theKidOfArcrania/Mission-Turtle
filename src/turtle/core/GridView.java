@@ -21,8 +21,13 @@ import turtle.comp.Player;
  */
 public class GridView extends Pane
 {
+	/** The number of rows in the view. */
 	public static final int VIEW_ROWS = 8;
+	
+	/** The number of columns in the view. */
 	public static final int VIEW_COLS = 12;
+	
+	private static final int DEF_CELL_SIZE = 100;
 	
 	private static final double INTERNAL_PADDING = 20;
 	private static final double CORNER_RADIUS = 5.0;
@@ -57,7 +62,7 @@ public class GridView extends Pane
 		viewed = grid;
 		getChildren().clear();
 		
-		int cellSize = Grid.DEF_CELL_SIZE;
+		int cellSize = DEF_CELL_SIZE;
 		if (grid != null)
 			cellSize = grid.getCellSize();
 		
@@ -102,7 +107,7 @@ public class GridView extends Pane
 	protected double computeMaxWidth(double height)
 	{
 		if (viewed == null)
-			return cols * Grid.DEF_CELL_SIZE;
+			return cols * DEF_CELL_SIZE;
 		return cols * viewed.getCellSize();
 	}
 	
@@ -115,7 +120,7 @@ public class GridView extends Pane
 	protected double computeMaxHeight(double width)
 	{
 		if (viewed == null)
-			return rows * Grid.DEF_CELL_SIZE;
+			return rows * DEF_CELL_SIZE;
 		return rows * viewed.getCellSize();
 	}
 	
@@ -128,7 +133,7 @@ public class GridView extends Pane
 	protected double computePrefWidth(double height)
 	{
 		if (viewed == null)
-			return cols * Grid.DEF_CELL_SIZE;
+			return cols * DEF_CELL_SIZE;
 		return cols * viewed.getCellSize();
 	}
 	
@@ -141,7 +146,7 @@ public class GridView extends Pane
 	protected double computePrefHeight(double width)
 	{
 		if (viewed == null)
-			return rows * Grid.DEF_CELL_SIZE;
+			return rows * DEF_CELL_SIZE;
 		return rows * viewed.getCellSize();
 	}
 	
@@ -154,7 +159,7 @@ public class GridView extends Pane
 	protected double computeMinWidth(double height)
 	{
 		if (viewed == null)
-			return cols * Grid.DEF_CELL_SIZE;
+			return cols * DEF_CELL_SIZE;
 		return cols * viewed.getCellSize();
 	}
 	
@@ -167,7 +172,7 @@ public class GridView extends Pane
 	protected double computeMinHeight(double width)
 	{
 		if (viewed == null)
-			return rows * Grid.DEF_CELL_SIZE;
+			return rows * DEF_CELL_SIZE;
 		return rows * viewed.getCellSize();
 	}
 	

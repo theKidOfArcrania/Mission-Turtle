@@ -18,6 +18,7 @@ import turtle.core.DominanceLevel;
  */
 public class Door extends Actor
 {
+	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = 0;
 	private static final int LOCK_OFFSET_IMAGE = 0;
 	
@@ -32,37 +33,21 @@ public class Door extends Actor
 	}
 	
 	/**
-	 * Executes an interaction with another actor. This will only
-	 * allow the pass if an actor has a color-matching key. This 
-	 * will subsequently take away that key used to open this door.
+	 * Checks whether an interaction with another actor is possible.
+	 * This checks if the actor contains a key of this same color to this door.
 	 * 
 	 * @param other the other actor to interact with.
 	 * @return true if the other actor can pass into location
 	 *         false if other actor is prohibited to pass.
 	 */
 	@Override
-	public boolean interact(Actor other)
+	public boolean checkInteract(Actor other)
 	{
 		if (other instanceof Player)
 		{
-			/**
-			 * Searches for a key that matches this color.
-			 */
-			Item itm = ((Player)other).useItem(new Predicate<Item>()
-			{
-				
-				/**
-				 * Tests whether if this item will be usable to this door.
-				 * @param t the item to test.
-				 * @return true if it works, false if it doesn't.
-				 */
-				@Override
-				public boolean test(Item t)
-				{
-					return t instanceof Key && ((Key)t).getColor() == getColor();
-				}
-			});
-			return itm != null;
+			for (Item itm : ((Player)other).getPocket())
+				if (itm instanceof Key && ((Key)itm).getColor() == getColor())
+					return true;
 		}
 		return false;
 	}
@@ -93,6 +78,43 @@ public class Door extends Actor
 		return color;
 	}
 
+
+	/**
+	 * Executes an interaction with another actor. This will only
+	 * allow the pass if an actor has a color-matching key. This 
+	 * will subsequently take away that key used to open this door.
+	 * 
+	 * @param other the other actor to interact with.
+	 * @return true if the other actor can pass into location
+	 *         false if other actor is prohibited to pass.
+	 */
+	@Override
+	public boolean interact(Actor other)
+	{
+		if (other instanceof Player)
+		{
+			/**
+			 * Searches for a key that matches this color.
+			 */
+			Item itm = ((Player)other).useItem(new Predicate<Item>()
+			{
+				
+				/**
+				 * Tests whether if this item will be usable to this door.
+				 * @param t the item to test.
+				 * @return true if it works, false if it doesn't.
+				 */
+				@Override
+				public boolean test(Item t)
+				{
+					return t instanceof Key && ((Key)t).getColor() == 
+							getColor();
+				}
+			});
+			return itm != null;
+		}
+		return false;
+	}
 
 	/**
 	 * @param color the new color to set for this door
