@@ -22,6 +22,7 @@ public class Hint extends Actor
 {
 	/** The default image for this component */
 	public static final int DEFAULT_IMAGE = -1; //TODO: get image index 
+	private static final int HINT_IMAGE = -1;
 			
 	private String message;
 	private Player playerRead;
@@ -31,7 +32,7 @@ public class Hint extends Actor
 	 */
 	public Hint()
 	{
-		// TODO: imagery
+		setImageFrame(HINT_IMAGE);
 		playerRead = null;
 		message = "";
 	}

@@ -157,7 +157,8 @@ public class Grid extends Pane
 		}
 		
 		/**
-		 * Compares two actors in reverse dominance order.
+		 * Compares two actors in reverse dominance order, 
+		 * relative to each other.
 		 */
 		residents.sort(new Comparator<Actor>() 
 		{
@@ -259,7 +260,7 @@ public class Grid extends Pane
 				if (children.get(insertInd) instanceof Actor)
 				{
 					Actor child = (Actor) children.get(insertInd);
-					if (child.dominanceLevelFor(null).compareTo(test) > 0)
+					if (child.dominanceLevelFor(null).compareTo(test) < 0)
 						break;
 				}
 			}

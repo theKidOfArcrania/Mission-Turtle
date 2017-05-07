@@ -40,7 +40,6 @@ public class TileSet
 				"tileset.png"));
 		compIndex = DEF_COMPS;
 		frameSize = DEF_FRAME_SIZE;
-		//TODO: finish all component indexes.
 	}
 	
 	/**

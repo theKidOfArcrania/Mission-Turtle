@@ -44,7 +44,7 @@ public class Bird extends Enemy
 			Player p = getParentGrid().getPlayer();
 			if (p != null)
 			{
-				int[] movement = calculateDirection(); //TODO: calculate direction.
+				int[] movement = calculateDirection();
 				boolean moved = false;
 				for (int dir : movement)
 				{
