@@ -36,22 +36,6 @@ public class Level
 	/** The parent level pack of this level. This is internally set by LevelPack */
 	LevelPack parent; 
 	
-	/**
-	 * Constructs a new level from a file offset pointing to level.
-	 * @param offset the file offset that points to level.
-	 * @throws IllegalArgumentException if a negative file offset is specified.
-	 */
-	public Level(long offset) 
-	{
-		if (offset < 0)
-			throw new IllegalArgumentException("Negative file offset");
-		this.parent = null;
-		this.offset = offset;
-		this.rows = -1;
-		this.cols = -1;
-		this.foodReq = 0;
-		this.timeLimit = -1;
-	}
 	
 	/**
 	 * Constructs a new blank level, that can be edited and saved.
@@ -73,6 +57,28 @@ public class Level
 		this.offset = -1;
 		this.foodReq = 0;
 		this.timeLimit = -1;
+	}
+
+	/**
+	 * Constructs a new level from a file offset pointing to level. This
+	 * internal constructor should ONLY be called by LevelPack to initialize
+	 * an unloaded level!
+	 * 
+	 * @param parent the level-pack that this level belongs to.
+	 * @param offset the file offset that points to level.
+	 * @throws IllegalArgumentException if a negative file offset is specified.
+	 */
+	Level(LevelPack parent, long offset) 
+	{
+		if (offset < 0)
+			throw new IllegalArgumentException("Negative file offset");
+		this.parent = null;
+		this.offset = offset;
+		this.rows = -1;
+		this.cols = -1;
+		this.foodReq = 0;
+		this.timeLimit = -1;
+		this.parent = parent;
 	}
 	
 	/**

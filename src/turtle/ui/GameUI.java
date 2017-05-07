@@ -126,6 +126,8 @@ public class GameUI extends VBox
 	private static final int SECS_IN_MIN = 60;
 	private static final Duration FADE_DURATION = Duration.seconds(.5);
 
+	private static final double FIT_WIDTH = 799;
+	private static final Duration CAROUSEL_DELAY = Duration.seconds(1.0); 
 	private static final double CAROUSEL_SPEED = 100;
 
 	private static final double SPACE_SIZE = 19.79296875;
@@ -238,8 +240,8 @@ public class GameUI extends VBox
 		currentPack = pck;
 		try
 		{
-			currentPack.loadLevel(0);
-			initLevel(currentPack.getLevel(0));
+			currentPack.loadLevel(1);
+			initLevel(currentPack.getLevel(1));
 		}
 		catch (IOException e)
 		{
@@ -360,11 +362,11 @@ public class GameUI extends VBox
 	{
 		pnlBar = new HBox();
 		
-		lblPackName = new Label("[Level Pack]:");
+		lblPackName = new Label("");
 		lblPackName.getStyleClass().add("bold");
         HBox.setMargin(lblPackName, new Insets(0, GAP_INSET, 0, GAP_INSET));
 
-        lblLevelName = new Label("[Level name]");
+        lblLevelName = new Label("");
 
         Pane spacing = new Pane();
         HBox.setHgrow(spacing, Priority.ALWAYS);
@@ -443,7 +445,7 @@ public class GameUI extends VBox
 	{
 		timeLeft = lvl.getTimeLimit();
 		
-		if (lvl.getPack() == null)
+		if (lvl.getPack() == null || lvl.getPack().getName().isEmpty())
 			lblPackName.setText("");
 		else
 			lblPackName.setText(lvl.getPack().getName() + ":");
@@ -581,11 +583,10 @@ public class GameUI extends VBox
 		msg.applyCss();
 		
 		double msgWidth = msg.prefWidth(-1);
-		double fitWidth = pnlMessagePanel.getWidth();
-		double overflow = msgWidth - fitWidth;
+		double overflow = msgWidth - FIT_WIDTH;
 		if (overflow > 0)
 		{
-			double firstSaw = (fitWidth - SPACE_SIZE) / 2;
+			double firstSaw = (FIT_WIDTH - SPACE_SIZE) / 2;
 			double from = msgWidth - firstSaw;
 			double to = -SPACE_SIZE - firstSaw;
 			
@@ -595,7 +596,7 @@ public class GameUI extends VBox
 			
 			msgScroller = new TranslateTransition(Duration.seconds(
 					(from - to) / CAROUSEL_SPEED), msg);
-			msgScroller.setDelay(FADE_DURATION);
+			msgScroller.setDelay(CAROUSEL_DELAY);
 			msgScroller.setFromX(from);
 			msgScroller.setToX(to);
 			msgScroller.setInterpolator(Interpolator.LINEAR);
