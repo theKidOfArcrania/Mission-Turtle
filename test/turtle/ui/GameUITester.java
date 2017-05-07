@@ -6,7 +6,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import turtle.comp.ColorType;
-import turtle.comp.Fire;
 import turtle.core.Component;
 import turtle.core.Grid;
 import turtle.core.Location;
@@ -25,6 +24,7 @@ import turtle.file.LevelPack;
  */
 public class GameUITester extends Application
 {
+	private static final int TEST_SIZE = 20;
 	private static final short COMP_IND_DOOR = (short)0;
 	private static final short COMP_IND_WATER = (short)3;
 	private static final short COMP_IND_EXIT = (short)4;
@@ -34,6 +34,7 @@ public class GameUITester extends Application
 	private static final short COMP_IND_KEY = (short)11;
 	private static final short COMP_IND_BIRD = (short)13;
 	private static final short COMP_IND_FOOD = (short)14;
+	private static final short COMP_IND_HINT = (short)15;
 	
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args)
@@ -58,55 +59,47 @@ public class GameUITester extends Application
 		
 		gui.requestFocus();
 		
-		LevelPack pack = generateTestPack();
+		LevelPack pack = generateEnemyTest();
 		gui.initLevelPack(pack);
 		
 		Grid lvl = gui.getGridView().getGrid();
-		//((Fire)lvl.getCellAt(0, 0)).transformToSand();
-		((Fire)lvl.getCellAt(6, 0)).transformToSand();
 	}
 
 	/**
-	 * Generates a test level pack to test against.
+	 * Generates a test level pack that tests the items (keys and food items)
+	 * the time limit, the food requirement, and also whether if the keys unlock
+	 * doors.
+	 * 
 	 * @return a created level-pack.
 	 */
-	private LevelPack generateTestPack()
+	private LevelPack generateItemTimeTest()
 	{
 		LevelPack testPack = new LevelPack("Test Pack");
-		Level test = new Level("Test Level", 20, 20);
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
 		test.setFoodRequirement(50);
 		test.setTimeLimit(50);
 		test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
 		
-		for (int r = 0; r < 20; r++)
-			for (int c = 0; c < 20; c++)
+		fillCells(test);
+		for (int r = 0; r < TEST_SIZE; r++)
+			for (int c = 0; c < TEST_SIZE; c++)
 			{
-				if (r % 6 == 0 && r > 0)
-					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-							new Location(r, c), COMP_IND_FIRE, new HashMap<>()));
-				else if (r % 6 == 1)
-					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-							new Location(r, c), COMP_IND_SAND, new HashMap<>()));
-				else
-					test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-							new Location(r, c), COMP_IND_WATER, new HashMap<>()));
-				
 				if (r % 6 != 1)
 				{
 					HashMap<String, Object> params = new HashMap<>();
-					if (Math.random() < .2)
+					if (Math.random() < 0)
 					{
 						params.put("color", (int)(Math.random() * ColorType.values()
 								.length));
 						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 								new Location(r, c), COMP_IND_KEY, params));
 					}
-					else if (Math.random() < .4 || c == 1)
+					else if (Math.random() < 0)
 						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 								new Location(r, c), COMP_IND_FOOD, params));
-					else if (Math.random() < .3)
+					else if (Math.random() < 0)
 					{
 						params.put("color", (int)(Math.random() * ColorType.values()
 								.length));
@@ -123,5 +116,79 @@ public class GameUITester extends Application
 		testPack.addLevel(test);
 		
 		return testPack;
+	}
+	
+	/**
+	 * Tests the enemies' movement patterns.
+	 * @return a level pack to test enemy patterns.
+	 */
+	private LevelPack generateEnemyTest()
+	{
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+		
+		test.setFoodRequirement(50);
+		test.setTimeLimit(50);
+		test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
+		
+		fillCells(test);
+		
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(1, 13), COMP_IND_BIRD, new HashMap<>()));
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
+		testPack.addLevel(test);
+		
+		return testPack;
+	}
+	
+	/**
+	 * Generates test packs to test hint tiles.
+	 * @return
+	 */
+	private LevelPack generateHintTest()
+	{
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+		
+		fillCells(test);
+		
+		HashMap<String, Object> params = new HashMap<>();
+		params.put("message", "This is a test hint.");
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(0, 2), COMP_IND_HINT, params));
+		params.put("message", "No, really! This is a test!");
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(0, 3), COMP_IND_HINT, params));
+		
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
+		testPack.addLevel(test);
+		
+		return testPack;
+	}
+	
+	/**
+	 * Fills the level with the base cells (water, fire, and sand)
+	 * @param lvl the level to fill
+	 */
+	private static void fillCells(Level lvl)
+	{
+		for (int r = 0; r < TEST_SIZE; r++)
+			for (int c = 0; c < TEST_SIZE; c++)
+			{
+				if (r % 6 == 1 || c == 0)
+					lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+							new Location(r, c), COMP_IND_SAND, new HashMap<>()));
+				else if (r % 6 == 0 && r > 0)
+					lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+							new Location(r, c), COMP_IND_FIRE, new HashMap<>()));
+				else
+					lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+							new Location(r, c), COMP_IND_WATER, new HashMap<>()));
+			}
+		lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
 	}
 }

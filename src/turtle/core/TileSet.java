@@ -21,7 +21,8 @@ public class TileSet
 	private static final Class<Component>[] DEF_COMPS = new Class[] {Door.class, 
 			TestCell.class, TestCell.class, Water.class, Exit.class, Fire.class,
 			Sand.class, TestCell.class, TestCell.class, TestCell.class,
-			Player.class, Key.class, Wall.class, Bird.class, Food.class}; 
+			Player.class, Key.class, Wall.class, Bird.class, Food.class,
+			Hint.class}; 
 	
 	private static final int DEF_FRAME_SIZE = 100;
 	private static final int FRAME_ROWS = 16;

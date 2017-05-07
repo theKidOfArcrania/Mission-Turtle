@@ -21,8 +21,8 @@ import turtle.core.DominanceLevel;
 public class Hint extends Actor
 {
 	/** The default image for this component */
-	public static final int DEFAULT_IMAGE = -1; //TODO: get image index 
-	private static final int HINT_IMAGE = -1;
+	public static final int DEFAULT_IMAGE = 55;
+	private static final int HINT_IMAGE = 55;
 			
 	private String message;
 	private Player playerRead;
@@ -148,7 +148,7 @@ public class Hint extends Actor
 	public void updateFrame(long frame)
 	{
 		super.updateFrame(frame);
-		if (playerRead != null && playerRead.getHeadLocation().equals(
+		if (playerRead != null && !playerRead.getHeadLocation().equals(
 				getHeadLocation()))
 		{
 			playerRead.resetMessage(this);

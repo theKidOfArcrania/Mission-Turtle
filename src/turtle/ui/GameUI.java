@@ -473,13 +473,15 @@ public class GameUI extends VBox
 		{
 			fade.setFromValue(0);
 			fade.setToValue(1);
+			fade.play();
+			msg.setOpacity(0);
 			pnlMessagePanel.getChildren().add(msg);
 		}
 		else
 		{
 			fade.setFromValue(1);
 			fade.setToValue(0);
-			
+			fade.play();
 			/** Removes the label when the animation is finished. */
 			fade.setOnFinished(new EventHandler<ActionEvent>()
 			{
@@ -631,6 +633,7 @@ public class GameUI extends VBox
 		if (p != null)
 			msg = p.getMessage();
 		
+		//System.out.println(msg);
 		if (!oldMsg.equals(msg))
 		{
 			if (lblMsg != null)
