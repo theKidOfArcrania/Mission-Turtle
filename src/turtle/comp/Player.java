@@ -2,6 +2,7 @@ package turtle.comp;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -140,7 +141,26 @@ public class Player extends Actor
 			}
 		
 		if (found != null)
+		{
 			pocket.remove(found);
+			
+			Iterator<ItemSlot> itr = slots.iterator();
+			while (itr.hasNext())
+			{
+				ItemSlot slot = itr.next();
+				if (slot.removeItem(found))
+				{
+					if (slot.isEmpty())
+					{
+						itr.remove();
+						getChildren().remove(slot);
+						layoutSlots();
+					}
+					break;
+				}
+			}
+		}
+		
 		return found;
 	}
 	

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import turtle.core.Actor;
+import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
 /**
@@ -33,6 +34,22 @@ public class Door extends Actor
 	}
 	
 	/**
+	 * Overrides dying so that it doesn't die from anything,
+	 * as this is a fixture. (Only "die" when we unlocked gate,
+	 * represented by killing itself.)
+	 * 
+	 * @param attacker the component who is attacking.
+	 * @return false always since it doesn't die.
+	 */
+	@Override
+	public boolean die(Component attacker)
+	{
+		if (attacker == this)
+			return super.die(attacker);
+		return false;
+	}
+	
+	/**
 	 * Checks whether an interaction with another actor is possible.
 	 * This checks if the actor contains a key of this same color to this door.
 	 * 
@@ -46,8 +63,13 @@ public class Door extends Actor
 		if (other instanceof Player)
 		{
 			for (Item itm : ((Player)other).getPocket())
+			{
 				if (itm instanceof Key && ((Key)itm).getColor() == getColor())
+				{
+					die(this);
 					return true;
+				}
+			}
 		}
 		return false;
 	}

@@ -25,7 +25,7 @@ import turtle.file.LevelPack;
  */
 public class GameUITester extends Application
 {
-
+	private static final short COMP_IND_DOOR = (short)0;
 	private static final short COMP_IND_WATER = (short)3;
 	private static final short COMP_IND_EXIT = (short)4;
 	private static final short COMP_IND_FIRE = (short)5;
@@ -105,7 +105,14 @@ public class GameUITester extends Application
 					}
 					else if (Math.random() < .4 || c == 1)
 						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-								new Location(r, c), COMP_IND_FOOD, new HashMap<>()));
+								new Location(r, c), COMP_IND_FOOD, params));
+					else if (Math.random() < .3)
+					{
+						params.put("color", (int)(Math.random() * ColorType.values()
+								.length));
+						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+								new Location(r, c), COMP_IND_DOOR, params));
+					}
 				}
 			}
 		
