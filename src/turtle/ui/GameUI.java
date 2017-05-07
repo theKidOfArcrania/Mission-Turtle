@@ -3,8 +3,7 @@ package turtle.ui;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.Transition;
+import javafx.animation.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -16,6 +15,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import turtle.comp.Player;
 import turtle.core.Actor;
@@ -36,12 +36,6 @@ import static turtle.ui.GameMenuUI.*;
  */
 public class GameUI extends VBox
 {
-	private static final int FPS_UPDATE_RATE = 10;
-	private static final int ACTION_START = -1;
-	private static final int ACTION_PAUSE = -2;
-	
-	private static final double SEMI_TRANS_ALPHA = .5;
-
 	/**
 	 * Runs the game timer, keep tracks of the game states each frame.
 	 */
@@ -63,6 +57,14 @@ public class GameUI extends VBox
 			frameTimes = new ArrayDeque<>(FRAME_SAMPLE);
 			setCycleCount(INDEFINITE);
 			setCycleDuration(FRAME_DURATION);
+		}
+		
+		/**
+		 * @return current frame-per-second value
+		 */
+		public double getFps()
+		{
+			return fps;
 		}
 		
 		/**
@@ -104,31 +106,46 @@ public class GameUI extends VBox
 			super.stop();
 			frame = 0;
 		}
-		
-		/**
-		 * @return current frame-per-second value
-		 */
-		public double getFps()
-		{
-			return fps;
-		}
 	}
+	private static final int FPS_UPDATE_RATE = 10;
 	
+	private static final int ACTION_START = -1;
+	private static final int ACTION_PAUSE = -2;
+
+	private static final double SEMI_TRANS_ALPHA = .5;
 	private static final Color DARKGRAY = Color.web("#505050");
 
 	private static final double GAP_INSET = 5.0;
 	private static final double LARGE_GAP_INSET = 20.0;
+	
 	private static final double FRAME_WIDTH = 10.0;
-
 	private static final int FRAMES_PER_SEC = 50;
 	private static final Duration FRAME_DURATION = Duration.seconds(1.0 / 
 			FRAMES_PER_SEC);
 	private static final int SECS_IN_MIN = 60;
 	private static final Duration FADE_DURATION = Duration.seconds(.5);
+
+	private static final double CAROUSEL_SPEED = 100;
+
+	private static final double SPACE_SIZE = 19.79296875;
+	
+	/**
+	 * Creates a spacer pane used for layouts.
+	 * @return a pane with a specfic spacing
+	 */
+	private static Pane createSpacer()
+	{
+		Pane spacing = new Pane();
+        HBox.setHgrow(spacing, Priority.NEVER);
+        spacing.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        spacing.setPrefSize(LARGE_GAP_INSET, 0);
+        spacing.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        return spacing;
+	}
 	
 	/* UI elements */
 	private HBox pnlBar;
-	private Label lblFps;
+    private Label lblFps;
     private Label lblPackName;
     private Label lblLevelName;
     private Label lblMenu;
@@ -139,17 +156,18 @@ public class GameUI extends VBox
     private Label lblFood;
     private Label lblTime;
     private Label lblMsg;
-    
     private GameMenuUI pnlMenuDialog;
-	
+    
+    private TranslateTransition msgScroller;
+    private boolean doubled;
+    
     /* Game-related stuff */
     private int dirPrevPressed;
-    private boolean[] moving;
     
-    private LevelPack currentPack;
+    private boolean[] moving;
+	private LevelPack currentPack;
 	private final GridView view;
 	private final GameTimer runner;
-	
 	private int timeLeft;
 	
 	private boolean started;
@@ -167,6 +185,9 @@ public class GameUI extends VBox
 		runner = new GameTimer();
 		started = false;
 		paused = false;
+		
+		msgScroller = null;
+		doubled = false;
 		
 		timeLeft = -1;
 		moving = new boolean[Actor.WEST + 1];
@@ -247,6 +268,33 @@ public class GameUI extends VBox
 	}
 	
 	/**
+	 * Checks player's current game status (whether if player won or lost).
+	 * @param p the player to check status against.
+	 */
+	private void checkPlayerStatus(Player p)
+	{
+		String status = null;
+		boolean success = false;
+		
+		if (p.isWinner())
+		{
+			status = "You Win!";
+			success = true;
+		}
+		else if (p.isDead())
+			status = "You Died!";
+		else if (timeLeft == 0)
+			status = "Time's Up!";
+		
+		if (status != null)
+		{
+			//TODO: show level-end dialog and maybe advance to next level.
+			System.out.println(status);
+			System.exit(1);
+		}
+	}
+	
+	/**
 	 * Called whenever a key event occurs.
 	 * @param event an event object describing the key event that 
 	 *   occurred.
@@ -290,7 +338,7 @@ public class GameUI extends VBox
 		
 		startGame();
 	}
-	
+
 	/**
 	 * Initializes the top bar UI, contains the level name, and also menu
 	 * button.
@@ -332,7 +380,7 @@ public class GameUI extends VBox
         pnlBar.getChildren().addAll(lblPackName, lblLevelName, spacing, 
         		lblMenu);
 	}
-	
+
 	/**
 	 * Initializes the game view UI area. (Has grid view).
 	 */
@@ -372,7 +420,7 @@ public class GameUI extends VBox
         
         
 	}
-
+	
 	/**
 	 * Initializes this Game UI with the level.
 	 * @param lvl the level to initialize with.
@@ -393,7 +441,7 @@ public class GameUI extends VBox
 		
 		updateUI();
 	}
-
+	
 	/**
 	 * Initializes the status bar UI, containing user status information.
 	 */
@@ -404,29 +452,35 @@ public class GameUI extends VBox
 		lblFps = new Label();
 		lblFps.getStyleClass().add("small");
 		lblFps.setMaxHeight(Double.MAX_VALUE);
+		lblFps.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
 		HBox.setMargin(lblFps, new Insets(0, GAP_INSET, 0, GAP_INSET));
 		
 		pnlMessagePanel = new StackPane();
+		pnlMessagePanel.setMinSize(0, 0);
         HBox.setHgrow(pnlMessagePanel, javafx.scene.layout.Priority.ALWAYS);
         
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(pnlMessagePanel.widthProperty());
+        clip.heightProperty().bind(pnlMessagePanel.heightProperty());
+        pnlMessagePanel.setClip(clip);
+        
         Label lblLabelFood = new Label("Food Left:");
+        lblLabelFood.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         lblLabelFood.getStyleClass().add("bold");
 
         lblFood = new Label("0000000000");
+        lblFood.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         HBox.setMargin(lblFood, new Insets(0, GAP_INSET, 0, GAP_INSET));
 
-        Pane spacing = new Pane();
-        HBox.setHgrow(spacing, Priority.NEVER);
-        spacing.setPrefHeight(0);
-        spacing.setPrefWidth(LARGE_GAP_INSET);
-
         Label lblLabelTime = new Label("Time Left:");
+        lblLabelTime.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         lblLabelTime.getStyleClass().add("bold");
 
         lblTime = new Label("--:--");
         lblTime.setPadding(new Insets(0, GAP_INSET, 0, GAP_INSET));
-        pnlStatus.getChildren().addAll(lblFps, pnlMessagePanel, lblLabelFood, lblFood,
-        		spacing, lblLabelTime, lblTime);
+        lblTime.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        pnlStatus.getChildren().addAll(lblFps, createSpacer(), pnlMessagePanel, 
+        		createSpacer(), lblLabelFood, lblFood, lblLabelTime, lblTime);
 	}
 	
 	/**
@@ -474,14 +528,17 @@ public class GameUI extends VBox
 			fade.setFromValue(0);
 			fade.setToValue(1);
 			fade.play();
+			
 			msg.setOpacity(0);
 			pnlMessagePanel.getChildren().add(msg);
+			checkMessageOverflow(msg);
 		}
 		else
 		{
 			fade.setFromValue(1);
 			fade.setToValue(0);
 			fade.play();
+			
 			/** Removes the label when the animation is finished. */
 			fade.setOnFinished(new EventHandler<ActionEvent>()
 			{
@@ -494,9 +551,46 @@ public class GameUI extends VBox
 				{
 					pnlMessagePanel.getChildren().remove(msg);
 					fade.setOnFinished(null); //Prevent memory leakage.
+					if (msgScroller != null)
+						msgScroller = null;
 				}
 			});
 		}
+	}
+
+	/**
+	 * Checks whether if this message overflows out of the bounds.
+	 * If so, it will scroll through 
+	 * @param msg
+	 */
+	private void checkMessageOverflow(Label msg)
+	{
+		msg.applyCss();
+		
+		double msgWidth = msg.prefWidth(-1);
+		double fitWidth = pnlMessagePanel.getWidth();
+		double overflow = msgWidth - fitWidth;
+		if (overflow > 0)
+		{
+			double firstSaw = (fitWidth - SPACE_SIZE) / 2;
+			double from = msgWidth - firstSaw;
+			double to = -SPACE_SIZE - firstSaw;
+			
+			msg.setText(msg.getText() + "   " + msg.getText());
+			msg.setTranslateX(from);
+			doubled = true;
+			
+			msgScroller = new TranslateTransition(Duration.seconds(
+					(from - to) / CAROUSEL_SPEED), msg);
+			msgScroller.setDelay(FADE_DURATION);
+			msgScroller.setFromX(from);
+			msgScroller.setToX(to);
+			msgScroller.setInterpolator(Interpolator.LINEAR);
+			msgScroller.setCycleCount(Animation.INDEFINITE);
+			msgScroller.play();
+		}
+		else
+			doubled = false;
 	}
 	
 	/**
@@ -533,7 +627,7 @@ public class GameUI extends VBox
 			runner.play();
 		started = true;
 	}
-	
+
 	/**
 	 * Updates next frame of game. 
 	 * @param frame current frame count.
@@ -574,33 +668,6 @@ public class GameUI extends VBox
 		
 		checkPlayerStatus(p);
 	}
-
-	/**
-	 * Checks player's current game status (whether if player won or lost).
-	 * @param p the player to check status against.
-	 */
-	private void checkPlayerStatus(Player p)
-	{
-		String status = null;
-		boolean success = false;
-		
-		if (p.isWinner())
-		{
-			status = "You Win!";
-			success = true;
-		}
-		else if (p.isDead())
-			status = "You Died!";
-		else if (timeLeft == 0)
-			status = "Time's Up!";
-		
-		if (status != null)
-		{
-			//TODO: show level-end dialog and maybe advance to next level.
-			System.out.println(status);
-			System.exit(1);
-		}
-	}
 	
 	/**
 	 * Update the dynamic parts of this UI to reflect the game status.
@@ -633,8 +700,10 @@ public class GameUI extends VBox
 		if (p != null)
 			msg = p.getMessage();
 		
-		//System.out.println(msg);
-		if (!oldMsg.equals(msg))
+		String check = msg;
+		if (doubled)
+			check = msg + "   " + msg;
+		if (!oldMsg.equals(check))
 		{
 			if (lblMsg != null)
 			{
@@ -644,6 +713,7 @@ public class GameUI extends VBox
 			if (!msg.isEmpty())
 			{
 				lblMsg = new Label(msg);
+				lblMsg.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
 				lblMsg.getStyleClass().add("italic");
 				messageEdit(true, lblMsg);
 			}

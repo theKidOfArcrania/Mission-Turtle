@@ -59,7 +59,7 @@ public class GameUITester extends Application
 		
 		gui.requestFocus();
 		
-		LevelPack pack = generateEnemyTest();
+		LevelPack pack = generateHintTest();
 		gui.initLevelPack(pack);
 		
 		Grid lvl = gui.getGridView().getGrid();
@@ -127,8 +127,6 @@ public class GameUITester extends Application
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
-		test.setFoodRequirement(50);
-		test.setTimeLimit(50);
 		test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
 		
@@ -161,6 +159,24 @@ public class GameUITester extends Application
 		params.put("message", "No, really! This is a test!");
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 3), COMP_IND_HINT, params));
+		params.put("message", "Testing how long a string could be before " +
+				"these ellipse will show up!! Hmmm... maybe a little longer " +
+				"than I anticipate! Wait... where are the ellipses? Pretty " + 
+				"sure it's long enough for these '...'!!! Where is it? Okay " +
+				"now i'm worried! Where are they?");
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(0, 4), COMP_IND_HINT, params));
+		params.put("message", "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
+				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
+				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
+				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
+				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
+				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
+				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
+				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" +
+				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" );
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(0, 5), COMP_IND_HINT, params));
 		
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
