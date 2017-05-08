@@ -219,4 +219,12 @@ public class LevelPack
 					+ "mode");
 		levels.remove(ind).parent = null;
 	}
+	
+	/**
+	 * @return the unique pack identifier for this level pack.
+	 */
+	public UUID getLevelPackID()
+	{
+		return levelPackID;
+	}
 }

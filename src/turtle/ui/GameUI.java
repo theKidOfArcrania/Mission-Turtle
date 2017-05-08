@@ -1,5 +1,7 @@
 package turtle.ui;
 
+import static turtle.ui.GameMenuUI.*;
+
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
@@ -24,8 +26,6 @@ import turtle.core.Grid;
 import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
-
-import static turtle.ui.GameMenuUI.*;
 
 /**
  * GameUI.java
@@ -240,9 +240,9 @@ public class GameUI extends VBox
 		currentPack = pck;
 		try
 		{
-			if (!currentPack.getLevel(0).isLoaded())
-				currentPack.loadLevel(0);
-			initLevel(currentPack.getLevel(0));
+			if (!currentPack.getLevel(1).isLoaded())
+				currentPack.loadLevel(1);
+			initLevel(currentPack.getLevel(1));
 		}
 		catch (IOException e)
 		{

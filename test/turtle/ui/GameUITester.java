@@ -131,17 +131,17 @@ public class GameUITester extends Application
 				if (r % 6 != 1)
 				{
 					HashMap<String, Object> params = new HashMap<>();
-					if (Math.random() < 0)
+					if (Math.random() < .2)
 					{
 						params.put("color", (int)(Math.random() * ColorType.values()
 								.length));
 						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 								new Location(r, c), COMP_IND_KEY, params));
 					}
-					else if (Math.random() < 0)
+					else if (Math.random() < .5)
 						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
 								new Location(r, c), COMP_IND_FOOD, params));
-					else if (Math.random() < 0)
+					else if (Math.random() < .5)
 					{
 						params.put("color", (int)(Math.random() * ColorType.values()
 								.length));
