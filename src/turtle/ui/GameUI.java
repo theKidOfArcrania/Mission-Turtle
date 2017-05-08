@@ -240,8 +240,9 @@ public class GameUI extends VBox
 		currentPack = pck;
 		try
 		{
-			currentPack.loadLevel(1);
-			initLevel(currentPack.getLevel(1));
+			if (!currentPack.getLevel(0).isLoaded())
+				currentPack.loadLevel(0);
+			initLevel(currentPack.getLevel(0));
 		}
 		catch (IOException e)
 		{

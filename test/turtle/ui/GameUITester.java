@@ -40,6 +40,7 @@ public class GameUITester extends Application
 	private static final short COMP_IND_BIRD = (short)13;
 	private static final short COMP_IND_FOOD = (short)14;
 	private static final short COMP_IND_HINT = (short)15;
+	private static final short COMP_IND_TRAP = (short)16;
 	
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args)
@@ -208,6 +209,25 @@ public class GameUITester extends Application
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 4), COMP_IND_HINT, params));
 		
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
+		testPack.addLevel(test);
+		
+		return testPack;
+	}
+	
+	private LevelPack testTraps()
+	{
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+		
+		fillCells(test);
+		
+		HashMap<String, Object> params = new HashMap<>();
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(1, 10), COMP_IND_BIRD, params));
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(1, 2), COMP_IND_TRAP, params));
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
 		testPack.addLevel(test);
