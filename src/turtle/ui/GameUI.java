@@ -1,5 +1,7 @@
 package turtle.ui;
 
+import static turtle.ui.GameMenuUI.*;
+
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
@@ -25,8 +27,6 @@ import turtle.core.Grid;
 import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
-
-import static turtle.ui.GameMenuUI.*;
 
 /**
  * GameUI.java
@@ -152,6 +152,7 @@ public class GameUI extends VBox
     private Label lblFps;
     private Label lblPackName;
     private Label lblLevelName;
+    private Label lblLevelStatus;
     private Label lblMenu;
     private StackPane pnlFrame;
     private StackPane pnlMenuBack;
@@ -174,6 +175,7 @@ public class GameUI extends VBox
 	private final GameTimer runner;
 	private int timeLeft;
 	
+	private boolean halted;
 	private boolean started;
 	private boolean paused;
 	
@@ -194,8 +196,10 @@ public class GameUI extends VBox
 		pnlMenuDialog = new GameMenuUI(this);
 		view = new GridView(null);
 		runner = new GameTimer();
+		
 		started = false;
 		paused = false;
+		halted = false;
 		
 		msgScroller = null;
 		doubled = false;
@@ -268,7 +272,6 @@ public class GameUI extends VBox
 			return;
 		}
 		
-		stopGame();
 		String prompt = "Are you sure you want to exit?";
 		if (id == ID_RESTART)
 			prompt = "Are you sure you want to restart?";
@@ -288,10 +291,12 @@ public class GameUI extends VBox
 			@Override
 			public void accept(int value)
 			{
-				pnlMenuBack.setVisible(false);
 				app.hideDialog(dlg);
 				if (value == 0)
+				{
+					stopGame();
 					executeMenu(id);
+				}
 			}
 		});
 		app.showDialog(dlg);
@@ -311,12 +316,15 @@ public class GameUI extends VBox
 				initLevel(currentLevelNum);
 				break;
 			case ID_LEVELSELECT:
+				pnlMenuBack.setVisible(false);
 				app.showLevelSelect();
 				break;
 			case ID_MAINMENU:
+				pnlMenuBack.setVisible(false);
 				app.showMainMenu();
 				break;
 			case ID_EXIT:
+				pnlMenuBack.setVisible(false);
 				System.exit(0);
 				break;
 		}
@@ -334,6 +342,9 @@ public class GameUI extends VBox
 		if (p.isWinner())
 		{
 			status = "Success! Level Completed!";
+			if (timeLeft != MainApp.RESULT_NO_TIME_LIMIT)
+				status += "\nYour time bonus: " + timeLeft;
+			status += "\n" + saveProgress();
 			success = true;
 		}
 		else if (p.isDead())
@@ -367,10 +378,41 @@ public class GameUI extends VBox
 				@Override
 				public void accept(int value)
 				{
-					app.hideDialog(prompt);
 					handleLevelDialog(value);
+					app.hideDialog(prompt);
 				}
 			});
+			
+			app.showDialog(prompt);
+			halted = true;
+		}
+	}
+	
+	/**
+	 * Saves the completion status of the current game.
+	 * @return a string describing a message about the score to player.
+	 */
+	private String saveProgress()
+	{
+		try
+		{
+			int prevScore = app.checkLevelCompletion(currentPack, 
+					currentLevelNum);
+			
+			if (timeLeft > prevScore)
+			{
+				app.completeLevel(currentPack, currentLevelNum, timeLeft);
+				return "Wowzers! New High Score!";
+			}
+			else if (prevScore != MainApp.RESULT_NO_TIME_LIMIT)
+				return "Impressive... but not as good as your previous score.";
+			else
+				return "Good Job!";
+		} 
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			return "Unable to save scores!";
 		}
 	}
 	
@@ -406,6 +448,8 @@ public class GameUI extends VBox
 	 */
 	private void handleKey(KeyEvent event)
 	{
+		if (halted)
+			return;
 		if (event.getEventType() == KeyEvent.KEY_TYPED)
 			return;
 		if (!mappedKeys.containsKey(event.getCode()))
@@ -457,6 +501,10 @@ public class GameUI extends VBox
         HBox.setMargin(lblPackName, new Insets(0, GAP_INSET, 0, GAP_INSET));
 
         lblLevelName = new Label("");
+        HBox.setMargin(lblLevelName, new Insets(0, GAP_INSET, 0, 0));
+        
+        lblLevelStatus = new Label("");
+        HBox.setMargin(lblLevelStatus, new Insets(0, GAP_INSET, 0, GAP_INSET));
 
         Pane spacing = new Pane();
         HBox.setHgrow(spacing, Priority.ALWAYS);
@@ -482,8 +530,8 @@ public class GameUI extends VBox
 			}
 		});
         
-        pnlBar.getChildren().addAll(lblPackName, lblLevelName, spacing, 
-        		lblMenu);
+        pnlBar.getChildren().addAll(lblPackName, lblLevelName, 
+        		lblLevelStatus, spacing, lblMenu);
 	}
 
 	/**
@@ -534,6 +582,7 @@ public class GameUI extends VBox
 	private void initLevel(int index)
 	{
 		stopGame();
+		halted = false;
 		
 		currentLevelNum = index;
 		Level lvl = currentPack.getLevel(index);
@@ -557,6 +606,23 @@ public class GameUI extends VBox
 		else
 			lblPackName.setText(lvl.getPack().getName() + ":");
 		lblLevelName.setText(lvl.getName());
+		
+		int score = MainApp.RESULT_NOT_DONE;
+		try
+		{
+			score = app.checkLevelCompletion(currentPack, index);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		if (score == MainApp.RESULT_NOT_DONE)
+			lblLevelStatus.setText("");
+		else if (score == MainApp.RESULT_NO_TIME_LIMIT)
+			lblLevelStatus.setText("Already completed!");
+		else 
+			lblLevelStatus.setText("Already completed with a time bonus: " +
+				score + "!");
 		
 		Grid g = lvl.createLevel();
 		view.initGrid(g);
@@ -754,7 +820,7 @@ public class GameUI extends VBox
 	 */
 	private void startGame()
 	{
-		if (!started)
+		if (halted || !started)
 			runner.play();
 		started = true;
 	}

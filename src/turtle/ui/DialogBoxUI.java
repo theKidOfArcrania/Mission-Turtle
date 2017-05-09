@@ -17,7 +17,7 @@ import javafx.scene.text.TextAlignment;
 public class DialogBoxUI extends Pane
 {
 	private static final double MARGINS = 5.0;
-	private static final double MIN_BUTTON_WIDTH = 80;
+	private static final double MIN_BUTTON_WIDTH = 100;
 
 	private final Label lblMessage;
 	private final StackPane pnlMessage;

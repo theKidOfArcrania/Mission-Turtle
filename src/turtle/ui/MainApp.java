@@ -3,6 +3,7 @@ package turtle.ui;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -117,9 +118,13 @@ public class MainApp extends Application
 	 */
 	public void showLevelSelect()
 	{
+		ArrayList<DialogBoxUI> dlgs = new ArrayList<>();
 		for (Node n : root.getChildren())
 			if (n instanceof DialogBoxUI)
-				hideDialog((DialogBoxUI)n);
+				dlgs.add((DialogBoxUI)n);
+		for (DialogBoxUI dlg : dlgs)
+			hideDialog(dlg);
+		
 		//TODO: here
 		System.exit(1);
 	}
@@ -130,9 +135,13 @@ public class MainApp extends Application
 	 */
 	public void showMainMenu()
 	{
+		ArrayList<DialogBoxUI> dlgs = new ArrayList<>();
 		for (Node n : root.getChildren())
 			if (n instanceof DialogBoxUI)
-				hideDialog((DialogBoxUI)n);
+				dlgs.add((DialogBoxUI)n);
+		for (DialogBoxUI dlg : dlgs)
+			hideDialog(dlg);
+		
 		//TODO: here
 		System.exit(1);
 	}
