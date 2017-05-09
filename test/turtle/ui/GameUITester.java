@@ -71,8 +71,11 @@ public class GameUITester extends Application
 			else
 				System.out.println("Invalid test: " + test + ". Try again.");
 		}
+		MainApp app = new MainApp();
+		GameUI gui = new GameUI(app);
 		
-		GameUI gui = new GameUI();
+		app.start(primaryStage);
+		
 		Scene s = new Scene(gui);
 		s.getStylesheets().add("/turtle/ui/styles.css");
 		
@@ -83,7 +86,7 @@ public class GameUITester extends Application
 		gui.requestFocus();
 		
 		LevelPack pack = (LevelPack) selected.invoke(this);
-		gui.initLevelPack(pack);
+		gui.initLevelPack(pack, 0);
 	}
 
 	/**

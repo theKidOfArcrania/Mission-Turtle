@@ -227,4 +227,12 @@ public class LevelPack
 	{
 		return levelPackID;
 	}
+
+	/**
+	 * @return the number of levels in this pack.
+	 */
+	public int getLevelCount()
+	{
+		return levels.size();
+	}
 }

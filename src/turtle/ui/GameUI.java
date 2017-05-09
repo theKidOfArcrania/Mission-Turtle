@@ -1,10 +1,9 @@
 package turtle.ui;
 
-import static turtle.ui.GameMenuUI.*;
-
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
+import java.util.function.IntConsumer;
 
 import javafx.animation.*;
 import javafx.event.ActionEvent;
@@ -26,6 +25,8 @@ import turtle.core.Grid;
 import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
+
+import static turtle.ui.GameMenuUI.*;
 
 /**
  * GameUI.java
@@ -166,8 +167,8 @@ public class GameUI extends VBox
     
     /* Game-related stuff */
     private int dirPrevPressed;
-    
     private boolean[] moving;
+    
 	private LevelPack currentPack;
 	private final GridView view;
 	private final GameTimer runner;
@@ -178,11 +179,18 @@ public class GameUI extends VBox
 	
 	private EnumMap<KeyCode, Integer> mappedKeys;
 	
+	private int currentLevelNum;
+	
+	private final MainApp app;
+	
 	/**
 	 * Creates a new GameUI and initializes UI.
+	 * @param app the main application of this game
 	 */
-	public GameUI()
+	public GameUI(MainApp app)
 	{
+		this.app = app;
+		
 		pnlMenuDialog = new GameMenuUI(this);
 		view = new GridView(null);
 		runner = new GameTimer();
@@ -194,6 +202,8 @@ public class GameUI extends VBox
 		
 		timeLeft = -1;
 		moving = new boolean[Actor.WEST + 1];
+		
+		currentLevelNum = 0;
 		
 		mappedKeys = new EnumMap<>(KeyCode.class);
 		mapKeys();
@@ -233,25 +243,12 @@ public class GameUI extends VBox
 	/**
 	 * Initializes this GameUI with a level pack.
 	 * @param pck the pack to use.
+	 * @param level the level index to start from. 
 	 */
-	public void initLevelPack(LevelPack pck)
+	public void initLevelPack(LevelPack pck, int level)
 	{
-		//TODO: load scores. start from chosen level.
 		currentPack = pck;
-		try
-		{
-			if (!currentPack.getLevel(1).isLoaded())
-				currentPack.loadLevel(1);
-			initLevel(currentPack.getLevel(1));
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-			//TODO: tell user that level is corrupted.
-			System.out.println("Level data corrupted!");
-			System.exit(1);
-		}
-		
+		initLevel(level);
 	}
 	
 	/**
@@ -262,25 +259,37 @@ public class GameUI extends VBox
 	 */
 	void handleGameMenu(int id)
 	{
-		//TODO: actions here.
-		switch (id)
+		if (id < ID_RESUME || id > ID_EXIT)
+			throw new IllegalArgumentException("Invalid action ID");
+		
+		pnlMenuBack.setVisible(false);
+		if (id == ID_RESUME)
 		{
-			case ID_RESUME:
-				break;
-			case ID_RESTART:
-				break;
-			case ID_LEVELSELECT:
-				break;
-			case ID_MAINMENU:
-				break;
-			case ID_EXIT:
-				break;
-			default:
-				return;
+			resumeGame();
+			return;
 		}
 		
-		resumeGame();
-		pnlMenuBack.setVisible(false);
+		stopGame();
+		String prompt = "Are you sure you want to exit?";
+		if (id == ID_RESTART)
+			prompt = "Are you sure you want to restart?";
+		//TODO: prompt user. if user cancels action return control.
+		
+		switch (id)
+		{
+			case ID_RESTART:
+				initLevel(currentLevelNum);
+				break;
+			case ID_LEVELSELECT:
+				app.showLevelSelect();
+				break;
+			case ID_MAINMENU:
+				app.showMainMenu();
+				break;
+			case ID_EXIT:
+				System.exit(0);
+				break;
+		}
 	}
 	
 	/**
@@ -294,7 +303,7 @@ public class GameUI extends VBox
 		
 		if (p.isWinner())
 		{
-			status = "You Win!";
+			status = "Success! Level Completed!";
 			success = true;
 		}
 		else if (p.isDead())
@@ -304,9 +313,59 @@ public class GameUI extends VBox
 		
 		if (status != null)
 		{
-			//TODO: show level-end dialog and maybe advance to next level.
-			System.out.println(status);
-			System.exit(1);
+			stopGame();
+			
+			boolean allowNext = success && currentLevelNum < 
+					currentPack.getLevelCount() - 1;
+			String[] options;
+			if (allowNext)
+				options = new String[] {"Menu", "Restart", "Onward!"};
+			else
+				options = new String[] {"Menu", "Restart"};
+			
+			DialogBoxUI prompt = new DialogBoxUI(status, options);
+			
+			/**
+			 * Listens for a user response (index of button pressed). 
+			 */
+			prompt.onResponse(new IntConsumer()
+			{
+				/**
+				 * Called when user responds. Delegates to handleLevelDialog.
+				 * @param value the index of response.
+				 */
+				@Override
+				public void accept(int value)
+				{
+					app.hideDialog(prompt);
+					handleLevelDialog(value);
+				}
+			});
+		}
+	}
+	
+	/**
+	 * Handles a end-of-level dialog response.
+	 * @param response the response index of user.
+	 */
+	private void handleLevelDialog(int response)
+	{
+		final int BUTTON_MENU = 0;
+		final int BUTTON_AGAIN = 1;
+		final int BUTTON_NEXT = 2;
+		
+		switch (response)
+		{
+		case BUTTON_AGAIN:
+			initLevel(currentLevelNum);
+			break;
+		case BUTTON_NEXT:
+			initLevel(currentLevelNum + 1);
+			break;
+		case BUTTON_MENU:
+		default:
+			app.showLevelSelect();
+			break;
 		}
 	}
 	
@@ -439,11 +498,28 @@ public class GameUI extends VBox
 	
 	/**
 	 * Initializes this Game UI with the level.
-	 * @param lvl the level to initialize with.
+	 * @param index the level index to initialize with.
 	 * @throws NullPointerException if <code>lvl</code> is null.
 	 */
-	private void initLevel(Level lvl)
+	private void initLevel(int index)
 	{
+		stopGame();
+		
+		currentLevelNum = index;
+		Level lvl = currentPack.getLevel(index);
+		try
+		{
+			if (!lvl.isLoaded())
+				currentPack.loadLevel(index);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			//TODO: tell user that level is corrupted and exit
+			System.out.println("Level data corrupted!");
+			System.exit(1);
+		}
+		
 		timeLeft = lvl.getTimeLimit();
 		
 		if (lvl.getPack() == null || lvl.getPack().getName().isEmpty())
@@ -606,6 +682,16 @@ public class GameUI extends VBox
 		}
 		else
 			doubled = false;
+	}
+	
+	/**
+	 * Stops the game.
+	 */
+	private void stopGame()
+	{
+		runner.stop();
+		started = false;
+		paused = false;
 	}
 	
 	/**

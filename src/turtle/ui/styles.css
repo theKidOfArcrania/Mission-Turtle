@@ -37,6 +37,15 @@
 	-fx-font-size: 28px;
 }
 
+/* Dialogs have a black background with a white border */
+.ldialog
+{
+	-fx-border-color: white;
+	-fx-border-style: solid;
+	-fx-border-width: 2px;
+	-fx-background-color: black;	
+}
+
 /* Light-weight button styles. Looks like a Label until you hover
  * over it. */
 .lbutton

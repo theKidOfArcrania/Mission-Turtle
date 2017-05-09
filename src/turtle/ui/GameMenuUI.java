@@ -7,8 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.VBox;
 
 /**
  * MenuUI.java
@@ -59,14 +58,11 @@ public class GameMenuUI extends VBox
     		createButton(ID_EXIT, "Exit", true)
         );
 		
-        setBackground(new Background(new BackgroundFill(Color.BLACK, 
-        		null, null)));
+        getStyleClass().add("ldialog");
         
         setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setPrefWidth(300.0);
         setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
-		setBorder(new Border(new BorderStroke(Color.WHITE, 
-			BorderStrokeStyle.SOLID, null, new BorderWidths(BORDER))));
 		
 		/** Filters out any mouse clicks in this game menu UI.*/
 		setOnMouseClicked(new EventHandler<Event>()
