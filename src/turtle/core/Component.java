@@ -34,6 +34,24 @@ public abstract class Component extends Pane
 	public static final TileSet DEFAULT_SET = new TileSet();
 	
 	private  static final double MOVE_SPEED = 10.0;
+
+	private static final int SHUFFLE = 50;
+	
+	/**
+	 * Utility method used to shuffle an array.
+	 * @param arr the array to shuffle
+	 */
+	public static void shuffle(int[] arr)
+	{
+		for (int i = 0; i < SHUFFLE * arr.length; i++)
+		{
+			int a = (int)(Math.random() * arr.length);
+			int b = (int)(Math.random() * arr.length);
+			int tmp = arr[a];
+			arr[a] = arr[b];
+			arr[b] = tmp;
+		}
+	}
 	
 	private final TileSet ts;
 	private final ImageView img;

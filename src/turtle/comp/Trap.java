@@ -8,7 +8,7 @@ import turtle.core.DominanceLevel;
  * Trap.java
  * 
  * This actor will kill any victim that happens to step over this contraption.
- * The trap will then immediately decinigrate. 
+ * The trap will then immediately disintegrate. 
  * 
  * @author Henry
  * Date: 5/7/17
@@ -20,6 +20,7 @@ public class Trap extends Actor
 	public static final int DEFAULT_IMAGE = 56;
 	private static final int TRAP_STILL_IMAGE = 56;
 	private static final int[] ANIMATION_IMAGE = {57, 58, 59};
+	
 	/**
 	 * Constructs a new trap actor and initializes image.
 	 */

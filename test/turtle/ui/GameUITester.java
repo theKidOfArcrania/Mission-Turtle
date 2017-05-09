@@ -35,6 +35,7 @@ public class GameUITester extends Application
 	private static final short COMP_IND_EXIT = (short)4;
 	private static final short COMP_IND_FIRE = (short)5;
 	private static final short COMP_IND_SAND = (short)6;
+	private static final short COMP_IND_BUCKET = (short)7;
 	private static final short COMP_IND_PLAYER = (short)10;
 	private static final short COMP_IND_KEY = (short)11;
 	private static final short COMP_IND_BIRD = (short)13;
@@ -146,6 +147,35 @@ public class GameUITester extends Application
 				new Location(1, 13), COMP_IND_BIRD, new HashMap<>()));
 		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
 				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
+		testPack.addLevel(test);
+		
+		return testPack;
+	}
+
+	//TODO: test with no player.
+	
+	/**
+	 * Tests the bucket functionality. 
+	 * @return test level pack 
+	 */
+	private LevelPack testBuckets()
+	{
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+		
+		HashMap<String, Object> params = new HashMap<>();
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+				new Location(0, 0), COMP_IND_PLAYER, params));
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+				new Location(1, 1), COMP_IND_BUCKET, params));
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+				new Location(1, 3), COMP_IND_BUCKET, params));
+		
+		params.put("filled", true);
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+				new Location(1, 5), COMP_IND_BUCKET, params));
+		
+		fillCells(test);
 		testPack.addLevel(test);
 		
 		return testPack;

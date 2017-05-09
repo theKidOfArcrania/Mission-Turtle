@@ -133,11 +133,23 @@ public abstract class Actor extends Component
 	public abstract DominanceLevel dominanceLevelFor(Actor other);
 	
 	/**
-	 * Moves this actor one space in specified direction. 
+	 * Executes move for an actor in a specified direction. Convenience
+	 * method for {@link #traverseDirection(int, boolean)}. 
 	 * @param direction direction to move in.
 	 * @return true if successful, false otherwise.
 	 */
 	public boolean traverseDirection(int direction)
+	{
+		return traverseDirection(direction, true);
+	}
+	
+	/**
+	 * Checks or executes move for an actor in a specified direction. 
+	 * @param direction direction to move in.
+	 * @param execute determine whether to execute move or just check move
+	 * @return true if successful, false otherwise.
+	 */
+	public boolean traverseDirection(int direction, boolean execute)
 	{
 		Grid parent = getParentGrid();
 		if (parent == null)
@@ -156,7 +168,10 @@ public abstract class Actor extends Component
 		default: return false;
 		}
 		
-		return parent.moveActor(this, row, col);
+		if (execute)
+			return parent.moveActor(this, row, col);
+		else
+			return parent.checkMove(this, row, col);
 	}
 	
 	/**

@@ -292,6 +292,7 @@ public class GameUI extends VBox
 			public void accept(int value)
 			{
 				app.hideDialog(dlg);
+				pnlMenuBack.setVisible(false);
 				if (value == 0)
 				{
 					stopGame();
@@ -504,6 +505,7 @@ public class GameUI extends VBox
         HBox.setMargin(lblLevelName, new Insets(0, GAP_INSET, 0, 0));
         
         lblLevelStatus = new Label("");
+        lblLevelStatus.getStyleClass().add("italic");
         HBox.setMargin(lblLevelStatus, new Insets(0, GAP_INSET, 0, GAP_INSET));
 
         Pane spacing = new Pane();
@@ -621,8 +623,8 @@ public class GameUI extends VBox
 		else if (score == MainApp.RESULT_NO_TIME_LIMIT)
 			lblLevelStatus.setText("Already completed!");
 		else 
-			lblLevelStatus.setText("Already completed with a time bonus: " +
-				score + "!");
+			lblLevelStatus.setText("Already completed (" +
+				score + " time bonus)");
 		
 		Grid g = lvl.createLevel();
 		view.initGrid(g);

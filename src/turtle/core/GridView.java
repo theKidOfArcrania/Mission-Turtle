@@ -22,7 +22,7 @@ import turtle.comp.Player;
 public class GridView extends Pane
 {
 	/** The number of rows in the view. */
-	public static final int VIEW_ROWS = 8;
+	public static final int VIEW_ROWS = 6;
 	
 	/** The number of columns in the view. */
 	public static final int VIEW_COLS = 12;

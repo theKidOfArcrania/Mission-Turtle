@@ -19,7 +19,7 @@ public class Fire extends Cell
 	private static final int[] ANIMATE_FRAMES = {18, 19, 20};
 	private static final int[] TRANSFORM_FRAMES = {19, 21, 22, 23, 24, 25, 26};
 	
-	private static final int SHUFFLE = 50;
+	private boolean smoking;
 	
 	/**
 	 * Constructs a new fire cell by initializing UI.
@@ -27,15 +27,10 @@ public class Fire extends Cell
 	public Fire()
 	{
 		int[] randomized = ANIMATE_FRAMES.clone();
-		for (int i = 0; i < SHUFFLE; i++)
-		{
-			int a = (int)(Math.random() * randomized.length);
-			int b = (int)(Math.random() * randomized.length);
-			int tmp = randomized[a];
-			randomized[a] = randomized[b];
-			randomized[b] = tmp;
-		}
+		shuffle(randomized);
 		animateFrames(randomized, true);
+		
+		smoking = false;
 	}
 	
 	/**
@@ -59,6 +54,8 @@ public class Fire extends Cell
 	@Override
 	public boolean pass(Actor visitor)
 	{
+		if (smoking)
+			return true;
 		visitor.die(this);
 		return true;
 	}
@@ -68,6 +65,7 @@ public class Fire extends Cell
 	 */
 	public void transformToSand()
 	{
+		smoking = true;
 		animateFrames(TRANSFORM_FRAMES, false);
 		transformTo(new Sand(), DEF_ANIMATION_FRAME_CHANGE * TRANSFORM_FRAMES.length);
 	}

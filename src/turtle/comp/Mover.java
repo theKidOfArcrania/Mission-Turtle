@@ -17,6 +17,26 @@ public abstract class Mover extends Actor
 {
 
 	/**
+	 * Checks an interaction with another actor. This will check whether
+	 * if the block can move in the specified direction of player's vector.
+	 * 
+	 * @param other other actor to interact with.
+	 * @return true to allow pass, false to deny pass.
+	 */
+	@Override
+	public boolean checkInteract(Actor other)
+	{
+		if (!(other instanceof Player))
+			return false;
+		
+		int dir = getPlayerVector();
+		if (dir == -1)
+			return false;
+		
+		return traverseDirection(dir, false);
+	}
+	
+	/**
 	 * Executes an interaction with another actor. This will move in the
 	 * specified vector of the player. In other words, this will execute
 	 * the "push" that the player has executed on this actor. Only the

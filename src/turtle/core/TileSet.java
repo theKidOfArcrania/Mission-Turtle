@@ -20,7 +20,7 @@ public class TileSet
 	@SuppressWarnings("unchecked")
 	private static final Class<Component>[] DEF_COMPS = new Class[] {Door.class, 
 			TestCell.class, TestCell.class, Water.class, Exit.class, Fire.class,
-			Sand.class, TestCell.class, TestCell.class, TestCell.class,
+			Sand.class, Bucket.class, TestCell.class, TestCell.class,
 			Player.class, Key.class, Wall.class, Bird.class, Food.class,
 			Hint.class, Trap.class}; 
 	

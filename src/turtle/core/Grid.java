@@ -223,7 +223,20 @@ public class Grid extends Pane
 	 */
 	public boolean moveActor(Actor comp, int row, int col)
 	{
-		return checkVisit(comp, row, col);
+		return checkVisit(comp, row, col, true);
+	}
+	
+	/**
+	 * Checks whether if actor can move to new location, but
+	 * doesn't actually move it there.
+	 * @param comp actor to move
+	 * @param row the new row to move to.
+	 * @param col the new column to move to.
+	 * @return true if and only if actor can move
+	 */
+	public boolean checkMove(Actor comp, int row, int col)
+	{
+		return checkVisit(comp, row, col, false);
 	}
 	
 	/**
@@ -240,7 +253,7 @@ public class Grid extends Pane
 		
 		
 		Location loc = comp.getHeadLocation();
-		boolean success = checkVisit(comp, loc.getRow(), loc.getColumn());
+		boolean success = checkVisit(comp, loc.getRow(), loc.getColumn(), true);
 		if (success)
 		{
 			if (comp instanceof Player)
@@ -384,16 +397,17 @@ public class Grid extends Pane
 	/**
 	 * Checks whether if the actor "visitor" can visit this 
 	 * location. It first checks for bounds issues. Then
-	 * it makes a preliminary check, then executes the 
-	 * visiting action. It always starts with the cell,
+	 * it makes a preliminary check, then executes (if specified) 
+	 * the visiting action. It always starts with the cell,
 	 * then moves up in actor dominance from highest to lowest
 	 * 
 	 * @param visitor the actor visitor that will move.
 	 * @param row row of the new location.
 	 * @param col column of the new location.
+	 * @param execute true if to execute move, false
 	 * @return true if the visit is permitted, false otherwise.
 	 */
-	private boolean checkVisit(Actor visitor, int row, int col)
+	private boolean checkVisit(Actor visitor, int row, int col, boolean execute)
 	{	
 		if (visitor.isMoving())
 			return false;
@@ -426,6 +440,9 @@ public class Grid extends Pane
 			if (!master[i].checkInteract(slave[i]))
 				return false;
 		}
+		
+		if (!execute)
+			return true;
 		
 		if (base[row][col] != null && !base[row][col].pass(visitor))
 			return false;
