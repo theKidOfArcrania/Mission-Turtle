@@ -12,6 +12,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import turtle.comp.ColorType;
+import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.Location;
 import turtle.file.CompSpec;
@@ -30,12 +31,15 @@ import turtle.file.LevelPack;
 public class GameUITester extends Application
 {
 	private static final int TEST_SIZE = 20;
+	
 	private static final short COMP_IND_DOOR = (short)0;
 	private static final short COMP_IND_WATER = (short)3;
 	private static final short COMP_IND_EXIT = (short)4;
 	private static final short COMP_IND_FIRE = (short)5;
 	private static final short COMP_IND_SAND = (short)6;
 	private static final short COMP_IND_BUCKET = (short)7;
+	private static final short COMP_IND_CANNON = (short)8;
+	private static final short COMP_IND_PROJECTILE = (short)9;
 	private static final short COMP_IND_PLAYER = (short)10;
 	private static final short COMP_IND_KEY = (short)11;
 	private static final short COMP_IND_BIRD = (short)13;
@@ -176,6 +180,33 @@ public class GameUITester extends Application
 				new Location(1, 5), COMP_IND_BUCKET, params));
 		
 		fillCells(test);
+		testPack.addLevel(test);
+		
+		return testPack;
+	}
+	
+	/**
+	 * Tests the functionality of cannons.
+	 * @return a level pack to test cannons.
+	 */
+	private LevelPack testCannon()
+	{
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+		
+		fillCells(test);
+		
+		HashMap<String, Object> params = new HashMap<>();
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(1, 13), COMP_IND_BIRD, params));
+		
+		params.put("heading", Actor.EAST);
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(1, 0), COMP_IND_CANNON, params));
+		
+		params.clear();
+		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				new Location(0, 1), COMP_IND_PLAYER, params));
 		testPack.addLevel(test);
 		
 		return testPack;

@@ -33,7 +33,9 @@ public abstract class Component extends Pane
 	/** The default tile-set to use. */
 	public static final TileSet DEFAULT_SET = new TileSet();
 	
-	private  static final double MOVE_SPEED = 10.0;
+	/** The number of frames equating to a big frame 
+	 * (defined as the player moving one frame.*/
+	public static final int BIG_FRAME = 10;
 
 	private static final int SHUFFLE = 50;
 	
@@ -161,7 +163,7 @@ public abstract class Component extends Pane
 	 */
 	public double getMoveSpeed()
 	{
-		return MOVE_SPEED;
+		return getTileSet().getFrameSize() / BIG_FRAME;
 	}
 
 	/**

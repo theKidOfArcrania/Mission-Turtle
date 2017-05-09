@@ -16,7 +16,7 @@ import turtle.core.Component;
 public class Bucket extends Mover
 {
 	/** The default image for this component */
-	public static final int DEFAULT_IMAGE = 52;
+	public static final int DEFAULT_IMAGE = 31;
 	
 	private static final int EMPTY_IMAGE = 31;
 	private static final int[] ANIMATE_FRAMES = {32,33,34};
@@ -82,7 +82,7 @@ public class Bucket extends Mover
 		super.setParameters(params);
 		Object val = params.get("filled");
 		if (val != null && val instanceof Boolean)
-			filled = (Boolean)val;
+			setFilled((Boolean)val);
 	}
 
 	

@@ -21,10 +21,10 @@ public abstract class Enemy extends Actor
 	 * This only let players go through.
 	 * 
 	 * @param other the other actor to interact with.
-	 * @return true to always allow interaction, false to deny interaction.
+	 * @return true to allow interaction, false to deny interaction.
 	 */
 	public boolean checkInteract(Actor other) {
-		return true;
+		return other instanceof Player;
 	}
 	
 	/**
