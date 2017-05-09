@@ -223,7 +223,6 @@ public class GameUI extends VBox
 			 * @param event an event object describing the key event that 
 			 *   occurred.
 			 */
-			@SuppressWarnings("incomplete-switch")
 			@Override
 			public void handle(KeyEvent event)
 			{
@@ -262,9 +261,9 @@ public class GameUI extends VBox
 		if (id < ID_RESUME || id > ID_EXIT)
 			throw new IllegalArgumentException("Invalid action ID");
 		
-		pnlMenuBack.setVisible(false);
 		if (id == ID_RESUME)
 		{
+			pnlMenuBack.setVisible(false);
 			resumeGame();
 			return;
 		}
@@ -273,8 +272,39 @@ public class GameUI extends VBox
 		String prompt = "Are you sure you want to exit?";
 		if (id == ID_RESTART)
 			prompt = "Are you sure you want to restart?";
-		//TODO: prompt user. if user cancels action return control.
 		
+		DialogBoxUI dlg = new DialogBoxUI(prompt, "Yes", "No");
+		
+		/**
+		 * Listens to the user's response to confirm this exiting.
+		 */
+		dlg.onResponse(new IntConsumer()
+		{
+			
+			/**
+			 * Called when user presses a response button.
+			 * @param value the button id pressed
+			 */
+			@Override
+			public void accept(int value)
+			{
+				pnlMenuBack.setVisible(false);
+				app.hideDialog(dlg);
+				if (value == 0)
+					executeMenu(id);
+			}
+		});
+		app.showDialog(dlg);
+	}
+	
+	/**
+	 * Executes game menu command based on id. This is called after
+	 * user confirms to do that command.
+	 * 
+	 * @param id the menu id
+	 */
+	private void executeMenu(int id)
+	{
 		switch (id)
 		{
 			case ID_RESTART:

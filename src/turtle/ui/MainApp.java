@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import javafx.application.Application;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import turtle.file.LevelPack;
@@ -38,13 +40,17 @@ public class MainApp extends Application
 	
 	private final HashMap<UUID, RandomAccessFile> openedFiles;
 	private final StackPane root;
+	private final GameUI game;
+	
 	/**
 	 * Constructs a new MainApp.
 	 */
 	public MainApp()
 	{
 		openedFiles = new HashMap<>();
-		root = new StackPane();
+		root = new StackPane(new Pane());
+		game = new GameUI(this);
+		
 	}
 	
 	/**
@@ -81,7 +87,13 @@ public class MainApp extends Application
 	 */
 	public void startGame(LevelPack pack, int level)
 	{
+		root.getChildren().set(0, game);
+		game.initLevelPack(pack, level);;
+		game.requestFocus();
 		
+		Stage s = (Stage)root.getScene().getWindow();
+		s.sizeToScene();
+		s.centerOnScreen();
 	}
 	
 	/**
@@ -91,7 +103,12 @@ public class MainApp extends Application
 	@Override
 	public void start(Stage primaryStage) 
 	{
-		primaryStage.showAndWait();
+		Scene s = new Scene(root);
+		s.getStylesheets().add("/turtle/ui/styles.css");
+		
+		primaryStage.setScene(s);
+		primaryStage.setResizable(false);
+		primaryStage.show();
 	}
 	
 	/**
