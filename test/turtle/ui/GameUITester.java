@@ -6,9 +6,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.TreeMap;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -213,7 +211,7 @@ public class GameUITester extends Application
 		for (int r = 0; r < TEST_SIZE; r++)
 			for (int c = 0; c < TEST_SIZE; c++)
 			{
-				if (r % 6 != 1)
+				if (r % 6 != 1 && (r != 0 || c != 0))
 				{
 					if (Math.random() < .1)
 						addActorSpecs(test, new Location(r, c), 
