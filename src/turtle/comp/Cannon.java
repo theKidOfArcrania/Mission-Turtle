@@ -5,6 +5,17 @@ import java.util.Map;
 import turtle.core.Grid;
 import turtle.core.Location;
 
+/**
+ * Cannon.java
+ * 
+ * This will shoot cannon projectiles at fixed interval times that can be 
+ * configured as a period. By itself it can be moved around much similarly
+ * to the {@link Bucket} class.
+ * 
+ * @author Henry
+ * Date: 5/9/17
+ * Period: 2
+ */
 public class Cannon extends Mover
 {
 	/** The default image for this component */
@@ -26,6 +37,9 @@ public class Cannon extends Mover
 		period = DEFAULT_SHOOTING_PERIOD; 
 	}
 	
+	/**
+	 * Fires a projectile in cannon's facing direction.
+	 */
 	private void shoot()
 	{
 		Grid parent = getParentGrid();

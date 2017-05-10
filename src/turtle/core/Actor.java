@@ -23,7 +23,8 @@ public abstract class Actor extends Component
 	public static final int SOUTH = 2;
 	public static final int WEST = 3;
 	
-	private static final int RIGHT_ANGLE = 90;
+	/** Angle measurement for right angle */
+	public static final int RIGHT_ANGLE = 90;
 	
 	//Some common dominance levels.
 	public static final DominanceLevel TOP = new DominanceLevel("Top", -200);

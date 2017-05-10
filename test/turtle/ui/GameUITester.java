@@ -9,7 +9,6 @@ import java.util.Scanner;
 import java.util.TreeMap;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import turtle.comp.ColorType;
 import turtle.core.Actor;
@@ -30,6 +29,10 @@ import turtle.file.LevelPack;
  */
 public class GameUITester extends Application
 {
+	private static final Location BIRD_LOC = new Location(1, 13);
+
+	private static final Location PLAYER_LOC = new Location(0, 0);
+
 	private static final int TEST_SIZE = 20;
 	
 	private static final short COMP_IND_DOOR = (short)0;
@@ -46,6 +49,10 @@ public class GameUITester extends Application
 	private static final short COMP_IND_FOOD = (short)14;
 	private static final short COMP_IND_HINT = (short)15;
 	private static final short COMP_IND_TRAP = (short)16;
+	private static final short COMP_IND_BUTTON = (short)17;
+	private static final short COMP_IND_FACTORY = (short)18;
+	
+	
 	
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args)
@@ -53,6 +60,58 @@ public class GameUITester extends Application
 		Application.launch(args);
 	}
 
+	/**
+	 * Utility method to adding cell specs
+	 * @param lvl level object
+	 * @param loc location of actor
+	 * @param id component id
+	 * @param params extra parameters to pass to component
+	 */
+	private static void addCellSpecs(Level lvl, Location loc, short id, 
+			HashMap<String, Object> params)
+	{
+		lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				loc, id, params));
+	}
+	
+	/**
+	 * Utility method to adding actor specs
+	 * @param lvl level object
+	 * @param loc location of actor
+	 * @param id component id
+	 * @param params extra parameters to pass to component
+	 */
+	private static void addActorSpecs(Level lvl, Location loc, short id, 
+			HashMap<String, Object> params)
+	{
+		lvl.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
+				loc, id, params));
+	}
+	
+	/**
+	 * Fills the level with the base cells (water, fire, and sand)
+	 * @param lvl the level to fill
+	 */
+	private static void fillCells(Level lvl)
+	{
+		HashMap<String, Object> params = new HashMap<>();
+		for (int r = 0; r < TEST_SIZE; r++)
+			for (int c = 0; c < TEST_SIZE; c++)
+			{
+				Location loc = new Location(r, c);
+				if (r % 6 == 1 || c == 0)
+					addCellSpecs(lvl, loc, COMP_IND_SAND, params);
+				else if (r % 6 == 0 && r > 0)
+					addCellSpecs(lvl, loc, COMP_IND_FIRE, params);
+				else
+					addCellSpecs(lvl, loc, COMP_IND_WATER, params);
+			}
+		lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
+	}
+	
+	private Scanner in;
+	
 	/**
 	 * Starts the main application
 	 * @param primaryStage the primary window that will first start up.
@@ -66,7 +125,7 @@ public class GameUITester extends Application
 			System.out.println("  -" + test);
 		
 		Method selected = null;
-		Scanner in = new Scanner(System.in);
+		in = new Scanner(System.in);
 		while (selected == null)
 		{
 			System.out.printf("Enter a test to do: ");
@@ -77,9 +136,11 @@ public class GameUITester extends Application
 				System.out.println("Invalid test: " + test + ". Try again.");
 		}
 		MainApp app = new MainApp();
-		app.start(primaryStage);
 		LevelPack pack = (LevelPack) selected.invoke(this);
+		
+		app.start(primaryStage);
 		app.startGame(pack, 0);
+		primaryStage.requestFocus();
 	}
 
 	/**
@@ -115,42 +176,38 @@ public class GameUITester extends Application
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
+		HashMap<String, Object> params = new HashMap<>();
+		
 		test.setFoodRequirement(50);
 		test.setTimeLimit(50);
-		test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
 		
+		addActorSpecs(test, new Location(1, 1), COMP_IND_EXIT, params);
 		fillCells(test);
 		for (int r = 0; r < TEST_SIZE; r++)
 			for (int c = 0; c < TEST_SIZE; c++)
 			{
 				if (r % 6 != 1)
 				{
-					HashMap<String, Object> params = new HashMap<>();
+					int rand = (int)(Math.random() * ColorType.values().length);
+					Location loc = new Location(r, c);
 					if (Math.random() < .2)
 					{
-						params.put("color", (int)(Math.random() * ColorType.values()
-								.length));
-						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-								new Location(r, c), COMP_IND_KEY, params));
+						params.put("color", rand);
+						addActorSpecs(test, loc, COMP_IND_KEY, params);
 					}
 					else if (Math.random() < .5)
-						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-								new Location(r, c), COMP_IND_FOOD, params));
+						addActorSpecs(test, loc, COMP_IND_FOOD, params);
 					else if (Math.random() < .5)
 					{
-						params.put("color", (int)(Math.random() * ColorType.values()
-								.length));
-						test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-								new Location(r, c), COMP_IND_DOOR, params));
+						params.put("color", rand);
+						addActorSpecs(test, loc, COMP_IND_DOOR, params);
 					}
+					params.clear();
 				}
 			}
 		
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(1, 13), COMP_IND_BIRD, new HashMap<>()));
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
+		addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, params);
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
 		testPack.addLevel(test);
 		
 		return testPack;
@@ -164,20 +221,65 @@ public class GameUITester extends Application
 	 */
 	private LevelPack testBuckets()
 	{
+		final Location BUCKT_A = new Location(1, 1);
+		final Location BUCKT_B = new Location(1, 3);
+		final Location BUCKT_C = new Location(1, 5);
+		
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
 		HashMap<String, Object> params = new HashMap<>();
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-				new Location(0, 0), COMP_IND_PLAYER, params));
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-				new Location(1, 1), COMP_IND_BUCKET, params));
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-				new Location(1, 3), COMP_IND_BUCKET, params));
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
+		addActorSpecs(test, BUCKT_A, COMP_IND_BUCKET, params);
+		addActorSpecs(test, BUCKT_B, COMP_IND_BUCKET, params);
 		
-		params.put("filled", true);
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-				new Location(1, 5), COMP_IND_BUCKET, params));
+		params.put("filled", true);	
+		addActorSpecs(test, BUCKT_C, COMP_IND_BUCKET, params);
+		
+		fillCells(test);
+		testPack.addLevel(test);
+		
+		return testPack;
+	}
+	
+	/**
+	 * Tests the buttons and factory functionality.
+	 * @return a test level pack.
+	 */
+	private LevelPack testButtons()
+	{
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+		
+		final Location FACT_A = new Location(1, 1);
+		final Location FACT_B = new Location(1, 3);
+		final Location BUT_LNK_A = new Location(2, 1);
+		final Location BUT_LNK_B = new Location(2, 3);
+		final Location BUT_NO_LNK = new Location(3, 1);
+		final Location BUT_BAD_LNK = new Location(4, 1);
+		
+		HashMap<String, Object> params = new HashMap<>();
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
+		
+		params.put("heading", Actor.EAST);
+		addCellSpecs(test, FACT_A, COMP_IND_FACTORY, params);
+		
+		System.out.print("Input a comonent ID to clone (9 is default): ");
+		if (in.hasNextShort())
+			params.put("cloned", in.nextShort());
+		else
+			params.put("cloned", COMP_IND_PROJECTILE);
+		addCellSpecs(test, FACT_B, COMP_IND_FACTORY, params);
+		params.clear();
+		
+		params.put("linked", FACT_A);
+		addActorSpecs(test, BUT_LNK_A, COMP_IND_BUTTON, params);
+		params.put("linked", FACT_B);
+		addActorSpecs(test, BUT_LNK_B, COMP_IND_BUTTON, params);
+		params.put("linked", PLAYER_LOC);
+		addActorSpecs(test, BUT_BAD_LNK, COMP_IND_BUTTON, params);
+		params.clear();
+		addActorSpecs(test, BUT_NO_LNK, COMP_IND_BUTTON, params);
 		
 		fillCells(test);
 		testPack.addLevel(test);
@@ -197,16 +299,13 @@ public class GameUITester extends Application
 		fillCells(test);
 		
 		HashMap<String, Object> params = new HashMap<>();
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(1, 13), COMP_IND_BIRD, params));
+		addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, params);
 		
 		params.put("heading", Actor.EAST);
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(1, 0), COMP_IND_CANNON, params));
+		addActorSpecs(test, new Location(1, 0), COMP_IND_CANNON, params);
 		
 		params.clear();
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 1), COMP_IND_PLAYER, params));
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
 		testPack.addLevel(test);
 		
 		return testPack;
@@ -226,10 +325,8 @@ public class GameUITester extends Application
 		
 		fillCells(test);
 		
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(1, 13), COMP_IND_BIRD, new HashMap<>()));
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
+		addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, new HashMap<>());
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, new HashMap<>());
 		testPack.addLevel(test);
 		
 		return testPack;
@@ -248,21 +345,18 @@ public class GameUITester extends Application
 		
 		HashMap<String, Object> params = new HashMap<>();
 		params.put("message", "This is a test hint.");
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 2), COMP_IND_HINT, params));
+		addActorSpecs(test, new Location(0, 2), COMP_IND_HINT, params);
 		params.put("message", "No, really! This is a test!");
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 3), COMP_IND_HINT, params));
+		addActorSpecs(test, new Location(0, 3), COMP_IND_HINT, params);
 		params.put("message", "Testing how long a string could be before " +
 				"these ellipse will show up!! Hmmm, maybe a little longer " +
 				"than I anticipated! Wait? Where are the ellipses? Pretty " + 
 				"sure it's long enough for those '...'!!! Where is it? Okay " +
 				"now i'm worried! Where are they? Oh I miss you :(");
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 4), COMP_IND_HINT, params));
+		addActorSpecs(test, new Location(0, 4), COMP_IND_HINT, params);
+		params.clear();
 		
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
+		addActorSpecs(test, new Location(0, 1), COMP_IND_PLAYER, params);
 		testPack.addLevel(test);
 		
 		return testPack;
@@ -276,12 +370,9 @@ public class GameUITester extends Application
 		fillCells(test);
 		
 		HashMap<String, Object> params = new HashMap<>();
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(1, 10), COMP_IND_BIRD, params));
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(1, 2), COMP_IND_TRAP, params));
-		test.getActorCompSpecs().add(new CompSpec(Component.DEFAULT_SET, 
-				new Location(0, 1), COMP_IND_PLAYER, new HashMap<>()));
+		addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, params);
+		addActorSpecs(test, new Location(1, 2), COMP_IND_TRAP, params);
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
 		testPack.addLevel(test);
 		
 		return testPack;
@@ -292,26 +383,5 @@ public class GameUITester extends Application
 		return new LevelPack(new File("test.mtp"));
 	}
 	
-	/**
-	 * Fills the level with the base cells (water, fire, and sand)
-	 * @param lvl the level to fill
-	 */
-	private static void fillCells(Level lvl)
-	{
-		for (int r = 0; r < TEST_SIZE; r++)
-			for (int c = 0; c < TEST_SIZE; c++)
-			{
-				if (r % 6 == 1 || c == 0)
-					lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-							new Location(r, c), COMP_IND_SAND, new HashMap<>()));
-				else if (r % 6 == 0 && r > 0)
-					lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-							new Location(r, c), COMP_IND_FIRE, new HashMap<>()));
-				else
-					lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-							new Location(r, c), COMP_IND_WATER, new HashMap<>()));
-			}
-		lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
-	}
+	
 }

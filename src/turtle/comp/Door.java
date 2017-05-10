@@ -139,6 +139,16 @@ public class Door extends Actor
 	}
 
 	/**
+	 * This overrides the Actor's setHeading since a heading does not
+	 * mean anything for this actor.
+	 */
+	@Override
+	public void setHeading(int heading)
+	{
+		//Does nothing
+	}
+	
+	/**
 	 * @param color the new color to set for this door
 	 * @throws NullPointerException if the color supplied is null.
 	 */

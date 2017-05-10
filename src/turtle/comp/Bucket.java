@@ -58,7 +58,16 @@ public class Bucket extends Mover
 		return super.die(attacker);
 	}
 	
-
+	/**
+	 * This overrides the Actor's setHeading since a heading does not
+	 * mean anything for this actor.
+	 */
+	@Override
+	public void setHeading(int heading)
+	{
+		//Does nothing
+	}
+	
 	/**
 	 * Sets a series of parameters for this bucket actor. This
 	 * class has one parameter attribute that has functionality:

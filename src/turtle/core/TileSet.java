@@ -22,11 +22,13 @@ public class TileSet
 			TestCell.class, TestCell.class, Water.class, Exit.class, Fire.class,
 			Sand.class, Bucket.class, Cannon.class, Projectile.class,
 			Player.class, Key.class, Wall.class, Bird.class, Food.class,
-			Hint.class, Trap.class}; 
+			Hint.class, Trap.class, Button.class, Factory.class}; 
 	
 	private static final int DEF_FRAME_SIZE = 100;
 	private static final int FRAME_ROWS = 16;
 	private static final int FRAME_COLS = 16;
+
+	private static final double SMALL = .0001;
 	
 	private int frameSize;
 	private Image tileset;
@@ -57,10 +59,13 @@ public class TileSet
 	 * @param index the index of image
 	 * @return an image at that particular frame.
 	 * @throws IndexOutOfBoundsException if index is not within 
-	 * 	0 <= index < 256 
+	 * 	-1 <= index < 256 
 	 */
 	public Rectangle2D frameAt(int index)
 	{
+		if (index == -1)
+			return new Rectangle2D(0, 0, SMALL, SMALL); 
+		
 		int col = index % FRAME_COLS;
 		int row = index / FRAME_COLS;
 		
@@ -75,9 +80,12 @@ public class TileSet
 	 * Obtains the component type at the slot index.
 	 * @param index the index of component to get
 	 * @return the class associated with component type.
+	 * @throws IllegalArgumentException if index is out of bounds.
 	 */
-	public Class<Component> componentAt(int index)
+	public Class<Component> componentAt(short index)
 	{
+		if (index < 0 || index >= compIndex.length)
+			throw new IllegalArgumentException("Illegal component index");
 		return compIndex[index];
 	}
 	
@@ -87,5 +95,13 @@ public class TileSet
 	public int getFrameSize()
 	{
 		return frameSize;
+	}
+
+	/**
+	 * @return number of possible components
+	 */
+	public int getComponentCount()
+	{
+		return compIndex.length;
 	}
 }

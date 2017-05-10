@@ -194,6 +194,29 @@ public class Grid extends Pane
 	{
 		this.foodLeft = foodLeft;
 	}
+
+	/**
+	 * Determines whether if a row/column location is a valid location, i.e.
+	 * is a location within this grid's bounds.
+	 * @param loc the location object representing row/column
+	 * @return true if valid, false if invalid.
+	 */
+	public boolean isValidLocation(Location loc)
+	{
+		return isValidLocation(loc.getRow(), loc.getColumn());
+	}
+	
+	/**
+	 * Determines whether if a row/column location is a valid location, i.e.
+	 * is a location within this grid's bounds.
+	 * @param row the row of the location.
+	 * @param col the column of the location.
+	 * @return true if valid, false if invalid.
+	 */
+	public boolean isValidLocation(int row, int col)
+	{
+		return row >= 0 && col >= 0 && row < rows && col < cols;
+	}
 	
 	/**
 	 * Increment the amount of food by one unit, and thus the amount of
@@ -452,17 +475,5 @@ public class Grid extends Pane
 		visitor.getHeadLocation().setLocation(row, col);
 		
 		return true;
-	}
-	
-	/**
-	 * Determines whether if a row/cell location is a valid location, i.e.
-	 * is a location within this grid's bounds.
-	 * @param row the row of the location.
-	 * @param col the column of the location.
-	 * @return true if valid, false if invalid.
-	 */
-	private boolean isValidLocation(int row, int col)
-	{
-		return row >= 0 && col >= 0 && row < rows && col < cols;
 	}
 }

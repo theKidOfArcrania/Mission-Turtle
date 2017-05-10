@@ -3,7 +3,6 @@ package turtle.core;
 import java.util.Map;
 
 import javafx.geometry.HPos;
-import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
@@ -27,16 +26,13 @@ public abstract class Component extends Pane
 	 */
 	public static final int DEF_ANIMATION_FRAME_CHANGE = 4;
 	
-	/** A very small number used to approximate zero.*/
-	public static final double SMALL = .0001;
-	
 	/** The default tile-set to use. */
 	public static final TileSet DEFAULT_SET = new TileSet();
 	
 	/** The number of frames equating to a big frame 
 	 * (defined as the player moving one frame.*/
 	public static final int BIG_FRAME = 10;
-
+	
 	private static final int SHUFFLE = 50;
 	
 	/**
@@ -77,20 +73,14 @@ public abstract class Component extends Pane
 	{
 		ts = DEFAULT_SET;
 		
-		img = new ImageView();
+		img = new ImageView(ts.getImageset());
 		this.getChildren().add(img);
 		
 		headLoc = new Location();
 		trailLoc = new Location();
 		
-		img.setImage(ts.getImageset());
-		img.setViewport(new Rectangle2D(0, 0, SMALL, SMALL));
-		currentImage = -1;
-		
+		setImageFrame(-1);
 		curFrame = 0;
-		animationOffset = -1;
-		imageFrames = null;
-		changeRate = -1;
 	}
 
 	/**
@@ -334,6 +324,7 @@ public abstract class Component extends Pane
 	protected void layoutChildren()
 	{
 		for (Node n : getManagedChildren())
-			layoutInArea(n, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER, VPos.CENTER);
+			layoutInArea(n, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER, 
+					VPos.CENTER);
 	}
 }

@@ -44,6 +44,16 @@ public abstract class Item extends Actor
 	}
 	
 	/**
+	 * This overrides the Actor's setHeading since a heading does not
+	 * mean anything for this actor.
+	 */
+	@Override
+	public void setHeading(int heading)
+	{
+		//Does nothing
+	}
+	
+	/**
 	 * Overrides dying so that it doesn't die from anything,
 	 * as this is a fixture.
 	 * 
@@ -58,8 +68,8 @@ public abstract class Item extends Actor
 	
 	/**
 	 * Obtains the dominance level of the actor in relation to another actor.
-	 * This will always return ITEM, so it is pretty on the dominance level
-	 * list.
+	 * This will always return ITEM, so it is pretty high on the 
+	 * dominance level list.
 	 * 
 	 * @param other other actor to compare with (or null for generally).
 	 * @return a dominance level of the actor.

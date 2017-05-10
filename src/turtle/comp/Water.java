@@ -2,10 +2,10 @@
 
 package turtle.comp;
 
-import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 import turtle.core.Actor;
 import turtle.core.Cell;
+import turtle.core.TileSet;
 
 /**
  * Water.java
@@ -38,8 +38,9 @@ public class Water extends Cell
 		frameCount = -1;
 		
 		top = new ImageView();
-		top.setImage(getTileSet().getImageset());
-		top.setViewport(new Rectangle2D(0, 0, SMALL, SMALL));
+		TileSet ts = getTileSet();
+		top.setImage(ts.getImageset());
+		top.setViewport(ts.frameAt(-1));
 		this.getChildren().add(top);
 	}
 	

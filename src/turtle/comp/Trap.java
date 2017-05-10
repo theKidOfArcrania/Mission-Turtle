@@ -86,4 +86,14 @@ public class Trap extends Actor
 		}
 		return false;
 	}
+	
+	/**
+	 * This overrides the Actor's setHeading since a heading does not
+	 * mean anything for this actor.
+	 */
+	@Override
+	public void setHeading(int heading)
+	{
+		//Does nothing
+	}
 }
