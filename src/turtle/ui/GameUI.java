@@ -1,5 +1,7 @@
 package turtle.ui;
 
+import static turtle.ui.GameMenuUI.*;
+
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
@@ -27,8 +29,6 @@ import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
 
-import static turtle.ui.GameMenuUI.*;
-
 /**
  * GameUI.java
  * 
@@ -44,17 +44,20 @@ public class GameUI extends VBox
 	 */
 	private class GameTimer extends Transition
 	{
-		private static final int FRAME_SAMPLE = 100;
+		private static final int SUBFRAMES = 3;
+		private static final int FRAME_SAMPLE = 10;
 		private long prevTime;
 		private long frame;
 		private ArrayDeque<Long> frameTimes;
 		private double fps;
+		private int subframe;
 		
 		/**
 		 * Constructs a new GameTimer.
 		 */
 		public GameTimer(){
 			prevTime = -1;
+			subframe = 0;
 			frame = 0;
 			fps = 0;
 			frameTimes = new ArrayDeque<>(FRAME_SAMPLE);
@@ -79,8 +82,13 @@ public class GameUI extends VBox
 		@Override
 		public void interpolate(double frac)
 		{
-			if (frac == 1) // Next Frame
+			subframe++;
+			if (subframe >= SUBFRAMES)
 			{
+				subframe = 0;
+			//if (frac == 1) // Next Frame
+			//{
+				
 				long time = System.nanoTime();
 				if (prevTime != -1)
 				{
