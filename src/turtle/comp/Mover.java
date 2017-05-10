@@ -17,16 +17,25 @@ public abstract class Mover extends Actor
 {
 
 	/**
-	 * There might be cases an actor can pass through, therefore it
-	 * will return true.
+	 * Checks whether an interaction with another actor is possible.
 	 * 
-	 * @param other other actor to interact with.
-	 * @return true to allow pass.
+	 * @param other the other actor to interact with.
+	 * @return true if the other actor can pass into location
+	 *         false if other actor is prohibited to pass.
 	 */
 	@Override
 	public boolean checkInteract(Actor other)
 	{
-		return true;
+		if (isDying())
+			return true;
+		
+		if (!(other instanceof Player))
+			return false;
+		
+		int dir = getPlayerVector();
+		if (dir == -1)
+			return false;
+		return traverseDirection(dir, false);
 	}
 	
 	/**

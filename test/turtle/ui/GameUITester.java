@@ -3,6 +3,8 @@ package turtle.ui;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -30,12 +32,14 @@ import turtle.file.LevelPack;
 public class GameUITester extends Application
 {
 	private static final Location BIRD_LOC = new Location(1, 13);
-
 	private static final Location PLAYER_LOC = new Location(0, 0);
 
+	private static final String TEST_PREFIX = "test";
+	
 	private static final int TEST_SIZE = 20;
 	
 	private static final short COMP_IND_DOOR = (short)0;
+	private static final short COMP_IND_GRASS = (short)1;
 	private static final short COMP_IND_PLASTIC = (short)2;
 	private static final short COMP_IND_WATER = (short)3;
 	private static final short COMP_IND_EXIT = (short)4;
@@ -120,21 +124,29 @@ public class GameUITester extends Application
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
-		Map<String, Method> tests = initializeTests();
+		//Map<String, Method> tests = initializeTests();
+		ArrayList<Method> tests = initializeTests();
 		System.out.println("Available tests: ");
-		for (String test : tests.keySet())
-			System.out.println("  -" + test);
+		for (int i = 0; i < tests.size(); i++)
+			System.out.println("  - (" + i + ") " + tests.get(i).getName().
+					substring(TEST_PREFIX.length()));
 		
 		Method selected = null;
 		in = new Scanner(System.in);
 		while (selected == null)
 		{
-			System.out.printf("Enter a test to do: ");
-			String test = in.nextLine();
-			if (tests.containsKey(test))
-				selected = tests.get(test);
+			System.out.printf("Enter the index of test to do: ");
+			Scanner resp = new Scanner(in.nextLine());
+			if (resp.hasNextInt())
+			{
+				int index = resp.nextInt();
+				if (index < 0 || index >= tests.size())
+					System.out.println("Invalid index. Try again");
+				else
+					selected = tests.get(index);
+			}
 			else
-				System.out.println("Invalid test: " + test + ". Try again.");
+				System.out.println("Invalid number. Try again.");
 		}
 		MainApp app = new MainApp();
 		LevelPack pack = (LevelPack) selected.invoke(this);
@@ -146,12 +158,12 @@ public class GameUITester extends Application
 
 	/**
 	 * Initializes all the test methods found within this class.
-	 * @return a mapping of test names and methods.
+	 * @return a sorted list of test methods.
 	 */
-	private Map<String, Method> initializeTests()
+	private ArrayList<Method> initializeTests()
 	{
-		final String TEST_PREFIX = "test";
-		Map<String, Method> tests = new TreeMap<>();
+		
+		ArrayList<Method> tests = new ArrayList<>();
 		for (Method mth : GameUITester.class.getDeclaredMethods())
 		{
 			if (mth.getName().startsWith(TEST_PREFIX) && 
@@ -159,18 +171,39 @@ public class GameUITester extends Application
 					LevelPack.class.isAssignableFrom(mth.getReturnType()))
 			{
 				mth.setAccessible(true);
-				tests.put(mth.getName().substring(TEST_PREFIX.length()), mth);
+				tests.add(mth);
 			}
 		}
+		
+		/**
+		 * Compares methods by their name, sorting by A-Z
+		 */
+		tests.sort(new Comparator<Method>()
+		{
+
+			/**
+			 * Compares two methods, effectively by alphabetical order via name
+			 * @param o1 the first method 
+			 * @param o2 the second method
+			 * @return negative value if first method comes first in alpha order, 
+			 * 		zero if both are equal,
+			 * 		positive value if second method cones first in alpha order.
+			 */
+			@Override
+			public int compare(Method o1, Method o2)
+			{
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
 		return tests;
 	}
 
 	/**
-	 * Generates a test level pack that tests the plastic wraps.
+	 * Generates a test level pack that tests the plastic wraps and grass.
 	 * 
 	 * @return a created level-pack.
 	 */
-	private LevelPack testPlasticWrap()
+	private LevelPack testPlasticWrapGrass()
 	{
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
@@ -185,6 +218,8 @@ public class GameUITester extends Application
 					if (Math.random() < .1)
 						addActorSpecs(test, new Location(r, c), 
 								COMP_IND_PLASTIC, params);
+					addActorSpecs(test, new Location(r, c), 
+							COMP_IND_GRASS, params);
 				}
 			}
 		
