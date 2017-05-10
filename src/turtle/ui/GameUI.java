@@ -39,6 +39,8 @@ import turtle.file.LevelPack;
  */
 public class GameUI extends VBox
 {
+	private static final String SECT_BREAK = "   ";
+
 	/**
 	 * Runs the game timer, keep tracks of the game states each frame.
 	 */
@@ -816,7 +818,7 @@ public class GameUI extends VBox
 			double from = msgWidth - firstSaw;
 			double to = -SPACE_SIZE - firstSaw;
 			
-			msg.setText(msg.getText() + "   " + msg.getText());
+			msg.setText(msg.getText() + SECT_BREAK + msg.getText());
 			msg.setTranslateX(from);
 			doubled = true;
 			
@@ -957,7 +959,7 @@ public class GameUI extends VBox
 		
 		String check = msg;
 		if (doubled)
-			check = msg + "   " + msg;
+			check = msg + SECT_BREAK + msg;
 		if (!oldMsg.equals(check))
 		{
 			if (lblMsg != null)

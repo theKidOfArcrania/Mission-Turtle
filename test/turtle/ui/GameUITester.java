@@ -244,7 +244,7 @@ public class GameUITester extends Application
 		test.setFoodRequirement(50);
 		test.setTimeLimit(50);
 		
-		addActorSpecs(test, new Location(1, 1), COMP_IND_EXIT, params);
+		addCellSpecs(test, new Location(1, 1), COMP_IND_EXIT, params);
 		fillCells(test);
 		for (int r = 0; r < TEST_SIZE; r++)
 			for (int c = 0; c < TEST_SIZE; c++)
@@ -383,8 +383,7 @@ public class GameUITester extends Application
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
-		test.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
+		addCellSpecs(test, new Location(1, 1), COMP_IND_EXIT, new HashMap<>());
 		
 		fillCells(test);
 		
@@ -407,6 +406,8 @@ public class GameUITester extends Application
 		fillCells(test);
 		
 		HashMap<String, Object> params = new HashMap<>();
+		params.put("message", "This is a test hint under us.");
+		addActorSpecs(test, new Location(0,1), COMP_IND_HINT, params);
 		params.put("message", "This is a test hint.");
 		addActorSpecs(test, new Location(0, 2), COMP_IND_HINT, params);
 		params.put("message", "No, really! This is a test!");
