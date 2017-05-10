@@ -1,9 +1,6 @@
 package turtle.core;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -23,7 +20,6 @@ import turtle.comp.Player;
  */
 public class Grid extends Pane
 {
-	
 	
 	private static final Color SHADOW_COLOR = Color.web("#101010");
 	private static final double SHADOW_RADIUS = 20;
@@ -49,6 +45,8 @@ public class Grid extends Pane
 		}
 	}
 	
+	private final Random rng;
+	
 	private final int rows;
 	private final int cols;
 	private final int cellSize;
@@ -70,6 +68,8 @@ public class Grid extends Pane
 	 */
 	public Grid(int rows, int cols)
 	{
+		rng = new Random();
+		
 		cellSize = Component.DEFAULT_SET.getFrameSize();
 		
 		this.rows = rows;
@@ -226,6 +226,27 @@ public class Grid extends Pane
 	{
 		if (foodLeft > 0)
 			foodLeft--;
+	}
+	
+	/**
+	 * Sets the grid's random number generator seed to a specified value.
+	 * This is often done when the program is replaying a particular game.
+	 * 
+	 * @param seed the new seed to set to
+	 */
+	public void setRNGSeed(long seed)
+	{
+		rng.setSeed(seed);
+	}
+	
+	/**
+	 * Obtains the grid's random number generator so that the 'random' movements
+	 * of certain components can be replayable by setting random seed.
+	 * @return grid's random number generator
+	 */
+	public Random getRNG()
+	{
+		return rng;
 	}
 	
 	/**

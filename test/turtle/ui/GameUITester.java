@@ -36,6 +36,7 @@ public class GameUITester extends Application
 	private static final int TEST_SIZE = 20;
 	
 	private static final short COMP_IND_DOOR = (short)0;
+	private static final short COMP_IND_PLASTIC = (short)2;
 	private static final short COMP_IND_WATER = (short)3;
 	private static final short COMP_IND_EXIT = (short)4;
 	private static final short COMP_IND_FIRE = (short)5;
@@ -164,6 +165,35 @@ public class GameUITester extends Application
 		return tests;
 	}
 
+	/**
+	 * Generates a test level pack that tests the plastic wraps.
+	 * 
+	 * @return a created level-pack.
+	 */
+	private LevelPack testPlasticWrap()
+	{
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+		
+		HashMap<String, Object> params = new HashMap<>();
+		fillCells(test);
+		for (int r = 0; r < TEST_SIZE; r++)
+			for (int c = 0; c < TEST_SIZE; c++)
+			{
+				if (r % 6 != 1)
+				{
+					if (Math.random() < .1)
+						addActorSpecs(test, new Location(r, c), 
+								COMP_IND_PLASTIC, params);
+				}
+			}
+		
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
+		testPack.addLevel(test);
+		
+		return testPack;
+	}
+	
 	/**
 	 * Generates a test level pack that tests the items (keys and food items)
 	 * the time limit, the food requirement, and also whether if the keys unlock
