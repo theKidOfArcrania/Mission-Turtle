@@ -17,23 +17,16 @@ public abstract class Mover extends Actor
 {
 
 	/**
-	 * Checks an interaction with another actor. This will check whether
-	 * if the block can move in the specified direction of player's vector.
+	 * There might be cases an actor can pass through, therefore it
+	 * will return true.
 	 * 
 	 * @param other other actor to interact with.
-	 * @return true to allow pass, false to deny pass.
+	 * @return true to allow pass.
 	 */
 	@Override
 	public boolean checkInteract(Actor other)
 	{
-		if (!(other instanceof Player))
-			return false;
-		
-		int dir = getPlayerVector();
-		if (dir == -1)
-			return false;
-		
-		return traverseDirection(dir, false);
+		return true;
 	}
 	
 	/**
@@ -50,6 +43,9 @@ public abstract class Mover extends Actor
 	@Override
 	public boolean interact(Actor other)
 	{
+		if (isDying())
+			return true;
+		
 		if (!(other instanceof Player))
 			return false;
 		
@@ -63,7 +59,8 @@ public abstract class Mover extends Actor
 	 * Obtains the dominance level of a mover. Movers should be near the top of
 	 * the z-order, therefore in such a case, when calculating z-order,
 	 * the mover will return an artificially low dominance level. However,
-	 * in other cases, it will have a relatively high dominance level (FIXTURE).
+	 * in other cases, it will have a medium dominance level (Mover).
+	 * 
 	 * 
 	 * @param other the other actor to compare with.
 	 * @return dominance level of a mover.
@@ -74,7 +71,7 @@ public abstract class Mover extends Actor
 		if (other == null)
 			return FLOATING;
 		else
-			return FIXTURE;
+			return MOVER;
 	}
 	
 	/**

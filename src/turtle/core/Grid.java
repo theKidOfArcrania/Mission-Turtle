@@ -12,7 +12,6 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import turtle.comp.Player;
-import turtle.comp.Projectile;
 
 /**
  * Grid.java
@@ -151,8 +150,7 @@ public class Grid extends Pane
 			if (n instanceof Actor)
 			{
 				Actor a = (Actor)n;
-				if (a.getHeadLocation().equals(search) || 
-						a.getTrailingLocation().equals(search))
+				if (a.getHeadLocation().equals(search))
 					residents.add(a);
 			}
 		}
@@ -438,8 +436,6 @@ public class Grid extends Pane
 				slave[i] = visitor;
 			}
 			if (!master[i].checkInteract(slave[i]))
-				return false;
-			if (!slave[i].checkInteract(master[i]))
 				return false;
 		}
 		

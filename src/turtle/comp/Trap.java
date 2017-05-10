@@ -57,8 +57,8 @@ public class Trap extends Actor
 	}
 
 	/**
-	 * Obtains dominance level for actor. This actor will always be
-	 * a fixture dominance, having a relatively high dominance level.
+	 * Obtains dominance level for actor. This actor has a fixture
+	 * dominance level since it passively destroys many. 
 	 * 
 	 * @param other the other actor to compare with.
 	 * @return dominance level.

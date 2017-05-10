@@ -30,8 +30,9 @@ public abstract class Actor extends Component
 	public static final DominanceLevel FLOATING = new DominanceLevel("Floating", -100);
 	public static final DominanceLevel PLAYER = new DominanceLevel("Player", 0);
 	public static final DominanceLevel ENEMY = new DominanceLevel("Enemy", 100);
-	public static final DominanceLevel ITEM = new DominanceLevel("Item", 200);
-	public static final DominanceLevel FIXTURE = new DominanceLevel("Fixture", 300);
+	public static final DominanceLevel MOVER = new DominanceLevel("Mover", 200);
+	public static final DominanceLevel ITEM = new DominanceLevel("Item", 300);
+	public static final DominanceLevel FIXTURE = new DominanceLevel("Fixture", 400);
 	
 	private boolean dying;
 	private boolean dead;
@@ -183,6 +184,9 @@ public abstract class Actor extends Component
 	 */
 	public boolean traverseDirection(int direction, boolean execute)
 	{
+		if (isDying())
+			return false;
+		
 		Grid parent = getParentGrid();
 		if (parent == null)
 			return false;

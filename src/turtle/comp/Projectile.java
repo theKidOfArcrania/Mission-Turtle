@@ -16,7 +16,8 @@ public class Projectile extends Enemy
 {
 	public static final int DEFAULT_IMAGE = 39;
 	
-	private static final DominanceLevel KILLER = new DominanceLevel("Killer", 400);
+	private static final DominanceLevel ENEMY_PLUS = 
+			new DominanceLevel("Enemy+", ENEMY.getDominanceValue() + 50);
 	
 	/**
 	 * Constructs a projectile.
@@ -54,9 +55,9 @@ public class Projectile extends Enemy
 	}
 	
 	/**
-	 * Obtains the dominance level of this projectile. This
-	 * has ultra-dominance over everything because it is the ultimate
-	 * killer machine, killing every actor in its path.
+	 * Obtains the dominance level of this projectile. Has
+	 * a slightly higher dominance than other enemies, since
+	 * the projectile can kill all other enemies.
 	 * 
 	 * @param other the other actor to compare with.
 	 * @return dominance level.
@@ -64,7 +65,7 @@ public class Projectile extends Enemy
 	@Override
 	public DominanceLevel dominanceLevelFor(Actor other)
 	{
-		return KILLER; 
+		return ENEMY_PLUS; 
 	}
 	
 	/**
@@ -84,7 +85,7 @@ public class Projectile extends Enemy
 			{
 				int newDir = (turn + heading) % options.length;
 				if (traverseDirection(newDir, true))
-					setHeading(heading);
+					setHeading(newDir);
 			}
 		}
 	}

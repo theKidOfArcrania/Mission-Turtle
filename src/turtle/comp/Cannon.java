@@ -2,7 +2,6 @@ package turtle.comp;
 
 import java.util.Map;
 
-import turtle.core.Actor;
 import turtle.core.Grid;
 import turtle.core.Location;
 
@@ -116,8 +115,7 @@ public class Cannon extends Mover
 		super.updateFrame(frame);
 		if (period != 0)
 		{
-			//frames must be more than the frames needed to move cannon one space.
-			int framesPeriod = Math.max(BIG_FRAME * period, BIG_FRAME + 1);
+			int framesPeriod = BIG_FRAME * period;
 			if (frame % framesPeriod == 0)
 				shoot();
 		}

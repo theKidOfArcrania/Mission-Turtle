@@ -1,7 +1,5 @@
 package turtle.ui;
 
-import static turtle.ui.GameMenuUI.*;
-
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
@@ -11,6 +9,7 @@ import javafx.animation.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
@@ -27,6 +26,8 @@ import turtle.core.Grid;
 import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
+
+import static turtle.ui.GameMenuUI.*;
 
 /**
  * GameUI.java
@@ -109,10 +110,14 @@ public class GameUI extends VBox
 			frame = 0;
 		}
 	}
+	
 	private static final int FPS_UPDATE_RATE = 10;
 	
 	private static final int ACTION_START = -1;
 	private static final int ACTION_PAUSE = -2;
+	private static final int ACTION_RESTART = -3;
+	private static final int ACTION_NEXT = -4;
+	private static final int ACTION_PREVIOUS = -5;
 
 	private static final double SEMI_TRANS_ALPHA = .5;
 	private static final Color DARKGRAY = Color.web("#505050");
@@ -120,11 +125,12 @@ public class GameUI extends VBox
 	private static final double GAP_INSET = 5.0;
 	private static final double LARGE_GAP_INSET = 20.0;
 	
+	private static final int LABEL_MIN_WIDTH = 50;
+	
 	private static final double FRAME_WIDTH = 10.0;
 	private static final int FRAMES_PER_SEC = 50;
 	private static final Duration FRAME_DURATION = Duration.seconds(1.0 / 
 			FRAMES_PER_SEC);
-	private static final int SECS_IN_MIN = 60;
 	private static final Duration FADE_DURATION = Duration.seconds(.5);
 
 	private static final double FIT_WIDTH = 799;
@@ -463,30 +469,62 @@ public class GameUI extends VBox
 			moving[action] = keyDown;
 			if (keyDown)
 				dirPrevPressed = action;
+			startGame();
 		}
 		else
 		{
-			switch (action)
-			{
-			case ACTION_PAUSE:
-				if (!keyDown)
-					return;
-				if (pnlMenuBack.isVisible())
-					handleGameMenu(ID_RESUME);
-				else
-				{
-					pauseGame();
-					pnlMenuBack.setVisible(true);
-				}
+			boolean controlDown = event.isControlDown();
+			if (!keyDown)
 				return;
-			case ACTION_START:
-				break;
-			default:
-				throw new InternalError("Should not happen!");
-			}
+			handleAction(action, controlDown);
 		}
 		
-		startGame();
+		
+	}
+
+	/**
+	 * Handles an action that a user might trigger.
+	 * @param action the action index triggered.
+	 * @param controlDown whether if user is holding control button down.
+	 */
+	private void handleAction(int action, boolean controlDown)
+	{
+		switch (action)
+		{
+		case ACTION_PAUSE:
+			
+			if (pnlMenuBack.isVisible())
+				handleGameMenu(ID_RESUME);
+			else
+			{
+				pauseGame();
+				pnlMenuBack.setVisible(true);
+			}
+			break;
+		case ACTION_START:
+			startGame();
+			break;
+		case ACTION_RESTART:
+			if (controlDown)
+				initLevel(currentLevelNum);
+			break;
+		case ACTION_NEXT:
+			try
+			{
+				if (controlDown && currentLevelNum < currentPack.
+						getLevelCount() - 1 && app.checkLevelCompletion
+						(currentPack, currentLevelNum) != MainApp.RESULT_NOT_DONE)
+					initLevel(currentLevelNum + 1);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			return;
+		case ACTION_PREVIOUS:
+			if (controlDown && currentLevelNum > 0)
+				initLevel(currentLevelNum - 1);
+		}
 	}
 
 	/**
@@ -658,17 +696,19 @@ public class GameUI extends VBox
         lblLabelFood.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         lblLabelFood.getStyleClass().add("bold");
 
-        lblFood = new Label("0000000000");
-        lblFood.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        lblFood = new Label("");
+        lblFood.setMinSize(LABEL_MIN_WIDTH, USE_PREF_SIZE);
+        lblFood.setAlignment(Pos.CENTER_RIGHT);
         HBox.setMargin(lblFood, new Insets(0, GAP_INSET, 0, GAP_INSET));
 
         Label lblLabelTime = new Label("Time Left:");
         lblLabelTime.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         lblLabelTime.getStyleClass().add("bold");
 
-        lblTime = new Label("--:--");
+        lblTime = new Label("---");
         lblTime.setPadding(new Insets(0, GAP_INSET, 0, GAP_INSET));
-        lblTime.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        lblTime.setMinSize(LABEL_MIN_WIDTH, USE_PREF_SIZE);
+        lblTime.setAlignment(Pos.CENTER_RIGHT);
         pnlStatus.getChildren().addAll(lblFps, createSpacer(), pnlMessagePanel, 
         		createSpacer(), lblLabelFood, lblFood, lblLabelTime, lblTime);
 	}
@@ -701,6 +741,9 @@ public class GameUI extends VBox
 		mappedKeys.put(KeyCode.ESCAPE, ACTION_PAUSE);
 		mappedKeys.put(KeyCode.PAUSE, ACTION_PAUSE);
 		mappedKeys.put(KeyCode.SPACE, ACTION_START);
+		mappedKeys.put(KeyCode.R, ACTION_RESTART);
+		mappedKeys.put(KeyCode.N, ACTION_NEXT);
+		mappedKeys.put(KeyCode.P, ACTION_PREVIOUS);
 	}
 	
 	/**
@@ -790,7 +833,13 @@ public class GameUI extends VBox
 		runner.stop();
 		started = false;
 		paused = false;
+		
+		for (int i = 0; i < moving.length; i++)
+			moving[i] = false;
 	}
+	
+	
+	
 	
 	/**
 	 * Pauses the game. Does nothing if it already is paused
@@ -802,6 +851,9 @@ public class GameUI extends VBox
 			return;
 		runner.pause();
 		paused = true;
+		
+		for (int i = 0; i < moving.length; i++)
+			moving[i] = false;
 	}
 	
 	/**
@@ -873,18 +925,14 @@ public class GameUI extends VBox
 	 */
 	private void updateUI()
 	{
-		String newStr = String.format("%010d", view.getGrid().getFoodRequirement());
+		String newStr = "" + view.getGrid().getFoodRequirement();
 		if (!newStr.equals(lblFood.getText()))
 			lblFood.setText(newStr);
 		
 		if (timeLeft == -1)
-			newStr = "--:--";
+			newStr = "---";
 		else
-		{
-			int min = timeLeft / SECS_IN_MIN;
-			int sec = timeLeft % SECS_IN_MIN;
-			newStr = String.format("%02d:%02d", min, sec);
-		}
+			newStr = "" + timeLeft;
 		if (!newStr.equals(lblTime.getText()))
 			lblTime.setText(newStr);
 		
