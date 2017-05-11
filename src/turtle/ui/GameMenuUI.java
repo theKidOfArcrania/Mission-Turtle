@@ -29,6 +29,10 @@ public class GameMenuUI extends VBox
 	public static final int ID_MAINMENU = 4;
 	public static final int ID_EXIT = 5;
 	
+	private static final String[] NAMES = {"Paused", "Resume", "Restart Level",
+			"LevelSelect", "Main Menu", "Exit"
+	};
+	
 	private static final double BORDER = 2.0;
 	private static final Insets MARGIN_INSET = new Insets(0.0, 5, 5, 5);
 	
@@ -44,20 +48,33 @@ public class GameMenuUI extends VBox
     public GameMenuUI(GameUI parent) {
     	this.parent = parent;
     	
-        lblTitle = createButton(ID_PAUSED, "Paused", false);
+        lblTitle = createButton(ID_PAUSED, "Paused", false, null);
         
 		separator = new Separator();
         separator.setStyle("-fx-background-color: WHITE;");
         VBox.setMargin(separator, MARGIN_INSET);
-
-        getChildren().addAll(lblTitle, separator, 
-    		createButton(ID_RESUME, "Resume", true),
-    		createButton(ID_RESTART, "Restart Level", true),
-    		createButton(ID_LEVELSELECT, "Level Select", true),
-    		createButton(ID_MAINMENU, "Main Menu", true),
-    		createButton(ID_EXIT, "Exit", true)
-        );
-		
+        
+        getChildren().addAll(lblTitle, separator); 
+        for (int i = 0; i < NAMES.length; i++)
+        {
+        	final int id = i;
+        	/** Handles mouse event when user clicks a menu button*/
+        	getChildren().add(createButton(i, NAMES[i], true, 
+        	        new EventHandler<MouseEvent>()
+        			{
+        				/** 
+        				 * Handles the event by delegating to the
+        				 * {@link turtle.ui.GameUI#handleGameMenu(int)} function.
+        				 * @param event the event associated with click.
+        				 */
+        				@Override
+        				public void handle(MouseEvent event)
+        				{
+        					parent.handleGameMenu(id);
+        				}
+        			}));
+        }
+        		
         getStyleClass().add("ldialog");
         
         setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
@@ -86,10 +103,11 @@ public class GameMenuUI extends VBox
 	 * @param id the specified id of the action to pass to handler.
 	 * @param name name of the button
 	 * @param enabled whether if this button is enabled or disabled.
+	 * @param handler the event handler when button is clicked.
 	 * @return a component (as a Label) that becomes the button.
 	 */
 	private Label createButton(final int id, String name, 
-		boolean enabled)
+		boolean enabled, EventHandler<MouseEvent> handler)
 	{
 		Label button = new Label(name);
 		button.getStyleClass().add("big");
@@ -102,22 +120,7 @@ public class GameMenuUI extends VBox
         VBox.setMargin(button, MARGIN_INSET);
 		
 		if (enabled)
-		{
-			/** Handles mouse event when user clicks a menu button*/
-			button.setOnMouseClicked(new EventHandler<MouseEvent>()
-			{
-				/** 
-				 * Handles the event by delegating to the
-				 * {@link turtle.ui.GameUI#handleGameMenu(int)} function.
-				 * @param event the event associated with click.
-				 */
-				@Override
-				public void handle(MouseEvent event)
-				{
-					parent.handleGameMenu(id);
-				}
-			});
-		}
+			button.setOnMouseClicked(handler);
 		
 		return button;
 	}
