@@ -152,7 +152,7 @@ public class GameUITester extends Application
 		LevelPack pack = (LevelPack) selected.invoke(this);
 		
 		app.start(primaryStage);
-		app.startGame(pack, 0);
+		app.startGame(pack, 7);
 		primaryStage.requestFocus();
 	}
 
@@ -450,6 +450,5 @@ public class GameUITester extends Application
 	{
 		return new LevelPack(new File("test.mtp"));
 	}
-	
 	
 }

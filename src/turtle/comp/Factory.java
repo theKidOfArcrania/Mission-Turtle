@@ -1,12 +1,12 @@
 package turtle.comp;
 
-import static turtle.core.Actor.*;
-
 import java.lang.reflect.Field;
 import java.util.Map;
 
 import javafx.scene.image.ImageView;
 import turtle.core.*;
+
+import static turtle.core.Actor.*;
 /**
  * Factory.java
  * 
@@ -30,6 +30,9 @@ public class Factory extends Cell
 	
 	private ImageView clonedImg;
 	
+	private long currentFrame;
+	private long cloning;
+	
 	/**
 	 * Constructs a new factory.
 	 */
@@ -37,6 +40,8 @@ public class Factory extends Cell
 	{
 		heading = Actor.NORTH;
 		headingMatters = false;
+		cloning = -1;
+		currentFrame = 0;
 		componentCloned = -1;
 
 		setImageFrame(DEFAULT_IMAGE);
@@ -91,40 +96,12 @@ public class Factory extends Cell
 	}
 
 	/**
-	 * Clones one actor in that particular direction.
+	 * Clones one actor in that particular direction. This will wait to clone
+	 * next animation frame, so to prevent a stack-overflow of clones.
 	 */
 	public void cloneActor()
 	{
-		Grid parent = getParentGrid();
-		if (parent == null || componentCloned == -1)
-			return;
-		
-		Location loc = getHeadLocation();
-		int row = loc.getRow();
-		int col = loc.getColumn();
-
-		switch (getHeading())
-		{
-		case NORTH: row--; break;
-		case EAST: col++; break;
-		case SOUTH: row++; break;
-		case WEST: col--; break;
-		default: return;
-		}
-		
-		try
-		{
-			Class<Component> comp = getTileSet().componentAt(componentCloned);
-			Actor clone = (Actor)comp.newInstance();
-			clone.setHeading(heading);
-			clone.getHeadLocation().setLocation(row, col);
-			clone.getTrailingLocation().setLocation(row, col);
-			parent.placeActor(clone);
-		}
-		catch (InstantiationException | IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
+		cloning = currentFrame;
 	}
 	
 	/**
@@ -225,6 +202,63 @@ public class Factory extends Cell
 	public boolean pass(Actor visitor)
 	{
 		return false;
+	}
+	
+	/**
+	 * Updates current animation frame. This overrides the update frame
+	 * so that we can do the cloning (one frame delayed).
+	 * @param frame the current frame number.
+	 */
+	@Override
+	public void updateFrame(long frame)
+	{
+		super.updateFrame(frame);
+		currentFrame = frame;
+		if (cloning >= 0)
+			doClone();
+	}
+	
+	/**
+	 * Does the actual cloning. Waits for at least one frame before 
+	 * doing the actual cloning.
+	 */
+	private void doClone()
+	{
+		Grid parent = getParentGrid();
+		if (parent == null || componentCloned == -1)
+			return;
+
+		if (cloning < 0 || cloning >= currentFrame)
+			return;
+		
+		cloning = -1;
+		
+		Location loc = getHeadLocation();
+		int row = loc.getRow();
+		int col = loc.getColumn();
+
+		switch (getHeading())
+		{
+		case NORTH: row--; break;
+		case EAST: col++; break;
+		case SOUTH: row++; break;
+		case WEST: col--; break;
+		default: return;
+		}
+		
+		try
+		{
+			Class<Component> comp = getTileSet().componentAt(componentCloned);
+			Actor clone = (Actor)comp.newInstance();
+			clone.setHeading(heading);
+			clone.getHeadLocation().setLocation(row, col);
+			clone.getTrailingLocation().setLocation(row, col);
+			parent.placeActor(clone);
+		}
+		catch (InstantiationException | IllegalAccessException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**

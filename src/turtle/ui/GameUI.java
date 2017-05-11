@@ -1,7 +1,5 @@
 package turtle.ui;
 
-import static turtle.ui.GameMenuUI.*;
-
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
@@ -28,6 +26,8 @@ import turtle.core.Grid;
 import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
+
+import static turtle.ui.GameMenuUI.*;
 
 /**
  * GameUI.java
@@ -912,6 +912,8 @@ public class GameUI extends VBox
 		}
 		
 		Player p = view.getPlayer();
+		if (p == null)
+			return;
 		if (moveDir != -1 && !p.isMoving())
 		{
 			p.setHeading(moveDir);

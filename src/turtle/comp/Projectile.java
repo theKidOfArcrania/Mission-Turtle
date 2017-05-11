@@ -55,20 +55,6 @@ public class Projectile extends Enemy
 	}
 	
 	/**
-	 * Obtains the dominance level of this projectile. Has
-	 * a slightly higher dominance than other enemies, since
-	 * the projectile can kill all other enemies.
-	 * 
-	 * @param other the other actor to compare with.
-	 * @return dominance level.
-	 */
-	@Override
-	public DominanceLevel dominanceLevelFor(Actor other)
-	{
-		return ENEMY_PLUS; 
-	}
-	
-	/**
 	 * Updates frames so that the projectile will move in its facing direction.
 	 * If per-say, it is blocked by something, it will attempt to turn 
 	 * @param frame the frame number
