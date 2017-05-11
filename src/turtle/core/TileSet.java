@@ -22,7 +22,8 @@ public class TileSet
 			Grass.class, PlasticWrap.class, Water.class, Exit.class, Fire.class,
 			Sand.class, Bucket.class, Cannon.class, Projectile.class,
 			Player.class, Key.class, Wall.class, Bird.class, Food.class,
-			Hint.class, Trap.class, Button.class, Factory.class}; 
+			Hint.class, Trap.class, Button.class, Factory.class, 
+			LawnMower.class, Baby.class}; 
 	
 	private static final int DEF_FRAME_SIZE = 100;
 	private static final int FRAME_ROWS = 16;

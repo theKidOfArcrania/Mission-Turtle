@@ -54,6 +54,8 @@ public class GameUITester extends Application
 	private static final short COMP_IND_TRAP = (short)16;
 	private static final short COMP_IND_BUTTON = (short)17;
 	private static final short COMP_IND_FACTORY = (short)18;
+	private static final short COMP_IND_LAWNMOWER = (short)19;
+	private static final short COMP_IND_BABY = (short)20;
 	
 	
 	
@@ -384,9 +386,11 @@ public class GameUITester extends Application
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
 		addCellSpecs(test, new Location(1, 1), COMP_IND_EXIT, new HashMap<>());
-		
 		fillCells(test);
-		
+		HashMap<String, Object> params = new HashMap<>();
+		params.put("heading", Actor.WEST);
+		addActorSpecs(test, new Location(1, 2), COMP_IND_LAWNMOWER, 
+				params);
 		addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, new HashMap<>());
 		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, new HashMap<>());
 		testPack.addLevel(test);

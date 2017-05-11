@@ -84,8 +84,12 @@ public class Projectile extends Enemy
 			for (int turn : options)
 			{
 				int newDir = (turn + heading) % options.length;
-				if (traverseDirection(newDir, true))
+				if (traverseDirection(newDir, true) || 
+						turn == options[options.length - 1])
+				{
 					setHeading(newDir);
+					break;
+				}
 			}
 		}
 	}
