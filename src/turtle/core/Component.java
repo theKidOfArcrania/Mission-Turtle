@@ -65,6 +65,9 @@ public abstract class Component extends Pane
 	private int[] imageFrames;
 	private int changeRate;
 	private boolean animationCycle;
+
+	private double transX;
+	private double transY;
 	
 	/**
 	 * Constructs a new component with the image background.
@@ -81,6 +84,9 @@ public abstract class Component extends Pane
 		
 		setImageFrame(-1);
 		curFrame = 0;
+		
+		transX = getTranslateX();
+		transY = getTranslateY();
 	}
 
 	/**
@@ -226,6 +232,18 @@ public abstract class Component extends Pane
 		updateAnimation(frame);
 		move();
 	}
+	
+
+	/**
+	 * Updates translation pos, including the cache translate values
+	 * @param x the x pos translation
+	 * @param y the y pos translation
+	 */
+	public void updateTranslate(double x, double y)
+	{
+		setTranslateX(transX = x);
+		setTranslateY(transY = y);
+	}
 
 	/**
 	 * Updates the current image to step forward one frame if it is in a sequence
@@ -267,12 +285,13 @@ public abstract class Component extends Pane
 				int cellSize = parent.getCellSize();
 				int xPos = cellSize * headLoc.getColumn();
 				int yPos = cellSize * headLoc.getRow();
-				if (xPos != getTranslateX())
-					setTranslateX(increment(getTranslateX(), xPos, speed));
-				if (yPos != getTranslateY())
-					setTranslateY(increment(getTranslateY(), yPos, speed));
 				
-				if (xPos == getTranslateX() && yPos == getTranslateY())
+				if (xPos != transX)
+					setTranslateX(transX = increment(transX, xPos, speed));
+				if (yPos != transY)
+					setTranslateY(transY = increment(transY, yPos, speed));
+				
+				if (xPos == transX && yPos == transY)
 					trailLoc.setLocation(headLoc);
 			}
 		}

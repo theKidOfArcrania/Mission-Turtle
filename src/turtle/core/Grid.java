@@ -303,8 +303,8 @@ public class Grid extends Pane
 			
 			comp.setParentGrid(this);
 			comp.getTrailingLocation().setLocation(loc);
-			comp.setTranslateX(loc.getColumn() * cellSize);
-			comp.setTranslateY(loc.getRow() * cellSize);
+			comp.updateTranslate(loc.getColumn() * cellSize, 
+					loc.getRow() * cellSize);
 			
 			List<Node> children = pnlStage.getChildren();
 			DominanceLevel test = comp.dominanceLevelFor(null);
@@ -343,8 +343,8 @@ public class Grid extends Pane
 		
 		comp.setParentGrid(this);
 		comp.getTrailingLocation().setLocation(loc);
-		comp.setTranslateX(loc.getColumn() * cellSize);
-		comp.setTranslateY(loc.getRow() * cellSize);
+		comp.updateTranslate(loc.getColumn() * cellSize, 
+				loc.getRow() * cellSize);
 		
 		base[loc.getRow()][loc.getColumn()] = comp;
 		pnlBase.getChildren().add(comp);
