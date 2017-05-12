@@ -40,13 +40,13 @@ import static turtle.ui.GameMenuUI.*;
 public class GameUI extends VBox
 {
 	private static final String SECT_BREAK = "   ";
-
+	
 	/**
 	 * Runs the game timer, keep tracks of the game states each frame.
 	 */
-	private class GameTimer extends Transition
+	private class GameTimer extends AnimationTimer
 	{
-		private static final int SUBFRAMES = 3;
+		private static final int SUBFRAMES = 1;
 		private static final int FRAME_SAMPLE = 10;
 		private long prevTime;
 		private long frame;
@@ -63,8 +63,6 @@ public class GameUI extends VBox
 			frame = 0;
 			fps = 0;
 			frameTimes = new ArrayDeque<>(FRAME_SAMPLE);
-			setCycleCount(INDEFINITE);
-			setCycleDuration(FRAME_DURATION);
 		}
 		
 		/**
@@ -78,18 +76,15 @@ public class GameUI extends VBox
 		/**
 		 * Handles each frame tick of the game (at 50fps). Delegate 
 		 * method to {@link turtle.ui.GameUI#updateFrame(long)}.
-		 * @param frac double from 0 to 1 to determine relative position. 
-		 * 		When it is 1, we update frame counter.
+		 * @param now the current time in nano seconds.
 		 */
 		@Override
-		public void interpolate(double frac)
+		public void handle(long now)
 		{
 			subframe++;
 			if (subframe >= SUBFRAMES)
 			{
 				subframe = 0;
-			//if (frac == 1) // Next Frame
-			//{
 				
 				long time = System.nanoTime();
 				if (prevTime != -1)
@@ -111,6 +106,14 @@ public class GameUI extends VBox
 		}
 		
 		/**
+		 * Pauses the game timer, but doesn't reset game frame counter.
+		 */
+		public void pause()
+		{
+			super.stop();
+		}
+		
+		/**
 		 * Stops the game timer, and resets game frame counter. 
 		 */
 		@Override
@@ -118,6 +121,7 @@ public class GameUI extends VBox
 		{
 			super.stop();
 			frame = 0;
+			subframe = 0;
 		}
 	}
 	
@@ -874,7 +878,7 @@ public class GameUI extends VBox
 	{
 		if (!paused || !started)
 			return;
-		runner.play();
+		runner.start();
 		paused = false;
 	}
 	
@@ -885,7 +889,7 @@ public class GameUI extends VBox
 	private void startGame()
 	{
 		if (halted || !started)
-			runner.play();
+			runner.start();
 		started = true;
 	}
 
