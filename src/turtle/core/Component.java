@@ -230,6 +230,10 @@ public abstract class Component extends Pane
 	{
 		curFrame = frame;
 		updateAnimation(frame);
+		
+		//Shouldn't need to move!
+		if (this instanceof Cell)
+			return;
 		move();
 	}
 	
@@ -275,25 +279,25 @@ public abstract class Component extends Pane
 	 */
 	private void move()
 	{
-		if (parent != null)
+		if (parent == null)
+			return;
+		
+		boolean validLocs = headLoc.isValidLocation() && 
+				trailLoc.isValidLocation();
+		if (validLocs)
 		{
-			boolean validLocs = headLoc.isValidLocation() && 
-					trailLoc.isValidLocation();
-			if (validLocs)
-			{
-				double speed = getMoveSpeed();
-				int cellSize = parent.getCellSize();
-				int xPos = cellSize * headLoc.getColumn();
-				int yPos = cellSize * headLoc.getRow();
-				
-				if (xPos != transX)
-					setTranslateX(transX = increment(transX, xPos, speed));
-				if (yPos != transY)
-					setTranslateY(transY = increment(transY, yPos, speed));
-				
-				if (xPos == transX && yPos == transY)
-					trailLoc.setLocation(headLoc);
-			}
+			double speed = getMoveSpeed();
+			int cellSize = parent.getCellSize();
+			int xPos = cellSize * headLoc.getColumn();
+			int yPos = cellSize * headLoc.getRow();
+			
+			if (xPos != transX)
+				setTranslateX(transX = increment(transX, xPos, speed));
+			if (yPos != transY)
+				setTranslateY(transY = increment(transY, yPos, speed));
+			
+			if (xPos == transX && yPos == transY)
+				trailLoc.setLocation(headLoc);
 		}
 	}
 	
