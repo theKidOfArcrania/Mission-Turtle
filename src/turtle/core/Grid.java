@@ -32,16 +32,12 @@ public class Grid extends Pane
 	 */
 	private class ComponentPane extends Pane {
 		/**
-		 * Lays all the children components of this layer.
+		 * This layout does nothing since no layout is necessary. 
 		 */
 		@Override
 		protected void layoutChildren()
 		{
-			for (Node child : getManagedChildren())
-			{
-				layoutInArea(child, 0, 0, cellSize, cellSize, 0, 
-						HPos.CENTER, VPos.CENTER);
-			}
+			//Does nothing
 		}
 	}
 	

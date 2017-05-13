@@ -133,21 +133,22 @@ public class GameUITester extends Application
 		
 		Method selected = null;
 		in = new Scanner(System.in);
-		while (selected == null)
-		{
-			System.out.printf("Enter the index of test to do: ");
-			Scanner resp = new Scanner(in.nextLine());
-			if (resp.hasNextInt())
-			{
-				int index = resp.nextInt();
-				if (index < 0 || index >= tests.size())
-					System.out.println("Invalid index. Try again");
-				else
-					selected = tests.get(index);
-			}
-			else
-				System.out.println("Invalid number. Try again.");
-		}
+//		while (selected == null)
+//		{
+//			System.out.printf("Enter the index of test to do: ");
+//			Scanner resp = new Scanner(in.nextLine());
+//			if (resp.hasNextInt())
+//			{
+//				int index = resp.nextInt();
+//				if (index < 0 || index >= tests.size())
+//					System.out.println("Invalid index. Try again");
+//				else
+//					selected = tests.get(index);
+//			}
+//			else
+//				System.out.println("Invalid number. Try again.");
+//		}
+		selected = tests.get(6);
 		MainApp app = new MainApp();
 		LevelPack pack = (LevelPack) selected.invoke(this);
 		
