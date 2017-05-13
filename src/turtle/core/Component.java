@@ -65,9 +65,6 @@ public abstract class Component extends Pane
 	private int[] imageFrames;
 	private int changeRate;
 	private boolean animationCycle;
-
-	private double transX;
-	private double transY;
 	
 	/**
 	 * Constructs a new component with the image background.
@@ -84,11 +81,6 @@ public abstract class Component extends Pane
 		
 		setImageFrame(-1);
 		curFrame = 0;
-		
-		transX = getTranslateX();
-		transY = getTranslateY();
-		
-		setCache(true);
 	}
 
 	/**
@@ -190,21 +182,6 @@ public abstract class Component extends Pane
 	}
 
 	/**
-	 * Determines whether if this element ever utilizes animating frames within its lifetime
-	 * whether it be moving across the grid, or just changing animation frames. If it is
-	 * considered static, the program will make some time-optimizations. A side-effect to
-	 * this would mean that the {@link #updateFrame(long)} method will NEVER be called. By
-	 * default, all components are active. Classes must override this method if they are
-	 * deemed static.
-	 * 
-	 * @return true if this is active, false if this is static.
-	 */
-	public boolean isActiveElement()
-	{
-		return true;
-	}
-	
-	/**
 	 * Determines whether if this component is moving.
 	 * @return true if moving, false if it is still
 	 */
@@ -247,23 +224,7 @@ public abstract class Component extends Pane
 	{
 		curFrame = frame;
 		updateAnimation(frame);
-		
-		//Shouldn't need to move!
-		if (this instanceof Cell)
-			return;
 		move();
-	}
-	
-
-	/**
-	 * Updates translation pos, including the cache translate values
-	 * @param x the x pos translation
-	 * @param y the y pos translation
-	 */
-	public void updateTranslate(double x, double y)
-	{
-		setTranslateX(transX = x);
-		setTranslateY(transY = y);
 	}
 
 	/**
@@ -296,25 +257,24 @@ public abstract class Component extends Pane
 	 */
 	private void move()
 	{
-		if (parent == null)
-			return;
-		
-		boolean validLocs = headLoc.isValidLocation() && 
-				trailLoc.isValidLocation();
-		if (validLocs)
+		if (parent != null)
 		{
-			double speed = getMoveSpeed();
-			int cellSize = parent.getCellSize();
-			int xPos = cellSize * headLoc.getColumn();
-			int yPos = cellSize * headLoc.getRow();
-			
-			if (xPos != transX)
-				setTranslateX(transX = increment(transX, xPos, speed));
-			if (yPos != transY)
-				setTranslateY(transY = increment(transY, yPos, speed));
-			
-			if (xPos == transX && yPos == transY)
-				trailLoc.setLocation(headLoc);
+			boolean validLocs = headLoc.isValidLocation() && 
+					trailLoc.isValidLocation();
+			if (validLocs)
+			{
+				double speed = getMoveSpeed();
+				int cellSize = parent.getCellSize();
+				int xPos = cellSize * headLoc.getColumn();
+				int yPos = cellSize * headLoc.getRow();
+				if (xPos != getTranslateX())
+					setTranslateX(increment(getTranslateX(), xPos, speed));
+				if (yPos != getTranslateY())
+					setTranslateY(increment(getTranslateY(), yPos, speed));
+				
+				if (xPos == getTranslateX() && yPos == getTranslateY())
+					trailLoc.setLocation(headLoc);
+			}
 		}
 	}
 	

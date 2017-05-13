@@ -49,16 +49,6 @@ public class Exit extends Cell
 	}
 
 	/**
-	 * Determines that this is a static element. 
-	 * @return false, b/c this is a static element.
-	 */
-	@Override
-	public boolean isActiveElement()
-	{
-		return false;
-	}
-	
-	/**
 	 * Updates each animation frame so that it will set winner flag
 	 * when player has finished moving into exit.
 	 * @param frame the frame number.

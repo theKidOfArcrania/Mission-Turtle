@@ -42,16 +42,6 @@ public abstract class Item extends Actor
 	public boolean checkInteract(Actor other) {
 		return true;
 	}
-
-	/**
-	 * Determines that this is a static element. 
-	 * @return false, b/c this is a static element.
-	 */
-	@Override
-	public boolean isActiveElement()
-	{
-		return false;
-	}
 	
 	/**
 	 * This overrides the Actor's setHeading since a heading does not

@@ -11,7 +11,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -46,20 +45,20 @@ public class GameUI extends VBox
 	 */
 	private class GameTimer extends AnimationTimer
 	{
-		private static final int SUBFRAMES = 1;
+		private static final double NANO_TO_SECONDS = 1e-9;
+		private static final double SECONDS_TO_MILLIS = 1e+3;
+		
 		private static final int FRAME_SAMPLE = 10;
 		private long prevTime;
 		private long frame;
 		private ArrayDeque<Long> frameTimes;
 		private double fps;
-		private int subframe;
 		
 		/**
 		 * Constructs a new GameTimer.
 		 */
 		public GameTimer(){
 			prevTime = -1;
-			subframe = 0;
 			frame = 0;
 			fps = 0;
 			frameTimes = new ArrayDeque<>(FRAME_SAMPLE);
@@ -74,35 +73,57 @@ public class GameUI extends VBox
 		}
 		
 		/**
-		 * Handles each frame tick of the game (at 50fps). Delegate 
+		 * Handles each frame tick of the game (capped at 50fps). Delegate 
 		 * method to {@link turtle.ui.GameUI#updateFrame(long)}.
 		 * @param now the current time in nano seconds.
 		 */
 		@Override
 		public void handle(long now)
 		{
-			subframe++;
-			if (subframe >= SUBFRAMES)
-			{
-				subframe = 0;
-				
-				long time = System.nanoTime();
-				if (prevTime != -1)
-				{
-					while (frameTimes.size() > FRAME_SAMPLE - 1)
-						frameTimes.remove();
-					frameTimes.add(time - prevTime);
-					double fps = 0;
-					for (long ftime : frameTimes)
-						fps += ftime * 1e-9;
-					fps = frameTimes.size() / fps;
-					this.fps = fps;
-					//System.out.printf("%.9f\n", fps);
-				}
-				prevTime = time;
-				updateFrame(frame);
-				frame++;
+			long prevTime = this.prevTime;
+			long time = capFrameRate(FRAMES_PER_SEC);
+			if (prevTime != -1)
+			{				
+				while (frameTimes.size() > FRAME_SAMPLE - 1)
+					frameTimes.remove();
+				frameTimes.add(time - prevTime);
+				double fps = 0;
+				for (long ftime : frameTimes)
+					fps += ftime * NANO_TO_SECONDS;
+				fps = frameTimes.size() / fps;
+				this.fps = fps;
 			}
+			updateFrame(frame);
+			frame++;
+		}
+
+		/**
+		 * Caps the frame-rate at a specified fps. If this is called faster than
+		 * fps, this will sleep the current thread until we reached 50 fps.
+		 * @param fps the fps value to cap at.
+		 * @return the current nano time after frame-rate capping
+		 */
+		private long capFrameRate(long fps)
+		{
+			long time = System.nanoTime();
+			if (prevTime != -1)
+			{
+				while ((time - prevTime) * NANO_TO_SECONDS < 1.0 / fps)
+				{
+					double waiting = 1.0 / fps - (time - prevTime) * NANO_TO_SECONDS;
+					try
+					{
+						Thread.sleep((long)(waiting * SECONDS_TO_MILLIS));
+					}
+					catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					}
+					time = System.nanoTime();
+				}
+			}
+			prevTime = time;
+			return time;
 		}
 		
 		/**
@@ -121,7 +142,6 @@ public class GameUI extends VBox
 		{
 			super.stop();
 			frame = 0;
-			subframe = 0;
 		}
 	}
 	
@@ -143,8 +163,6 @@ public class GameUI extends VBox
 	
 	private static final double FRAME_WIDTH = 10.0;
 	private static final int FRAMES_PER_SEC = 50;
-	private static final Duration FRAME_DURATION = Duration.seconds(1.0 / 
-			FRAMES_PER_SEC);
 	private static final Duration FADE_DURATION = Duration.seconds(.5);
 
 	private static final double FIT_WIDTH = 799;
