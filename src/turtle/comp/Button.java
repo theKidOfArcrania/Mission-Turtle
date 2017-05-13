@@ -38,7 +38,16 @@ public class Button extends Actor
 		return linkedLocation;
 	}
 
-
+	/**
+	 * Determines that this is a static element. 
+	 * @return false, b/c this is a static element.
+	 */
+	@Override
+	public boolean isActiveElement()
+	{
+		return false;
+	}
+	
 	/**
 	 * Interacts with other actors, triggering the associated factory (if any).
 	 * @param other other actor to interact with.

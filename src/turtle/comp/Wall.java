@@ -40,6 +40,16 @@ public class Wall extends Cell
 	}
 
 	/**
+	 * Determines that this is a static element. 
+	 * @return false, b/c this is a static element.
+	 */
+	@Override
+	public boolean isActiveElement()
+	{
+		return false;
+	}
+	
+	/**
 	 * Checks whether if a pass to this cell is ever possible. This
 	 * lets no one to pass this wall. It will block everything.
 	 * 

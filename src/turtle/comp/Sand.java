@@ -51,5 +51,15 @@ public class Sand extends Cell
 	{
 		return true;
 	}
+	
+	/**
+	 * Determines that this is a static element. 
+	 * @return false, b/c this is a static element.
+	 */
+	@Override
+	public boolean isActiveElement()
+	{
+		return false;
+	}
 
 }

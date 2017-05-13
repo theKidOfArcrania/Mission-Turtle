@@ -188,6 +188,21 @@ public abstract class Component extends Pane
 	}
 
 	/**
+	 * Determines whether if this element ever utilizes animating frames within its lifetime
+	 * whether it be moving across the grid, or just changing animation frames. If it is
+	 * considered static, the program will make some time-optimizations. A side-effect to
+	 * this would mean that the {@link #updateFrame(long)} method will NEVER be called. By
+	 * default, all components are active. Classes must override this method if they are
+	 * deemed static.
+	 * 
+	 * @return true if this is active, false if this is static.
+	 */
+	public boolean isActiveElement()
+	{
+		return true;
+	}
+	
+	/**
 	 * Determines whether if this component is moving.
 	 * @return true if moving, false if it is still
 	 */

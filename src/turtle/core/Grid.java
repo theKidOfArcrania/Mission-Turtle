@@ -53,6 +53,7 @@ public class Grid extends Pane
 	
 	private final Cell[][] base;
 	private final HashMap<Actor, Location> actorLocs;
+	private final Set<Component> activeComps;
 	
 	private Pane pnlBase;
 	private Pane pnlStage;
@@ -68,6 +69,34 @@ public class Grid extends Pane
 	 */
 	public Grid(int rows, int cols)
 	{
+		/**
+		 * Organizes components by order in reverse dominance level. (Cells have highest 
+		 * dominance level)
+		 */
+		activeComps = new TreeSet<>(new Comparator<Component>()
+		{
+
+			/**
+			 * Compares two components
+			 * @param c1 first component
+			 * @param c2 second component
+			 * @return negative for "less than", 0 for equals, positive 
+			 * 	for "more than".
+			 */
+			@Override
+			public int compare(Component c1, Component c2)
+			{
+				if (c1 == c2)
+					return 0;
+				if (c1 instanceof Cell)
+					return -1;
+				if (c2 instanceof Cell)
+					return 1;
+				return ((Actor)c2).dominanceLevelFor(null).compareTo(
+						((Actor)c1).dominanceLevelFor(null));
+			}
+		});
+		
 		rng = new Random();
 		
 		cellSize = Component.DEFAULT_SET.getFrameSize();
@@ -321,9 +350,13 @@ public class Grid extends Pane
 			}
 			children.add(insertInd, comp);
 			actorLocs.put(comp, loc);
+			if (comp.isActiveElement())
+				activeComps.add(comp);
 		}
 		return success;
 	}
+	
+	
 	
 	/**
 	 * Places a new cell in the cell's specified location.
@@ -348,6 +381,8 @@ public class Grid extends Pane
 		
 		base[loc.getRow()][loc.getColumn()] = comp;
 		pnlBase.getChildren().add(comp);
+		if (comp.isActiveElement())
+			activeComps.add(comp);
 		return true;
 	}
 	
@@ -400,24 +435,13 @@ public class Grid extends Pane
 	public void updateFrame(long frame)
 	{
 		//Avoid concurrency issues.
-		List<Node> base = new ArrayList<>(pnlBase.getChildren());
-		List<Node> stage = new ArrayList<>(pnlStage.getChildren());
+		List<Component> active = new ArrayList<>(activeComps);
 		
-		for (Node n : base)
+		for (Component c : active)
 		{
-			if (n instanceof Cell)
-				((Cell)n).updateFrame(frame);
-		}
-		
-		for (Node n : stage)
-		{
-			if (n instanceof Actor)
-			{
-				Actor a = (Actor)n;
-				a.updateFrame(frame);
-				if (a.isDead())
-					removeActor(a);
-			}
+			c.updateFrame(frame);
+			if (c instanceof Actor && ((Actor)c).isDead())
+				removeActor((Actor)c);
 		}
 	}
 	
