@@ -48,7 +48,7 @@ public class GridView extends Pane
 		
 		//LinearGradient grad = new LinearGradient(0, 0, 1, 1, true, null, 
 		//		new Stop(0, Color.LIGHTGRAY), new Stop(1, Color.GRAY));
-		setBackground(new Background(new BackgroundFill(Color.GRAY, 
+		setBackground(new Background(new BackgroundFill(Color.BLACK, 
         		null, null)));
 	}
 	

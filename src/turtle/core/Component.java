@@ -87,6 +87,8 @@ public abstract class Component extends Pane
 		
 		transX = getTranslateX();
 		transY = getTranslateY();
+		
+		setCache(true);
 	}
 
 	/**

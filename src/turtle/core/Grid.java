@@ -5,9 +5,7 @@ import java.util.*;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import turtle.comp.Player;
 
 /**
@@ -21,9 +19,6 @@ import turtle.comp.Player;
 public class Grid extends Pane
 {
 	
-	private static final Color SHADOW_COLOR = Color.web("#101010");
-	private static final double SHADOW_RADIUS = 20;
-	
 	/**
 	 * Manages a list of maze components and lays them out with appropriate
 	 * sizes and locations. 
@@ -32,12 +27,16 @@ public class Grid extends Pane
 	 */
 	private class ComponentPane extends Pane {
 		/**
-		 * This layout does nothing since no layout is necessary. 
+		 * Lays all the children components of this layer.
 		 */
 		@Override
 		protected void layoutChildren()
 		{
-			//Does nothing
+			for (Node child : getManagedChildren())
+			{
+				layoutInArea(child, 0, 0, cellSize, cellSize, 0, 
+						HPos.CENTER, VPos.CENTER);
+			}
 		}
 	}
 	
@@ -106,8 +105,6 @@ public class Grid extends Pane
 		
 		pnlBase = new ComponentPane();
 		pnlStage = new ComponentPane();
-		
-		setEffect(new DropShadow(SHADOW_RADIUS, SHADOW_COLOR));
 		
 		getChildren().addAll(pnlBase, pnlStage);
 	}

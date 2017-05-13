@@ -594,7 +594,8 @@ public class GameUI extends VBox
 	private void initGameView()
 	{
         StackPane.setMargin(view, new Insets(FRAME_WIDTH));
-        view.setEffect(new DropShadow());
+        //view.setCacheShape(true);
+        //view.setEffect(new DropShadow());
         
         pnlMenuBack = new StackPane();
         pnlMenuBack.setBackground(new Background(new BackgroundFill(
@@ -622,6 +623,7 @@ public class GameUI extends VBox
         setVgrow(pnlFrame, javafx.scene.layout.Priority.ALWAYS);
         pnlFrame.setBackground(new Background(new BackgroundFill(DARKGRAY, 
         		null, null)));
+        pnlFrame.setCacheShape(true);
         pnlFrame.setEffect(new InnerShadow());
         pnlFrame.getChildren().addAll(view, pnlMenuBack);
         
