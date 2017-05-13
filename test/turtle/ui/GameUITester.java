@@ -55,7 +55,7 @@ public class GameUITester extends Application
 	private static final short COMP_IND_BUTTON = (short)17;
 	private static final short COMP_IND_FACTORY = (short)18;
 	private static final short COMP_IND_LAWNMOWER = (short)19;
-	private static final short COMP_IND_BABY = (short)20;
+	private static final short COMP_IND_CHILD = (short)20;
 	
 	
 	
@@ -133,22 +133,21 @@ public class GameUITester extends Application
 		
 		Method selected = null;
 		in = new Scanner(System.in);
-//		while (selected == null)
-//		{
-//			System.out.printf("Enter the index of test to do: ");
-//			Scanner resp = new Scanner(in.nextLine());
-//			if (resp.hasNextInt())
-//			{
-//				int index = resp.nextInt();
-//				if (index < 0 || index >= tests.size())
-//					System.out.println("Invalid index. Try again");
-//				else
-//					selected = tests.get(index);
-//			}
-//			else
-//				System.out.println("Invalid number. Try again.");
-//		}
-		selected = tests.get(6);
+		while (selected == null)
+		{
+			System.out.printf("Enter the index of test to do: ");
+			Scanner resp = new Scanner(in.nextLine());
+			if (resp.hasNextInt())
+			{
+				int index = resp.nextInt();
+				if (index < 0 || index >= tests.size())
+					System.out.println("Invalid index. Try again");
+				else
+					selected = tests.get(index);
+			}
+			else
+				System.out.println("Invalid number. Try again.");
+		}
 		MainApp app = new MainApp();
 		LevelPack pack = (LevelPack) selected.invoke(this);
 		
