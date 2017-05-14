@@ -1,5 +1,8 @@
 package turtle.comp;
 
+import turtle.core.Grid;
+import turtle.core.Location;
+
 /**
  * Child.java
  * 
@@ -17,7 +20,10 @@ public class Child extends Enemy
 	public static final int DEFAULT_IMAGE = 62;
 	
 	private static final int WALK_FRAMES[] = {63,62};
+
+	private static final int CHARGE_DIST = 5;
 	
+	private long lastMove;
 	private boolean frenzyState;
 	
 	/**
@@ -44,15 +50,54 @@ public class Child extends Enemy
 	}
 	
 	/**
-	 * 
+	 * Update frames so to update child's moving frame
 	 */
 	@Override
 	public void updateFrame(long frame)
 	{
 		super.updateFrame(frame);
+		Grid g = getParentGrid();
+		if (g == null)
+			return;
+		if (isMoving())
+			return;
+		
 		if (frenzyState)
 		{
-			traverseDirection(getHeading());
+			if (traverseDirection(getHeading()))
+				lastMove = frame;
+			else
+				frenzyState = false;
+		}
+		else
+		{
+			if (frame - lastMove > BIG_FRAME * 2)
+			{
+				Location playerLoc = g.getPlayer().getHeadLocation();
+				Location loc = getHeadLocation();
+				
+				int dr = Math.abs(playerLoc.getRow() - loc.getRow());
+				int dc = Math.abs(playerLoc.getColumn() - loc.getColumn());
+				if (dr * dc == 0 && dr + dc <= CHARGE_DIST)
+				{
+					frenzyState = true;
+					return;
+				}
+			}
+			
+			int[] choices = {NORTH, EAST, SOUTH, WEST};
+			shuffle(choices, g.getRNG());
+			int lastDir = NORTH;
+			for (int dir : choices)
+			{
+				lastDir = dir;
+				if (traverseDirection(dir))
+				{
+					lastMove = frame;
+					break;
+				}
+			}
+			setHeading(lastDir);
 		}
 	}
 }

@@ -65,6 +65,13 @@ public class PlasticWrap extends Enemy
 			return;
 		
 		if (!isMoving() && g.getCellAt(getHeadLocation()) instanceof Water)
-			traverseDirection((g.getRNG().nextInt(DIRECTIONS)));
+		{
+			int[] choices = {NORTH, EAST, SOUTH, WEST};
+			shuffle(choices, g.getRNG());
+			for (int dir : choices)
+				if (traverseDirection(dir))
+					break;
+		}
+			
 	}
 }

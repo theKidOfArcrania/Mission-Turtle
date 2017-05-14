@@ -1,5 +1,7 @@
 package turtle.comp;
 
+import java.util.Random;
+
 import turtle.core.Actor;
 import turtle.core.Cell;
 
@@ -27,7 +29,7 @@ public class Fire extends Cell
 	public Fire()
 	{
 		int[] randomized = ANIMATE_FRAMES.clone();
-		shuffle(randomized);
+		shuffle(randomized, new Random());
 		animateFrames(randomized, true);
 		
 		smoking = false;

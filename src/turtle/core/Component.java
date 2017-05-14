@@ -1,6 +1,7 @@
 package turtle.core;
 
 import java.util.Map;
+import java.util.Random;
 
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -38,13 +39,14 @@ public abstract class Component extends Pane
 	/**
 	 * Utility method used to shuffle an array.
 	 * @param arr the array to shuffle
+	 * @param rng the random generator to shuffle with.
 	 */
-	public static void shuffle(int[] arr)
+	public static void shuffle(int[] arr, Random rng)
 	{
 		for (int i = 0; i < SHUFFLE * arr.length; i++)
 		{
-			int a = (int)(Math.random() * arr.length);
-			int b = (int)(Math.random() * arr.length);
+			int a = rng.nextInt(arr.length);
+			int b = rng.nextInt(arr.length);
 			int tmp = arr[a];
 			arr[a] = arr[b];
 			arr[b] = tmp;

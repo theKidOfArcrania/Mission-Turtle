@@ -1,6 +1,7 @@
 package turtle.comp;
 
 import java.util.Map;
+import java.util.Random;
 
 import turtle.core.Component;
 
@@ -113,7 +114,7 @@ public class Bucket extends Mover
 		if (filled)
 		{
 			int[] randomized = ANIMATE_FRAMES.clone();
-			shuffle(randomized);
+			shuffle(randomized, new Random());
 			animateFrames(randomized, true);
 		}
 		else
