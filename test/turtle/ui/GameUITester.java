@@ -52,10 +52,10 @@ public class GameUITester extends Application
 	private static final short COMP_IND_FOOD = (short)14;
 	private static final short COMP_IND_HINT = (short)15;
 	private static final short COMP_IND_TRAP = (short)16;
-	private static final short COMP_IND_BUTTON = (short)17;
-	private static final short COMP_IND_FACTORY = (short)18;
-	private static final short COMP_IND_LAWNMOWER = (short)19;
-	private static final short COMP_IND_CHILD = (short)20;
+	private static final short COMP_IND_LAWNMOWER = (short)17;
+	private static final short COMP_IND_CHILD = (short)18;
+	private static final short COMP_IND_BUTTON = (short)19;
+	private static final short COMP_IND_FACTORY = (short)20;
 	
 	
 	
@@ -152,7 +152,7 @@ public class GameUITester extends Application
 		LevelPack pack = (LevelPack) selected.invoke(this);
 		
 		app.start(primaryStage);
-		app.startGame(pack, 7);
+		app.startGame(pack, 0);
 		primaryStage.requestFocus();
 	}
 

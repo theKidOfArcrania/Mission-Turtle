@@ -16,9 +16,11 @@ import turtle.core.*;
 public class Button extends Actor
 {
 	/** The default image for this component */
-	public static final int DEFAULT_IMAGE = 60;
+	public static final int DEFAULT_IMAGE = 64;
+	private static final int BUTTON_OFFSET_IMAGE = 64;
 	
 	private Location linkedLocation;
+	private ColorType color;
 	
 	/**
 	 * Constructs a new button and initializes image
@@ -27,6 +29,7 @@ public class Button extends Actor
 	{
 		setImageFrame(DEFAULT_IMAGE);
 		linkedLocation = new Location();
+		setColor(ColorType.RED);
 	}
 
 	
@@ -79,6 +82,26 @@ public class Button extends Actor
 	}
 	
 	/**
+	 * @return the color of this button
+	 */
+	public ColorType getColor()
+	{
+		return color;
+	}
+	
+	/**
+	 * @param color the new color to set for this button
+	 * @throws NullPointerException if the color supplied is null.
+	 */
+	public void setColor(ColorType color)
+	{
+		if (color == null)
+			throw new NullPointerException();
+		setImageFrame(color.getImageFrame(BUTTON_OFFSET_IMAGE));
+		this.color = color;
+	}
+	
+	/**
 	 * Overrides dying so that it doesn't die from anything,
 	 * as this is a fixture.
 	 * 
@@ -114,6 +137,11 @@ public class Button extends Actor
 	 *     <th>Description</th>
 	 *   </tr>
 	 *   <tr>
+	 *     <td><code>color</code></td>
+	 *     <td><code>int</code></td>
+	 *     <td>This sets the color index (0-based) of this button.</td>
+	 *   </tr>
+	 *   <tr>
 	 *     <td><code>linked</code></td>
 	 *     <td><code>Location</code></td>
 	 *     <td>This sets the linked location of button. </td>
@@ -125,7 +153,15 @@ public class Button extends Actor
 	public void setParameters(Map<String, Object> params)
 	{
 		super.setParameters(params);
-		Object val = params.get("linked");
+		Object val = params.get("color");
+		if (val != null && val instanceof Integer)
+		{
+			ColorType colors[] = ColorType.values();
+			int ind = (Integer)val;
+			if (ind >= 0 && ind < colors.length)
+				setColor(colors[ind]);
+		}
+		val = params.get("linked");
 		if (val != null && val instanceof Location)
 			linkedLocation.setLocation((Location)val);
 	}

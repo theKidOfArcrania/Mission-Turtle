@@ -20,7 +20,8 @@ import static turtle.core.Actor.*;
 public class Factory extends Cell
 {
 	/** The default image for this component */
-	public static final int DEFAULT_IMAGE = 61;
+	public static final int DEFAULT_IMAGE = 70;
+	private static final int FACTORY_OFFSET_IMAGE = 70;
 	
 	private static final double RATIO_CLONE_IMG = .8;
 	
@@ -32,6 +33,8 @@ public class Factory extends Cell
 	
 	private long currentFrame;
 	private long cloning;
+	
+	private ColorType color;
 	
 	/**
 	 * Constructs a new factory.
@@ -55,6 +58,28 @@ public class Factory extends Cell
 		clonedImg.setImage(ts.getImageset());
 		clonedImg.setViewport(ts.frameAt(-1));
 		this.getChildren().add(clonedImg);
+		
+		setColor(ColorType.RED);
+	}
+	
+	/**
+	 * @return the color of this factory
+	 */
+	public ColorType getColor()
+	{
+		return color;
+	}
+	
+	/**
+	 * @param color the new color to set for this factory
+	 * @throws NullPointerException if the color supplied is null.
+	 */
+	public void setColor(ColorType color)
+	{
+		if (color == null)
+			throw new NullPointerException();
+		setImageFrame(color.getImageFrame(FACTORY_OFFSET_IMAGE));
+		this.color = color;
 	}
 	
 	/**
@@ -141,14 +166,19 @@ public class Factory extends Cell
 	 *     <th>Description</th>
 	 *   </tr>
 	 *   <tr>
-	 *     <td><code>heading</code></td>
-	 *     <td><code>int</code></td>
-	 *     <td>This sets the facing direction of the factory. </td>
-	 *   </tr>
-	 *   <tr>
 	 *     <td><code>cloned</code></td>
 	 *     <td><code>int</code></td>
 	 *     <td>This sets the component id to clone, or -1 to clone nothing</td>
+	 *   </tr>
+	 *   <tr>
+	 *     <td><code>color</code></td>
+	 *     <td><code>int</code></td>
+	 *     <td>This sets the color index (0-based) of this button.</td>
+	 *   </tr>
+	 *   <tr>
+	 *     <td><code>heading</code></td>
+	 *     <td><code>int</code></td>
+	 *     <td>This sets the facing direction of the factory. </td>
 	 *   </tr>
 	 * </table>
 	 * @param params the parameter object.
@@ -157,7 +187,17 @@ public class Factory extends Cell
 	public void setParameters(Map<String, Object> params)
 	{
 		super.setParameters(params);
-		Object val = params.get("heading");
+		
+		Object val = params.get("color");
+		if (val != null && val instanceof Integer)
+		{
+			ColorType colors[] = ColorType.values();
+			int ind = (Integer)val;
+			if (ind >= 0 && ind < colors.length)
+				setColor(colors[ind]);
+		}
+		
+		val = params.get("heading");
 		//TODO: replace Integer with Number.
 		if (val != null && val instanceof Integer)
 		{

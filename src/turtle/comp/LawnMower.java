@@ -2,6 +2,7 @@ package turtle.comp;
 
 /**
  * LawnMower.java
+ * Moves back and forth with no reason or rhyme. Kills turtles within the path.
  * 
  * @author Henry
  * Date: 5/10/17
@@ -10,7 +11,7 @@ package turtle.comp;
 public class LawnMower extends Enemy
 {
 	/** The default image for this component */
-	public static final int DEFAULT_IMAGE = 62;
+	public static final int DEFAULT_IMAGE = 60;
 	private static final int DIRECTIONS = 4;
 	
 	/**

@@ -14,9 +14,9 @@ package turtle.comp;
 public class Child extends Enemy
 {
 	/** The default image for this component */
-	public static final int DEFAULT_IMAGE = 64;
+	public static final int DEFAULT_IMAGE = 62;
 	
-	private static final int WALK_FRAMES[] = {65,64};
+	private static final int WALK_FRAMES[] = {63,62};
 	
 	private boolean frenzyState;
 	
