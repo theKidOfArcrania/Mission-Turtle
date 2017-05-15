@@ -29,6 +29,7 @@ import turtle.file.LevelPack;
  */
 public class GameUITester extends Application
 {
+	private static final Location EXIT_LOC = new Location(1, 1);
 	private static final Location BIRD_LOC = new Location(1, 13);
 	private static final Location PLAYER_LOC = new Location(0, 0);
 
@@ -48,6 +49,7 @@ public class GameUITester extends Application
 	private static final short COMP_IND_PROJECTILE = (short)9;
 	private static final short COMP_IND_PLAYER = (short)10;
 	private static final short COMP_IND_KEY = (short)11;
+	private static final short COMP_IND_WALL = (short)12;
 	private static final short COMP_IND_BIRD = (short)13;
 	private static final short COMP_IND_FOOD = (short)14;
 	private static final short COMP_IND_HINT = (short)15;
@@ -112,7 +114,28 @@ public class GameUITester extends Application
 					addCellSpecs(lvl, loc, COMP_IND_WATER, params);
 			}
 		lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
-				new Location(1, 1), COMP_IND_EXIT, new HashMap<>()));
+				EXIT_LOC, COMP_IND_EXIT, new HashMap<>()));
+	}
+	
+	/**
+	 * Fills the level with sand and walls
+	 * @param lvl the level to fill
+	 */
+	private static void fillSandCells(Level lvl)
+	{
+		final double WALL_CHANCE = .05;
+		HashMap<String, Object> params = new HashMap<>();
+		for (int r = 0; r < TEST_SIZE; r++)
+			for (int c = 0; c < TEST_SIZE; c++)
+			{
+				Location loc = new Location(r, c);
+				if (Math.random() < WALL_CHANCE)
+					addCellSpecs(lvl, loc, COMP_IND_WALL, params);
+				else
+					addCellSpecs(lvl, loc, COMP_IND_SAND, params);
+			}
+		lvl.getCellCompSpecs().add(new CompSpec(Component.DEFAULT_SET,
+				EXIT_LOC, COMP_IND_EXIT, new HashMap<>()));
 	}
 	
 	private Scanner in;
@@ -246,7 +269,7 @@ public class GameUITester extends Application
 		test.setFoodRequirement(50);
 		test.setTimeLimit(50);
 		
-		addCellSpecs(test, new Location(1, 1), COMP_IND_EXIT, params);
+		addCellSpecs(test, EXIT_LOC, COMP_IND_EXIT, params);
 		fillCells(test);
 		for (int r = 0; r < TEST_SIZE; r++)
 			for (int c = 0; c < TEST_SIZE; c++)
@@ -377,6 +400,26 @@ public class GameUITester extends Application
 	}
 	
 	/**
+	 * Tests the functionality of the child
+	 * @return a test level pack
+	 */
+	private LevelPack testChild()
+	{
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+		
+		fillSandCells(test);
+		
+		HashMap<String, Object> params = new HashMap<>();
+		addActorSpecs(test, BIRD_LOC, COMP_IND_CHILD, params);
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
+		testPack.addLevel(test);
+		
+		return testPack;
+	}
+	
+	
+	/**
 	 * Tests the enemies' movement patterns.
 	 * @return a level pack to test enemy patterns.
 	 */
@@ -385,7 +428,7 @@ public class GameUITester extends Application
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
-		addCellSpecs(test, new Location(1, 1), COMP_IND_EXIT, new HashMap<>());
+		addCellSpecs(test, EXIT_LOC, COMP_IND_EXIT, new HashMap<>());
 		fillCells(test);
 		HashMap<String, Object> params = new HashMap<>();
 		params.put("heading", Actor.WEST);

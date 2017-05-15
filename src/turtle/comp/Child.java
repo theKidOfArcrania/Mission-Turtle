@@ -21,10 +21,11 @@ public class Child extends Enemy
 	
 	private static final int WALK_FRAMES[] = {63,62};
 
-	private static final int CHARGE_DIST = 5;
+	private static final int CHARGE_DIST = 10;
 	
 	private long lastMove;
 	private boolean frenzyState;
+	private boolean moving;
 	
 	/**
 	 * Constructs a new child object.
@@ -32,6 +33,7 @@ public class Child extends Enemy
 	public Child()
 	{
 		setImageFrame(DEFAULT_IMAGE);
+		moving = false;
 	}
 
 	/**
@@ -59,6 +61,16 @@ public class Child extends Enemy
 		Grid g = getParentGrid();
 		if (g == null)
 			return;
+		
+		if (moving ^ isMoving())
+		{
+			moving = !moving;
+			if (moving)
+				animateFrames(WALK_FRAMES, true);
+			else
+				setImageFrame(DEFAULT_IMAGE);
+		}
+		
 		if (isMoving())
 			return;
 		
@@ -71,16 +83,19 @@ public class Child extends Enemy
 		}
 		else
 		{
-			if (frame - lastMove > BIG_FRAME * 2)
+			if (frame - lastMove == BIG_FRAME * 2)
 			{
 				Location playerLoc = g.getPlayer().getHeadLocation();
 				Location loc = getHeadLocation();
 				
-				int dr = Math.abs(playerLoc.getRow() - loc.getRow());
-				int dc = Math.abs(playerLoc.getColumn() - loc.getColumn());
-				if (dr * dc == 0 && dr + dc <= CHARGE_DIST)
+				int dr = playerLoc.getRow() - loc.getRow();
+				int dc = playerLoc.getColumn() - loc.getColumn();
+				int dar = Math.abs(dr);
+				int dac = Math.abs(dc);
+				if (dr * dc == 0 && dar + dac <= CHARGE_DIST)
 				{
 					frenzyState = true;
+					setHeading(dr, dc);
 					return;
 				}
 			}
@@ -98,6 +113,29 @@ public class Child extends Enemy
 				}
 			}
 			setHeading(lastDir);
+		}
+	}
+	
+	/**
+	 * Sets a heading based on a delta of row/column
+	 * @param dr the delta of row (player - this)
+	 * @param dc the delta of column (player - this)
+	 */
+	private void setHeading(int dr, int dc)
+	{
+		if (dc == 0)
+		{
+			if (dr > 0)
+				setHeading(SOUTH);
+			else
+				setHeading(NORTH);
+		}
+		else
+		{
+			if (dc > 0)
+				setHeading(EAST);
+			else
+				setHeading(WEST);
 		}
 	}
 }
