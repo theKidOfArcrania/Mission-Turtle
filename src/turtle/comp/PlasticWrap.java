@@ -48,7 +48,6 @@ public class PlasticWrap extends Enemy
 	@Override
 	public double getMoveSpeed()
 	{
-		// TODO Auto-generated method stub
 		return super.getMoveSpeed() / 2;
 	}
 	

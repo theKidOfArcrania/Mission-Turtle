@@ -3,9 +3,9 @@ package turtle.ui;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
+import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 
 import javafx.application.Application;
 import javafx.scene.Node;
@@ -32,28 +32,37 @@ public class MainApp extends Application
 	
 	/** Result when level is not completed. */
 	public static final int RESULT_NOT_DONE = -2;
-	
+
+	private static final Preferences prefs = Preferences.userNodeForPackage(
+			MainApp.class);
+
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args)
 	{
 		Application.launch(args);
 	}
-	
-	private final HashMap<UUID, RandomAccessFile> openedFiles;
+
+	private final HashMap<UUID, LevelPack> loadedPacks;
+	private final HashMap<UUID, RandomAccessFile> saveStatus;
 	private final StackPane root;
-	private final GameUI game;
-	
+
+	private StartUI startUI;
+	private LevelSelectUI selectUI;
+	private GameUI gameUI;
+
 	/**
 	 * Constructs a new MainApp.
 	 */
 	public MainApp()
 	{
-		openedFiles = new HashMap<>();
+		loadedPacks = new HashMap<>();
+		saveStatus = new HashMap<>();
 		root = new StackPane(new Pane());
-		game = new GameUI(this);
-		
+
+		startUI = new StartUI(this);
+		gameUI = new GameUI(this);
 	}
-	
+
 	/**
 	 * Checks whether if a level has been completed or not, and in how much 
 	 * time it is completed.
@@ -62,25 +71,40 @@ public class MainApp extends Application
 	 * @param level the index of level to check
 	 * @return the time completed, or the constants RESULT_NO_TIME_LIMIT
 	 * 	or RESULT_NOT_DONE.
-	 * @throws IOException if an I/O error occurs while reading file.
 	 * @throws IllegalArgumentException if illegal argument is supplied.
 	 */
-	public int checkLevelCompletion(LevelPack pack, int level) throws IOException
+	public int checkLevelCompletion(LevelPack pack, int level)
 	{
 		if (level < 0 || level >= pack.getLevelCount())
 			throw new IllegalArgumentException("Level index is out of bounds.");
-		
-		RandomAccessFile raf = openLevelSaveFile(pack);
-		long offset = Long.BYTES * level;
-		if (raf.length() < offset + Long.BYTES)
-			raf.setLength(offset + Long.BYTES);
-		raf.seek(offset);
-		if (raf.readInt() == 0)
+
+		try
+		{
+			RandomAccessFile raf = openLevelSaveFile(pack);
+			long offset = Long.BYTES * level;
+			if (raf.length() < offset + Long.BYTES)
+				raf.setLength(offset + Long.BYTES);
+			raf.seek(offset);
+			if (raf.readInt() == 0)
+				return RESULT_NOT_DONE;
+			else
+				return raf.readInt();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
 			return RESULT_NOT_DONE;
-		else
-			return raf.readInt();
+		}
 	}
-	
+
+	/**
+	 * @return a list of all loaded level packs.
+	 */
+	public List<LevelPack> getLevelPacks()
+	{
+		return new ArrayList<>(loadedPacks.values());
+	}
+
 	/**
 	 * Runs the game UI at a particular level pack and level.
 	 * @param pack the level pack to run.
@@ -88,15 +112,38 @@ public class MainApp extends Application
 	 */
 	public void startGame(LevelPack pack, int level)
 	{
-		root.getChildren().set(0, game);
-		game.initLevelPack(pack, level);;
-		game.requestFocus();
-		
-		Stage s = (Stage)root.getScene().getWindow();
-		s.sizeToScene();
-		s.centerOnScreen();
+		if (!gameUI.initLevelPack(pack, level))
+			return;
+		gameUI.requestFocus();
+		showUI(gameUI);
 	}
-	
+
+	/**
+	 * Runs the game UI at the progress where the player last stopped off.
+	 * If there is no progress, this will run the first level of the first
+	 * level pack.
+	 */
+	public void startPreviousGame()
+	{
+		LevelPack active = getLastActivePack();
+		if (active == null)
+		{
+			if (loadedPacks.isEmpty())
+				return;
+			active = loadedPacks.values().iterator().next();
+		}
+		if (active.getLevelCount() == 0)
+			return;
+
+		int lvl = 0;
+		for (; lvl < active.getLevelCount(); lvl++)
+		{
+			if (checkLevelCompletion(active, lvl) == RESULT_NOT_DONE)
+				break;
+		}
+		startGame(active, lvl);
+	}
+
 	/**
 	 * Starts the game application!
 	 * @param primaryStage the initial main window of application.
@@ -110,6 +157,10 @@ public class MainApp extends Application
 		primaryStage.setScene(s);
 		primaryStage.setResizable(false);
 		primaryStage.show();
+
+		showMainMenu();
+		loadLevelPacks();
+		selectUI = new LevelSelectUI(this);
 	}
 	
 	/**
@@ -118,15 +169,8 @@ public class MainApp extends Application
 	 */
 	public void showLevelSelect()
 	{
-		ArrayList<DialogBoxUI> dlgs = new ArrayList<>();
-		for (Node n : root.getChildren())
-			if (n instanceof DialogBoxUI)
-				dlgs.add((DialogBoxUI)n);
-		for (DialogBoxUI dlg : dlgs)
-			hideDialog(dlg);
-		
-		//TODO: here
-		System.exit(1);
+		selectUI.updateStatus();
+		showUI(selectUI);
 	}
 	
 	/**
@@ -135,15 +179,7 @@ public class MainApp extends Application
 	 */
 	public void showMainMenu()
 	{
-		ArrayList<DialogBoxUI> dlgs = new ArrayList<>();
-		for (Node n : root.getChildren())
-			if (n instanceof DialogBoxUI)
-				dlgs.add((DialogBoxUI)n);
-		for (DialogBoxUI dlg : dlgs)
-			hideDialog(dlg);
-		
-		//TODO: here
-		System.exit(1);
+		showUI(startUI);
 	}
 	
 	/**
@@ -166,7 +202,83 @@ public class MainApp extends Application
 	{
 		root.getChildren().remove(dlg);
 	}
-	
+
+	/**
+	 * Hides all dialogs from displaying.
+	 */
+	public void hideAllDialogs()
+	{
+		ArrayList<DialogBoxUI> dlgs = new ArrayList<>();
+		for (Node n : root.getChildren())
+			if (n instanceof DialogBoxUI)
+				dlgs.add((DialogBoxUI)n);
+		for (DialogBoxUI dlg : dlgs)
+			hideDialog(dlg);
+	}
+
+	/**
+	 * @return the last level pack the user has accessed, or null if none
+	 * existed.
+	 */
+	public LevelPack getLastActivePack()
+	{
+		String lastPack = prefs.get("status.pack", "");
+		if (lastPack.isEmpty())
+			return null;
+
+		try
+		{
+			return loadedPacks.get(UUID.fromString(lastPack));
+		}
+		catch (IllegalArgumentException e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * Saves the last level pack the user has accessed
+	 * @param pack the level pack accessed
+	 */
+	public void setLastActivePack(LevelPack pack)
+	{
+		prefs.put("status.pack", pack.getLevelPackID().toString());
+	}
+
+	/**
+	 * Resets ALL scores.
+	 */
+	public void resetScores()
+	{
+		try
+		{
+			for (RandomAccessFile raf : saveStatus.values())
+				raf.close();
+			saveStatus.clear();
+
+			boolean success = true;
+			File[] dir = new File(System.getProperty("user.home"), ".turtle")
+					.listFiles();
+			if (dir != null)
+			{
+				for (File f : dir)
+				{
+					if (f.isFile() && !f.delete())
+						success = false;
+				}
+			}
+
+			if (!success)
+				showDialog(new DialogBoxUI("Unable to reset scores.", "OK"));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			showDialog(new DialogBoxUI("Unable to reset scores.", "OK"));
+		}
+	}
+
 	/**
 	 * Saves the information that the user has completed a particular level 
 	 * from a particular level pack. This is internally called by GameUI.
@@ -192,7 +304,8 @@ public class MainApp extends Application
 		raf.writeInt(1);
 		raf.writeInt(time);
 	}
-	
+
+
 	/**
 	 * Obtains the opened level-pack save data for the level pack.
 	 * This will open a new file if one did not exist yet.
@@ -203,14 +316,61 @@ public class MainApp extends Application
 	private RandomAccessFile openLevelSaveFile(LevelPack pack) throws IOException
 	{
 		UUID id = pack.getLevelPackID();
-		if (!openedFiles.containsKey(id))
+		if (!saveStatus.containsKey(id))
 		{
 			File dir = new File(System.getProperty("user.home"), ".turtle");
-			if (!dir.exists())
-				dir.mkdir();
-			openedFiles.put(id, new RandomAccessFile(new File(dir, 
+			if (!dir.exists() && !dir.mkdir())
+				System.err.println("Unable to create .turtle directory");
+			saveStatus.put(id, new RandomAccessFile(new File(dir,
 					pack.getLevelPackID() + ".sav"), "rw"));
 		}
-		return openedFiles.get(id);
+		return saveStatus.get(id);
 	}
+
+	/**
+	 * Loads all the level packs bundled with this game.
+	 */
+	private void loadLevelPacks()
+	{
+		Pattern fileReg = Pattern.compile(".+\\.mtp$");
+		File dir = new File(".");
+		File[] packs = dir.listFiles();
+		if (packs == null)
+			return;
+
+		boolean success = true;
+		for (File f : packs)
+		{
+			try
+			{
+				if (f.isFile() && fileReg.matcher(f.getName()).matches())
+				{
+					LevelPack pack = new LevelPack(f);
+					loadedPacks.put(pack.getLevelPackID(), pack);
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				success = false;
+			}
+		}
+		if (!success)
+			showDialog(new DialogBoxUI("Unable to load some level packs.",
+					"OK"));
+	}
+
+	/**
+	 * Displays a UI within this app and readies its size.
+	 * @param ui the UI to display
+	 */
+	private void showUI(Pane ui)
+	{
+		hideAllDialogs();
+		root.getChildren().set(0, ui);
+		Stage s = (Stage)root.getScene().getWindow();
+		s.sizeToScene();
+		s.centerOnScreen();
+	}
+
 }

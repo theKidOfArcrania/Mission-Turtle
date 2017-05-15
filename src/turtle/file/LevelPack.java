@@ -55,8 +55,11 @@ public class LevelPack
 			levels.add(new Level(this, levelOffsets[i]));
 		}
 		levelPackID = new UUID(raf.readLong(), raf.readLong());
-		
+
 		name = raf.readUTF();
+
+		for (Level lvl : levels)
+			lvl.readHeader(raf);
 	}
 	
 	/**

@@ -5,6 +5,7 @@
 	-fx-font-family: "System";
 	-fx-font-size: 18px;
 	-fx-background: black;
+	-fx-focus-color: gray;
 }
 
 /* Small font-size */
@@ -65,8 +66,8 @@
 }
 
 /* When pressed, the gradient flips and text darken to reflect
- * pressed nature. */
-.lbutton:pressed
+ * pressed nature. Also if this is a selected item, also pressed.*/
+.lbutton:pressed, .litem.selected
 {
 	-fx-background-color: linear-gradient( to top, rgba(216,216,216,0.3) 0%, 
 		rgba(255,255,255,.5) 45%, rgba(164,164,164,0.4) 55%, 

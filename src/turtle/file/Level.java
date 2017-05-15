@@ -195,30 +195,41 @@ public class Level
 	}
 
 	/**
-	 * Loads a level from the file into memory.
+	 * Reads the header of a level only.
 	 * @param raf the file to load level from
-	 * @throws IllegalStateException if this is called on a level does not
-	 * 		load from file.
 	 * @throws IOException if the level file is corrupted.
 	 * @throws IllegalStateException if this level does not load from a file.
+	 * @see #loadLevel(RandomAccessFile)
 	 */
-	public void loadLevel(RandomAccessFile raf) throws IOException
+	public void readHeader(RandomAccessFile raf) throws IOException
 	{
 		if (offset == -1)
 			throw new IllegalStateException("Not a level from file.");
 
 		if (loaded)
 			return;
-		
+
 		raf.seek(offset);
-		
+
 		//Read header.
 		rows = raf.readInt();
 		cols = raf.readInt();
-		
+
 		name = raf.readUTF();
 		foodReq = raf.readInt();
-		timeLimit = raf.readInt();		
+		timeLimit = raf.readInt();
+	}
+
+	/**
+	 * Loads a level from the file into memory.
+	 * @param raf the file to load level from
+	 * @throws IOException if the level file is corrupted.
+	 * @throws IllegalStateException if this level does not load from a file.
+	 * @see #readHeader(RandomAccessFile)
+	 */
+	public void loadLevel(RandomAccessFile raf) throws IOException
+	{
+		readHeader(raf);
 		
 		//Read comp specs
 		cells.clear();
@@ -327,7 +338,6 @@ public class Level
 	 * Writes a component specification to the current location
 	 * @param raf the file to write to
 	 * @param spec the spec to write.
-	 * @param component specification to write
 	 * @throws IOException if unable to write to file.
 	 */
 	private void writeCompSpec(RandomAccessFile raf, CompSpec spec) throws 

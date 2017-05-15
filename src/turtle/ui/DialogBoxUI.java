@@ -19,8 +19,6 @@ public class DialogBoxUI extends Pane
 	private static final double MARGINS = 5.0;
 	private static final double MIN_BUTTON_WIDTH = 100;
 
-	private final Label lblMessage;
-	private final StackPane pnlMessage;
 	private final EqualGridPane pnlButtons;
 	private final VBox pnlDialog;
 
@@ -35,12 +33,12 @@ public class DialogBoxUI extends Pane
 			String... buttons)
 	{
 
-		lblMessage = new Label(message);
+		Label lblMessage = new Label(message);
 		lblMessage.setWrapText(true);
 		lblMessage.setTextAlignment(TextAlignment.CENTER);
 		StackPane.setAlignment(lblMessage, Pos.CENTER);
 
-		pnlMessage = new StackPane();
+		Pane pnlMessage = new StackPane();
 		pnlMessage.getStyleClass().add("DialogMessage");
 		VBox.setMargin(pnlMessage, new Insets(0, MARGINS, MARGINS, MARGINS));
 		pnlMessage.getChildren().add(lblMessage);

@@ -191,7 +191,6 @@ public class GameUI extends VBox
     private Label lblPackName;
     private Label lblLevelName;
     private Label lblLevelStatus;
-    private Label lblMenu;
     private StackPane pnlFrame;
     private StackPane pnlMenuBack;
     private HBox pnlStatus;
@@ -230,31 +229,31 @@ public class GameUI extends VBox
 	public GameUI(MainApp app)
 	{
 		this.app = app;
-		
+
 		pnlMenuDialog = new GameMenuUI(this);
 		view = new GridView(null);
 		runner = new GameTimer();
-		
+
 		started = false;
 		paused = false;
 		halted = false;
-		
+
 		msgScroller = null;
 		doubled = false;
-		
+
 		timeLeft = -1;
 		moving = new boolean[Actor.WEST + 1];
-		
+
 		currentLevelNum = 0;
-		
+
 		mappedKeys = new EnumMap<>(KeyCode.class);
 		mapKeys();
-		
+
 		initUI();
-		
+
 		setFocusTraversable(true);
 		requestFocus();
-		
+
 		/**
 		 * Event handler that listens to all key events that occurs.
 		 */
@@ -262,8 +261,9 @@ public class GameUI extends VBox
 		{
 			/**
 			 * Called when a key event occurs.
-			 * @param event an event object describing the key event that 
-			 *   occurred.
+			 *
+			 * @param event an event object describing the key event that
+			 *              occurred.
 			 */
 			@Override
 			public void handle(KeyEvent event)
@@ -274,22 +274,18 @@ public class GameUI extends VBox
 	}
 	
 	/**
-	 * @return the grid view displayed by this game UI.
-	 */
-	public GridView getGridView()
-	{
-		return view;
-	}
-	
-	/**
 	 * Initializes this GameUI with a level pack.
 	 * @param pck the pack to use.
-	 * @param level the level index to start from. 
+	 * @param level the level index to start from.
+	 * @return true if this is successful, false if this fails.
 	 */
-	public void initLevelPack(LevelPack pck, int level)
+	public boolean initLevelPack(LevelPack pck, int level)
 	{
 		currentPack = pck;
-		initLevel(level);
+		if (!initLevel(level))
+			return false;
+		app.setLastActivePack(pck);
+		return true;
 	}
 	
 	/**
@@ -454,7 +450,25 @@ public class GameUI extends VBox
 			return "Unable to save scores!";
 		}
 	}
-	
+
+	/**
+	 * Turns a status code into its associated message.
+	 * @param status the finish status.
+	 * @return a status message.
+	 */
+	private String getStatus(int status)
+	{
+		if (status == MainApp.RESULT_NOT_DONE)
+			return "";
+		else if (status == MainApp.RESULT_NO_TIME_LIMIT)
+			return "(Done)";
+
+		final int SECONDS_TO_MIN = 60;
+		int min = status / SECONDS_TO_MIN;
+		int sec = status % SECONDS_TO_MIN;
+		return String.format("(+%d:%02d)", min, sec);
+	}
+
 	/**
 	 * Handles a end-of-level dialog response.
 	 * @param response the response index of user.
@@ -505,7 +519,7 @@ public class GameUI extends VBox
 		}
 		else
 		{
-			boolean controlDown = event.isControlDown();
+			boolean controlDown = event.isControlDown() || !started;
 			if (!keyDown)
 				return;
 			handleAction(action, controlDown);
@@ -541,17 +555,10 @@ public class GameUI extends VBox
 				initLevel(currentLevelNum);
 			break;
 		case ACTION_NEXT:
-			try
-			{
-				if (controlDown && currentLevelNum < currentPack.
-						getLevelCount() - 1 && app.checkLevelCompletion
-						(currentPack, currentLevelNum) != MainApp.RESULT_NOT_DONE)
-					initLevel(currentLevelNum + 1);
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+			if (controlDown && currentLevelNum < currentPack.
+					getLevelCount() - 1 && app.checkLevelCompletion
+					(currentPack, currentLevelNum) != MainApp.RESULT_NOT_DONE)
+				initLevel(currentLevelNum + 1);
 			return;
 		case ACTION_PREVIOUS:
 			if (controlDown && currentLevelNum > 0)
@@ -581,7 +588,7 @@ public class GameUI extends VBox
         Pane spacing = new Pane();
         HBox.setHgrow(spacing, Priority.ALWAYS);
 
-        lblMenu = new Label("Menu");
+        Label lblMenu = new Label("Menu");
         lblMenu.getStyleClass().add("lbutton");
         lblMenu.setPadding(new Insets(0, GAP_INSET, 0, GAP_INSET));
         HBox.setMargin(lblMenu, new Insets(0, GAP_INSET, 0, GAP_INSET));
@@ -652,8 +659,9 @@ public class GameUI extends VBox
 	 * Initializes this Game UI with the level.
 	 * @param index the level index to initialize with.
 	 * @throws NullPointerException if <code>lvl</code> is null.
+	 * @return true if successful, false if this fails.
 	 */
-	private void initLevel(int index)
+	private boolean initLevel(int index)
 	{
 		stopGame();
 		halted = false;
@@ -668,9 +676,9 @@ public class GameUI extends VBox
 		catch (IOException e)
 		{
 			e.printStackTrace();
-			//TODO: tell user that level is corrupted and exit
-			System.out.println("Level data corrupted!");
-			System.exit(1);
+			app.showMainMenu();
+			app.showDialog(new DialogBoxUI("Level data corrupted!", "OK"));
+			return false;
 		}
 		
 		timeLeft = lvl.getTimeLimit();
@@ -681,27 +689,14 @@ public class GameUI extends VBox
 			lblPackName.setText(lvl.getPack().getName() + ":");
 		lblLevelName.setText(lvl.getName());
 		
-		int score = MainApp.RESULT_NOT_DONE;
-		try
-		{
-			score = app.checkLevelCompletion(currentPack, index);
-		} catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		
-		if (score == MainApp.RESULT_NOT_DONE)
-			lblLevelStatus.setText("");
-		else if (score == MainApp.RESULT_NO_TIME_LIMIT)
-			lblLevelStatus.setText("Already completed!");
-		else 
-			lblLevelStatus.setText("Already completed (" +
-				score + " time bonus)");
+		int score = app.checkLevelCompletion(currentPack, index);
+		lblLevelStatus.setText(getStatus(score));
 		
 		Grid g = lvl.createLevel();
 		view.initGrid(g);
 		
 		updateUI();
+		return true;
 	}
 	
 	/**
@@ -828,7 +823,7 @@ public class GameUI extends VBox
 	/**
 	 * Checks whether if this message overflows out of the bounds.
 	 * If so, it will scroll through 
-	 * @param msg
+	 * @param msg the message to check for overflow
 	 */
 	private void checkMessageOverflow(Label msg)
 	{
@@ -942,7 +937,6 @@ public class GameUI extends VBox
 		{
 			p.setHeading(moveDir);
 			p.traverseDirection(moveDir);
-			moveDir = -1;
 		}
 		
 		//Update grid stuff.

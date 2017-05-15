@@ -1,2 +1,4 @@
 /bin/
 *.fxml
+.idea/
+Mission Turtle.iml
