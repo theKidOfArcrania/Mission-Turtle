@@ -7,7 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.Separator;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -19,12 +18,12 @@ import java.util.Collection;
 
 /**
  * LevelSelectUI.java
- *
+ * <p>
  * This displays a list of levels the user can play at the moment.
  *
  * @author Henry Wang
- * Date: 05/14/2017
- * Period: 2
+ *         Date: 05/14/2017
+ *         Period: 2
  */
 public class LevelSelectUI extends VBox
 {
@@ -45,6 +44,7 @@ public class LevelSelectUI extends VBox
 
     /**
      * Creates a new StartUI and initializes UI.
+     *
      * @param app the MainApp the app to execute run level
      */
     public LevelSelectUI(MainApp app)
@@ -85,6 +85,7 @@ public class LevelSelectUI extends VBox
 
     /**
      * Initializes the interactable buttons to go back and play.
+     *
      * @return the buttons pane
      */
     private Pane initButtonsUI()
@@ -93,41 +94,42 @@ public class LevelSelectUI extends VBox
         buttons.setPadding(new Insets(MARGINS));
         buttons.setHgap(MARGINS);
         buttons.getChildren().addAll(
-            /** Handles mouse event when user selects back button*/
-            MenuUI.createButton("Back", true, true, new
-                    EventHandler<MouseEvent>()
-            {
-                /**
-                 * Handles the click event.
-                 * @param event the event associated with click.
-                 */
-                @Override
-                public void handle(MouseEvent event)
-                {
-                    app.showMainMenu();
-                }
-            }),
+                /** Handles mouse event when user selects back button*/
+                MenuUI.createButton("Back", true, true, new
+                        EventHandler<MouseEvent>()
+                        {
+                            /**
+                             * Handles the click event.
+                             * @param event the event associated with click.
+                             */
+                            @Override
+                            public void handle(MouseEvent event)
+                            {
+                                app.showMainMenu();
+                            }
+                        }),
 
-            /** Handles mouse event when user selects play button*/
-            MenuUI.createButton("Play!", true, true, new
-                    EventHandler<MouseEvent>()
-            {
-                /**
-                 * Handles the click event.
-                 * @param event the event associated with click.
-                 */
-                @Override
-                public void handle(MouseEvent event)
-                {
-                    if (selectedPack != null && selectedLevel != -1)
-                        app.startGame(selectedPack, selectedLevel);
-                }
-            }));
+                /** Handles mouse event when user selects play button*/
+                MenuUI.createButton("Play!", true, true, new
+                        EventHandler<MouseEvent>()
+                        {
+                            /**
+                             * Handles the click event.
+                             * @param event the event associated with click.
+                             */
+                            @Override
+                            public void handle(MouseEvent event)
+                            {
+                                if (selectedPack != null && selectedLevel != -1)
+                                    app.startGame(selectedPack, selectedLevel);
+                            }
+                        }));
         return buttons;
     }
 
     /**
      * Creates a scroll pane adjusted to a node.
+     *
      * @param child the node to attach scroll pane.
      * @return an initialized scroll-pane.
      */
@@ -144,6 +146,7 @@ public class LevelSelectUI extends VBox
 
     /**
      * Initializes the list of level packs.
+     *
      * @return the UI list for level packs
      */
     private MenuUI initializePacksList()
@@ -179,6 +182,7 @@ public class LevelSelectUI extends VBox
 
     /**
      * Updates the levels UI list for a particular level pack.
+     *
      * @param pack the level pack to populate level list.
      */
     private void initLevelsUI(LevelPack pack)
@@ -229,7 +233,8 @@ public class LevelSelectUI extends VBox
 
     /**
      * Sets the selected state of a list-item node.
-     * @param n the list-item node.
+     *
+     * @param n        the list-item node.
      * @param selected true to be selected, false to deselect.
      */
     private void setSelectedState(Node n, boolean selected)
@@ -239,13 +244,13 @@ public class LevelSelectUI extends VBox
         {
             if (!stylClss.contains("selected"))
                 stylClss.add("selected");
-        }
-        else
+        } else
             stylClss.remove("selected");
     }
 
     /**
      * Turns a status code into its associated message.
+     *
      * @param status the finish status.
      * @return a status message.
      */

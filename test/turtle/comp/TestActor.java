@@ -11,12 +11,12 @@ import java.util.Map;
 
 /**
  * turtle.comp.TestActor.java
- *
+ * <p>
  * This is a configurable actor that is used for test cases.
  *
  * @author Henry Wang
- * Date: 05/16/2017
- * Period: 2
+ *         Date: 05/16/2017
+ *         Period: 2
  */
 public class TestActor extends Actor
 {
@@ -94,35 +94,36 @@ public class TestActor extends Actor
      * Sets a series of parameters for this test actor. This
      * below specifies the list of parameters:
      * <table>
-     *   <tr>
-     *     <th>Name</th>
-     *     <th>Type</th>
-     *     <th>Description</th>
-     *   </tr>
-     *   <tr>
-     *     <td><code>back</code></td>
-     *     <td><code>Color</code></td>
-     *     <td>Background color of actor</td>
-     *   </tr>
-     *   <tr>
-     *     <td><code>level</code></td>
-     *     <td><code>int</code></td>
-     *     <td>Dominance level of actor</td>
-     *   </tr>
-     *   <tr>
-     *     <td><code>killer</code></td>
-     *     <td><code>boolean</code></td>
-     *     <td>Determines whether if actor will kill others</td>
-     *   </tr>
-     *   <tr>
-     *     <td><code>wall</code></td>
-     *     <td><code>boolean</code></td>
-     *     <td>Determines whether if actor acts wall-like</td>
-     *   </tr>
+     * <tr>
+     * <th>Name</th>
+     * <th>Type</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td><code>back</code></td>
+     * <td><code>Color</code></td>
+     * <td>Background color of actor</td>
+     * </tr>
+     * <tr>
+     * <td><code>level</code></td>
+     * <td><code>int</code></td>
+     * <td>Dominance level of actor</td>
+     * </tr>
+     * <tr>
+     * <td><code>killer</code></td>
+     * <td><code>boolean</code></td>
+     * <td>Determines whether if actor will kill others</td>
+     * </tr>
+     * <tr>
+     * <td><code>wall</code></td>
+     * <td><code>boolean</code></td>
+     * <td>Determines whether if actor acts wall-like</td>
+     * </tr>
      * </table>
      * Note: unlike other components, this does not check for type-safe on
      * parameters, since this is only a test component and not used for
      * production.
+     *
      * @param params the parameter object.
      */
     @Override
@@ -130,13 +131,13 @@ public class TestActor extends Actor
     {
         super.setParameters(params);
         if (params.containsKey("back"))
-            setBack((Color)params.get("back"));
+            setBack((Color) params.get("back"));
         if (params.containsKey("level"))
-            setDomLevel((Integer)params.get("level"));
+            setDomLevel((Integer) params.get("level"));
         if (params.containsKey("killer"))
-            setKiller((Boolean)params.get("killer"));
+            setKiller((Boolean) params.get("killer"));
         if (params.containsKey("wall"))
-            setWall((Boolean)params.get("wall"));
+            setWall((Boolean) params.get("wall"));
     }
 
     /**
@@ -169,7 +170,7 @@ public class TestActor extends Actor
     public boolean interact(Actor other)
     {
         System.out.println(getLogHeading() + ": " + other +
-                        " interacted with me!");
+                " interacted with me!");
         if (!wall && killer)
             other.die(this);
         return !wall;
