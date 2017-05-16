@@ -193,7 +193,7 @@ public class LevelSelectUI extends VBox
         {
             final int num = i;
             /** Handles mouse event when user clicks a menu button*/
-            String name = pack.getLevel(i).getName();
+            String name = (i + 1) + " - " + pack.getLevel(i).getName();
             if (!reachable)
                 name = "\uD83D\uDD12 " + name;
             int status = app.checkLevelCompletion(pack, i);

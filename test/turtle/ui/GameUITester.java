@@ -139,7 +139,8 @@ public class GameUITester extends Application
 	}
 	
 	private Scanner in;
-	
+	private MainApp app;
+
 	/**
 	 * Starts the main application
 	 * @param primaryStage the primary window that will first start up.
@@ -167,16 +168,20 @@ public class GameUITester extends Application
 					System.out.println("Invalid index. Try again");
 				else
 					selected = tests.get(index);
-			}
-			else
+			} else
 				System.out.println("Invalid number. Try again.");
 		}
-		MainApp app = new MainApp();
-		LevelPack pack = (LevelPack) selected.invoke(this);
-		
+
+		app = new MainApp();
 		app.start(primaryStage);
-		app.startGame(pack, 0);
-		primaryStage.requestFocus();
+
+		if (LevelPack.class.isAssignableFrom(selected.getReturnType()))
+		{
+			LevelPack pack = (LevelPack) selected.invoke(this);
+			app.startGame(pack, 0);
+		}
+		else
+			selected.invoke(this);
 	}
 
 	/**
@@ -190,8 +195,7 @@ public class GameUITester extends Application
 		for (Method mth : GameUITester.class.getDeclaredMethods())
 		{
 			if (mth.getName().startsWith(TEST_PREFIX) && 
-					mth.getParameterTypes().length == 0 &&
-					LevelPack.class.isAssignableFrom(mth.getReturnType()))
+					mth.getParameterTypes().length == 0)
 			{
 				mth.setAccessible(true);
 				tests.add(mth);
@@ -443,7 +447,7 @@ public class GameUITester extends Application
 	
 	/**
 	 * Generates test packs to test hint tiles.
-	 * @return
+	 * @return a level pack to test hints
 	 */
 	private LevelPack testHints()
 	{
@@ -472,7 +476,11 @@ public class GameUITester extends Application
 		
 		return testPack;
 	}
-	
+
+	/**
+	 * Tests the trap functionality.
+	 * @return a level pack testing traps
+	 */
 	private LevelPack testTraps()
 	{
 		LevelPack testPack = new LevelPack("Test Pack");
@@ -488,10 +496,26 @@ public class GameUITester extends Application
 		
 		return testPack;
 	}
-	
+
+	/**
+	 * Tests the loading functionality.
+	 * @return the loaded test level-pack.
+	 * @throws IOException if an error occurs while reading levelpack.
+	 */
 	private LevelPack testLoading() throws IOException
 	{
 		return new LevelPack(new File("test.mtp"));
 	}
-	
+
+	/**
+	 * Unlocks all levels by marking them as done.
+	 * @throws IOException if an error occurs while saving scores.
+	 */
+	private void testUnlock() throws IOException
+	{
+		for (LevelPack pack : app.getLevelPacks())
+			for (int i = 0; i < pack.getLevelCount(); i++)
+				app.completeLevel(pack, i, MainApp.RESULT_NO_TIME_LIMIT);
+	}
+
 }
