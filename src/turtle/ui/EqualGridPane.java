@@ -21,6 +21,7 @@ public class EqualGridPane extends Pane
     private final int columns;
     private double hgap;
     private double vgap;
+    
     /**
      * Creates an EqualGridPane with number of rows and columns.
      *

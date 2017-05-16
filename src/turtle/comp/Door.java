@@ -1,11 +1,11 @@
 package turtle.comp;
 
+import java.util.Map;
+import java.util.function.Predicate;
+
 import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
-
-import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * Door.java
@@ -76,9 +76,7 @@ public class Door extends Actor
 
     /**
      * Obtains the dominance level of the actor in relation to another actor.
-     * This will be high on the dominance level since it is a fixture. However
-     * like {@link Mover}, it should actually be located near the top of
-     * z-order. So for ordering, it returns a low dominance level.
+     * This will be high on the dominance level since it is a fixture.
      *
      * @param other other actor to compare with (or null for generally).
      * @return a dominance level of the actor.
@@ -86,10 +84,7 @@ public class Door extends Actor
     @Override
     public DominanceLevel dominanceLevelFor(Actor other)
     {
-        if (other == null)
-            return FLOATING;
-        else
-            return FIXTURE;
+        return FIXTURE;
     }
 
     /**

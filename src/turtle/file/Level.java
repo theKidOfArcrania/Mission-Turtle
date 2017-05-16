@@ -1,11 +1,11 @@
 package turtle.file;
 
-import turtle.core.*;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
+
+import turtle.core.*;
 
 /**
  * Level.java
@@ -20,12 +20,7 @@ import java.util.List;
  */
 public class Level
 {
-    private final ArrayList<CompSpec> cells = new ArrayList<>();
-    private final ArrayList<CompSpec> actors = new ArrayList<>();
-    /**
-     * The parent level pack of this level. This is internally set by LevelPack
-     */
-    LevelPack parent;
+    
     private boolean loaded;
     private long offset;
     private String name;
@@ -33,7 +28,11 @@ public class Level
     private int cols;
     private int timeLimit;
     private int foodReq;
+    
+    private final ArrayList<CompSpec> cells = new ArrayList<>();
+    private final ArrayList<CompSpec> actors = new ArrayList<>();
 
+    LevelPack parent;
 
     /**
      * Constructs a new blank level, that can be edited and saved.

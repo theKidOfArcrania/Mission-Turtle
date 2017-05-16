@@ -1,5 +1,12 @@
 package turtle.ui;
 
+import static turtle.ui.GameMenuUI.*;
+
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.EnumMap;
+import java.util.function.IntConsumer;
+
 import javafx.animation.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,13 +28,6 @@ import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.EnumMap;
-import java.util.function.IntConsumer;
-
-import static turtle.ui.GameMenuUI.*;
-
 /**
  * GameUI.java
  * <p>
@@ -41,29 +41,36 @@ public class GameUI extends VBox
 {
     private static final String SECT_BREAK = "   ";
     private static final int FPS_UPDATE_RATE = 10;
+    
     private static final int ACTION_START = -1;
     private static final int ACTION_PAUSE = -2;
     private static final int ACTION_RESTART = -3;
     private static final int ACTION_NEXT = -4;
     private static final int ACTION_PREVIOUS = -5;
+    
     private static final double SEMI_TRANS_ALPHA = .5;
     private static final Color DARKGRAY = Color.web("#505050");
+    
     private static final double GAP_INSET = 5.0;
     private static final double LARGE_GAP_INSET = 20.0;
     private static final int LABEL_MIN_WIDTH = 50;
+    private static final double FPS_WIDTH = 60.0;
     private static final double FRAME_WIDTH = 10.0;
-    private static final int FRAMES_PER_SEC = 50; //TODO: change to 30
+    
+    private static final int FRAMES_PER_SEC = 30;
     private static final Duration FADE_DURATION = Duration.seconds(.5);
-    private static final double FIT_WIDTH = 799;
+    
     private static final Duration CAROUSEL_DELAY = Duration.seconds(1.0);
     private static final double CAROUSEL_SPEED = 100;
     private static final double SPACE_SIZE = 19.79296875;
+    
     private final GameMenuUI pnlMenuDialog;
     private final boolean[] moving;
     private final GridView view;
     private final GameTimer runner;
     private final EnumMap<KeyCode, Integer> mappedKeys;
     private final MainApp app;
+    
     /* UI elements */
     private HBox pnlBar;
     private Label lblFps;
@@ -79,6 +86,7 @@ public class GameUI extends VBox
     private Label lblMsg;
     private TranslateTransition msgScroller;
     private boolean doubled;
+    
     /* Game-related stuff */
     private int dirPrevPressed;
     private LevelPack currentPack;
@@ -375,7 +383,7 @@ public class GameUI extends VBox
                 break;
             case BUTTON_MENU:
             default:
-                app.showLevelSelect();
+                app.showMainMenu();
                 break;
         }
     }
@@ -598,6 +606,7 @@ public class GameUI extends VBox
         lblFps.getStyleClass().add("small");
         lblFps.setMaxHeight(Double.MAX_VALUE);
         lblFps.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        lblFps.setPrefWidth(FPS_WIDTH);
         HBox.setMargin(lblFps, new Insets(0, GAP_INSET, 0, GAP_INSET));
 
         pnlMessagePanel = new StackPane();
@@ -716,12 +725,13 @@ public class GameUI extends VBox
     private void checkMessageOverflow(Label msg)
     {
         msg.applyCss();
-
+        
+        double fitWidth = pnlMessagePanel.getWidth();
         double msgWidth = msg.prefWidth(-1);
-        double overflow = msgWidth - FIT_WIDTH;
+        double overflow = msgWidth - fitWidth;
         if (overflow > 0)
         {
-            double firstSaw = (FIT_WIDTH - SPACE_SIZE) / 2;
+            double firstSaw = (fitWidth - SPACE_SIZE) / 2;
             double from = msgWidth - firstSaw;
             double to = -SPACE_SIZE - firstSaw;
 

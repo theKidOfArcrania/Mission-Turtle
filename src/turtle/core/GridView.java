@@ -1,12 +1,14 @@
 package turtle.core;
 
 import javafx.geometry.HPos;
+import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import turtle.comp.Player;
 
 /**
@@ -21,20 +23,12 @@ import turtle.comp.Player;
  */
 public class GridView extends Pane
 {
-    /**
-     * The number of rows in the view.
-     */
-    public static final int VIEW_ROWS = 6;
-
-    /**
-     * The number of columns in the view.
-     */
-    public static final int VIEW_COLS = 12;
-
     private static final int DEF_CELL_SIZE = 100;
 
     private static final double INTERNAL_PADDING = 20;
     private static final double CORNER_RADIUS = 5.0;
+    private static final double SCREEN_PADDING = 200.0;
+    
     private final int rows;
     private final int cols;
     private Grid viewed;
@@ -46,12 +40,14 @@ public class GridView extends Pane
      */
     public GridView(Grid init)
     {
-        rows = VIEW_ROWS;
-        cols = VIEW_COLS;
+    	Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+    	double width = bounds.getWidth() - SCREEN_PADDING;
+    	double height = bounds.getHeight() - SCREEN_PADDING;
+    	
+        rows = (int)(height / DEF_CELL_SIZE);
+        cols = (int)(width / DEF_CELL_SIZE);
         initGrid(init);
 
-        //LinearGradient grad = new LinearGradient(0, 0, 1, 1, true, null,
-        //		new Stop(0, Color.LIGHTGRAY), new Stop(1, Color.GRAY));
         setBackground(new Background(new BackgroundFill(Color.BLACK,
                 null, null)));
     }
@@ -213,6 +209,9 @@ public class GridView extends Pane
      */
     private double calcOffset(double viewSize, double maxSize, double point)
     {
+    	if (viewSize > maxSize)
+    		return -(viewSize - maxSize) / 2;
+    	
         double off = point - viewSize / 2;
         return Math.min(Math.max(-INTERNAL_PADDING, off),
                 (maxSize + INTERNAL_PADDING) - viewSize);

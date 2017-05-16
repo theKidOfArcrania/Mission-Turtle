@@ -1,13 +1,5 @@
 package turtle.ui;
 
-import javafx.application.Application;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-import turtle.file.LevelPack;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -17,6 +9,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
+
+import javafx.application.Application;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import turtle.file.LevelPack;
 
 /**
  * MainApp.java
@@ -30,23 +30,18 @@ import java.util.regex.Pattern;
 @SuppressWarnings("resource")
 public class MainApp extends Application
 {
-    /**
-     * Result when level is completed with no time-limit
-     */
     public static final int RESULT_NO_TIME_LIMIT = -1;
-
-    /**
-     * Result when level is not completed.
-     */
     public static final int RESULT_NOT_DONE = -2;
 
     private static final Preferences prefs = Preferences.userNodeForPackage(
             MainApp.class);
+    
     private final HashMap<UUID, LevelPack> loadedPacks;
     private final HashMap<UUID, RandomAccessFile> saveStatus;
     private final StackPane root;
     private final StartUI startUI;
     private final GameUI gameUI;
+    
     private LevelSelectUI selectUI;
     /**
      * Constructs a new MainApp.

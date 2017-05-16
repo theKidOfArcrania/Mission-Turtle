@@ -1,5 +1,13 @@
 package turtle.ui;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Scanner;
+
 import javafx.application.Application;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -10,14 +18,6 @@ import turtle.core.Location;
 import turtle.file.CompSpec;
 import turtle.file.Level;
 import turtle.file.LevelPack;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Scanner;
 
 /**
  * GameUITester.java
@@ -34,11 +34,14 @@ public class GameUITester extends Application
     public static final int CYCLE_PATTERN = 6;
     public static final double PLASTIC_CHANCE = .1;
     public static final double FIFTY_CHANCE = .5;
+    
     private static final Location EXIT_LOC = new Location(1, 1);
     private static final Location BIRD_LOC = new Location(1, 13);
     private static final Location PLAYER_LOC = new Location(0, 0);
+    
     private static final String TEST_PREFIX = "test";
     private static final int TEST_SIZE = 20;
+    
     private static final short COMP_IND_DOOR = (short) 0;
     private static final short COMP_IND_GRASS = (short) 1;
     private static final short COMP_IND_PLASTIC = (short) 2;
@@ -626,7 +629,10 @@ public class GameUITester extends Application
     {
         for (LevelPack pack : app.getLevelPacks())
             for (int i = 0; i < pack.getLevelCount(); i++)
-                app.completeLevel(pack, i, MainApp.RESULT_NO_TIME_LIMIT);
+            {
+            	if (app.checkLevelCompletion(pack, i) == MainApp.RESULT_NOT_DONE)
+            		app.completeLevel(pack, i, MainApp.RESULT_NO_TIME_LIMIT);
+            }
     }
 
 }

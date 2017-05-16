@@ -22,8 +22,8 @@ public class LevelPack
     private static final int VERSION_1 = 1;
 
     private final boolean loadedMode;
-
     private final RandomAccessFile raf;
+    
     private final long[] levelOffsets;
     private final UUID levelPackID;
     private final ArrayList<Level> levels;
