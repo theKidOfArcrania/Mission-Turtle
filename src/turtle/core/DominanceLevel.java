@@ -76,9 +76,7 @@ public class DominanceLevel implements Serializable, Comparable<DominanceLevel>
 		if (getClass() != obj.getClass())
 			return false;
 		DominanceLevel other = (DominanceLevel) obj;
-		if (dominanceValue != other.dominanceValue)
-			return false;
-		return true;
+		return dominanceValue == other.dominanceValue;
 	}
 
 	/**

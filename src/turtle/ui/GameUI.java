@@ -162,7 +162,7 @@ public class GameUI extends VBox
 	private static final int LABEL_MIN_WIDTH = 50;
 	
 	private static final double FRAME_WIDTH = 10.0;
-	private static final int FRAMES_PER_SEC = 50;
+	private static final int FRAMES_PER_SEC = 50; //TODO: change to 30
 	private static final Duration FADE_DURATION = Duration.seconds(.5);
 
 	private static final double FIT_WIDTH = 799;

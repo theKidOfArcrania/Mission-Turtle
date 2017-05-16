@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import javafx.application.Application;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import turtle.comp.ColorType;
 import turtle.core.Actor;
@@ -27,6 +28,7 @@ import turtle.file.LevelPack;
  * Date: 4/29/17
  * Period: 2
  */
+@SuppressWarnings("unused")
 public class GameUITester extends Application
 {
 	private static final Location EXIT_LOC = new Location(1, 1);
@@ -43,7 +45,8 @@ public class GameUITester extends Application
 	private static final short COMP_IND_WATER = (short)3;
 	private static final short COMP_IND_EXIT = (short)4;
 	private static final short COMP_IND_FIRE = (short)5;
-	private static final short COMP_IND_SAND = (short)6;
+	public static final int CYCLE_PATTERN = 6;
+	private static final short COMP_IND_SAND = (short) CYCLE_PATTERN;
 	private static final short COMP_IND_BUCKET = (short)7;
 	private static final short COMP_IND_CANNON = (short)8;
 	private static final short COMP_IND_PROJECTILE = (short)9;
@@ -58,9 +61,10 @@ public class GameUITester extends Application
 	private static final short COMP_IND_CHILD = (short)18;
 	private static final short COMP_IND_BUTTON = (short)19;
 	private static final short COMP_IND_FACTORY = (short)20;
-	
-	
-	
+	private static final short COMP_IND_TEST = (short)21;
+	public static final double PLASTIC_CHANCE = .1;
+
+
 	@SuppressWarnings("javadoc")
 	public static void main(String[] args)
 	{
@@ -106,9 +110,9 @@ public class GameUITester extends Application
 			for (int c = 0; c < TEST_SIZE; c++)
 			{
 				Location loc = new Location(r, c);
-				if (r % 6 == 1 || c == 0)
+				if (r % CYCLE_PATTERN == 1 || c == 0)
 					addCellSpecs(lvl, loc, COMP_IND_SAND, params);
-				else if (r % 6 == 0 && r > 0)
+				else if (r % CYCLE_PATTERN == 0 && r > 0)
 					addCellSpecs(lvl, loc, COMP_IND_FIRE, params);
 				else
 					addCellSpecs(lvl, loc, COMP_IND_WATER, params);
@@ -120,8 +124,9 @@ public class GameUITester extends Application
 	/**
 	 * Fills the level with sand and walls
 	 * @param lvl the level to fill
+	 * @param walls true to add a sprinkle of walls
 	 */
-	private static void fillSandCells(Level lvl)
+	private static void fillSandCells(Level lvl, boolean walls)
 	{
 		final double WALL_CHANCE = .05;
 		HashMap<String, Object> params = new HashMap<>();
@@ -129,7 +134,7 @@ public class GameUITester extends Application
 			for (int c = 0; c < TEST_SIZE; c++)
 			{
 				Location loc = new Location(r, c);
-				if (Math.random() < WALL_CHANCE)
+				if (Math.random() < WALL_CHANCE && walls)
 					addCellSpecs(lvl, loc, COMP_IND_WALL, params);
 				else
 					addCellSpecs(lvl, loc, COMP_IND_SAND, params);
@@ -240,9 +245,9 @@ public class GameUITester extends Application
 		for (int r = 0; r < TEST_SIZE; r++)
 			for (int c = 0; c < TEST_SIZE; c++)
 			{
-				if (r % 6 != 1 && (r != 0 || c != 0))
+				if (r % CYCLE_PATTERN != 1 && (r != 0 || c != 0))
 				{
-					if (Math.random() < .1)
+					if (Math.random() < PLASTIC_CHANCE)
 						addActorSpecs(test, new Location(r, c), 
 								COMP_IND_PLASTIC, params);
 					addActorSpecs(test, new Location(r, c), 
@@ -278,7 +283,7 @@ public class GameUITester extends Application
 		for (int r = 0; r < TEST_SIZE; r++)
 			for (int c = 0; c < TEST_SIZE; c++)
 			{
-				if (r % 6 != 1)
+				if (r % CYCLE_PATTERN != 1)
 				{
 					int rand = (int)(Math.random() * ColorType.values().length);
 					Location loc = new Location(r, c);
@@ -385,6 +390,8 @@ public class GameUITester extends Application
 	 */
 	private LevelPack testCannon()
 	{
+		Location CANNON_LOC = new Location(1, 0);
+
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
@@ -394,7 +401,7 @@ public class GameUITester extends Application
 		addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, params);
 		
 		params.put("heading", Actor.EAST);
-		addActorSpecs(test, new Location(1, 0), COMP_IND_CANNON, params);
+		addActorSpecs(test, CANNON_LOC, COMP_IND_CANNON, params);
 		
 		params.clear();
 		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
@@ -412,7 +419,7 @@ public class GameUITester extends Application
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
-		fillSandCells(test);
+		fillSandCells(test, true);
 		
 		HashMap<String, Object> params = new HashMap<>();
 		addActorSpecs(test, BIRD_LOC, COMP_IND_CHILD, params);
@@ -421,7 +428,39 @@ public class GameUITester extends Application
 		
 		return testPack;
 	}
-	
+
+	/**
+	 * Tests the functionality of the lawnmower
+	 * @return a test level pack
+	 */
+	private LevelPack testLawnMower()
+	{
+		double MOWER_CHANCE = .05;
+
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+
+		fillSandCells(test, true);
+
+		HashMap<String, Object> params = new HashMap<>();
+		for (int r = 0; r < TEST_SIZE; r++)
+			for (int c = 0; c < TEST_SIZE; c++)
+			{
+				if (Math.random() < MOWER_CHANCE)
+				{
+					params.put("heading", (int)(Math.random() *
+							(Actor.WEST + 1)));
+					addActorSpecs(test, new Location(r, c), COMP_IND_LAWNMOWER,
+							params);
+				}
+			}
+
+
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
+		testPack.addLevel(test);
+
+		return testPack;
+	}
 	
 	/**
 	 * Tests the enemies' movement patterns.
@@ -429,6 +468,8 @@ public class GameUITester extends Application
 	 */
 	private LevelPack testEnemies()
 	{
+		final Location MOWER_LOC = new Location(1, 2);
+
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
@@ -436,44 +477,97 @@ public class GameUITester extends Application
 		fillCells(test);
 		HashMap<String, Object> params = new HashMap<>();
 		params.put("heading", Actor.WEST);
-		addActorSpecs(test, new Location(1, 2), COMP_IND_LAWNMOWER, 
-				params);
+		addActorSpecs(test, MOWER_LOC, COMP_IND_LAWNMOWER, params);
 		addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, new HashMap<>());
 		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, new HashMap<>());
 		testPack.addLevel(test);
 		
 		return testPack;
 	}
-	
+
+	/**
+	 * Generates test packs to test dominance levels
+	 * @return a level pack to test dominance
+	 */
+	private LevelPack testDominance()
+	{
+		final Location LOC_A = new Location(0, 1);
+		final Location LOC_B = new Location(0, 2);
+		final Location LOC_C = new Location(0, 3);
+		final Location LOC_D = new Location(0, 4);
+		final Location LOC_E = new Location(0, 5);
+		final Location LOC_F = new Location(0, CYCLE_PATTERN);
+
+		LevelPack testPack = new LevelPack("Test Pack");
+		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
+		
+		fillSandCells(test, false);
+
+		//Test adding. We should see squares with colors RED RED BLUE
+		HashMap<String, Object> params = new HashMap<>();
+		params.put("level", 1);
+		params.put("back", Color.RED);
+		addActorSpecs(test, LOC_A, COMP_IND_TEST, params);
+		params.put("level", 2);
+		params.put("back", Color.BLUE);
+		addActorSpecs(test, LOC_A, COMP_IND_TEST, params);
+		addActorSpecs(test, LOC_B, COMP_IND_TEST, params);
+		params.put("level", 1);
+		params.put("back", Color.RED);
+		addActorSpecs(test, LOC_B, COMP_IND_TEST, params);
+		addActorSpecs(test, LOC_C, COMP_IND_TEST, params);
+		params.put("back", Color.BLUE);
+		addActorSpecs(test, LOC_C, COMP_IND_TEST, params);
+		params.clear();
+
+		//Test interact. Only first will print out stuff.
+		params.put("back", Color.GREEN);
+		params.put("level", 1);
+		addActorSpecs(test, LOC_D, COMP_IND_TEST, params);
+		params.put("level", 0);
+		addActorSpecs(test, LOC_E, COMP_IND_TEST, params);
+		params.put("level", -1);
+		addActorSpecs(test, LOC_F, COMP_IND_TEST, params);
+		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
+		testPack.addLevel(test);
+		
+		return testPack;
+	}
+
 	/**
 	 * Generates test packs to test hint tiles.
 	 * @return a level pack to test hints
 	 */
 	private LevelPack testHints()
 	{
+		final Location LOC_A = new Location(0, 1);
+		final Location LOC_B = new Location(0, 2);
+		final Location LOC_C = new Location(0, 3);
+		final Location LOC_D = new Location(0, 4);
+
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
-		
+
 		fillCells(test);
-		
+
 		HashMap<String, Object> params = new HashMap<>();
 		params.put("message", "This is a test hint under us.");
-		addActorSpecs(test, new Location(0,1), COMP_IND_HINT, params);
+		addActorSpecs(test, LOC_A, COMP_IND_HINT, params);
 		params.put("message", "This is a test hint.");
-		addActorSpecs(test, new Location(0, 2), COMP_IND_HINT, params);
+		addActorSpecs(test, LOC_B, COMP_IND_HINT, params);
 		params.put("message", "No, really! This is a test!");
-		addActorSpecs(test, new Location(0, 3), COMP_IND_HINT, params);
+		addActorSpecs(test, LOC_C, COMP_IND_HINT, params);
 		params.put("message", "Testing how long a string could be before " +
 				"these ellipse will show up!! Hmmm, maybe a little longer " +
-				"than I anticipated! Wait? Where are the ellipses? Pretty " + 
+				"than I anticipated! Wait? Where are the ellipses? Pretty " +
 				"sure it's long enough for those '...'!!! Where is it? Okay " +
 				"now i'm worried! Where are they? Oh I miss you :(");
-		addActorSpecs(test, new Location(0, 4), COMP_IND_HINT, params);
+		addActorSpecs(test, LOC_D, COMP_IND_HINT, params);
 		params.clear();
-		
-		addActorSpecs(test, new Location(0, 1), COMP_IND_PLAYER, params);
+
+		addActorSpecs(test, LOC_A, COMP_IND_PLAYER, params);
 		testPack.addLevel(test);
-		
+
 		return testPack;
 	}
 
@@ -483,6 +577,8 @@ public class GameUITester extends Application
 	 */
 	private LevelPack testTraps()
 	{
+		final Location TRAP_LOC = new Location(1, 2);
+
 		LevelPack testPack = new LevelPack("Test Pack");
 		Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 		
@@ -490,7 +586,7 @@ public class GameUITester extends Application
 		
 		HashMap<String, Object> params = new HashMap<>();
 		addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, params);
-		addActorSpecs(test, new Location(1, 2), COMP_IND_TRAP, params);
+		addActorSpecs(test, TRAP_LOC, COMP_IND_TRAP, params);
 		addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
 		testPack.addLevel(test);
 		

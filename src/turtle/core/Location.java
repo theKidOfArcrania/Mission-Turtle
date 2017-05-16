@@ -127,9 +127,7 @@ public class Location implements Serializable
 			return true;
 		if (col != other.col)
 			return false;
-		if (row != other.row)
-			return false;
-		return true;
+		return row == other.row;
 	}
 
 	/**
@@ -142,6 +140,12 @@ public class Location implements Serializable
 		this.row = row;
 		this.col = col;
 	}
-	
-	
+
+	/**
+	 * @return string representation of this location in R#C# format.
+	 */
+	public String toString()
+	{
+		return "R" + row + "C" + col;
+	}
 }
