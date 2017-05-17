@@ -1,5 +1,7 @@
 package turtle.comp;
 
+import java.util.Map;
+
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
@@ -7,10 +9,8 @@ import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
-import java.util.Map;
-
 /**
- * turtle.comp.TestActor.java
+ * TestActor.java
  * <p>
  * This is a configurable actor that is used for test cases.
  *
