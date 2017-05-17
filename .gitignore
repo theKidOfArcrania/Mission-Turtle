@@ -2,3 +2,4 @@
 *.fxml
 .idea/
 Mission Turtle.iml
+/out/
