@@ -136,7 +136,7 @@ public class MainApp extends Application
             return;
 
         int lvl = 0;
-        for (; lvl < active.getLevelCount(); lvl++)
+        for (; lvl < active.getLevelCount() - 1; lvl++)
         {
             if (checkLevelCompletion(active, lvl) == RESULT_NOT_DONE)
                 break;
