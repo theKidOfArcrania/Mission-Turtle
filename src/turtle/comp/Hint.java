@@ -1,5 +1,6 @@
 package turtle.comp;
 
+import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
@@ -53,6 +54,29 @@ public class Hint extends Actor
     }
 
     /**
+     * This overrides the Actor's setHeading since a heading does not
+     * mean anything for this actor.
+     * @return always north (since it is facing that direction always).
+     */
+    @Override
+    @NotAttribute
+    public int getHeading()
+    {
+        return NORTH;
+    }
+
+    /**
+     * This overrides the Actor's setHeading since a heading does not
+     * mean anything for this actor.
+     */
+    @Override
+    @NotAttribute
+    public void setHeading(int heading)
+    {
+        //Does nothing
+    }
+
+    /**
      * @return the message this hint will tell.
      */
     public String getMessage()
@@ -68,33 +92,6 @@ public class Hint extends Actor
     public void setMessage(String message)
     {
         this.message = message;
-    }
-
-    /**
-     * Sets a series of parameters for this hint tile. This
-     * class has one parameter attribute that has functionality:
-     * <table>
-     * <tr>
-     * <th>Name</th>
-     * <th>Type</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td><code>message</code></td>
-     * <td><code>String</code></td>
-     * <td>This sets the message that this hint will display</td>
-     * </tr>
-     * </table>
-     *
-     * @param params the parameter object.
-     */
-    @Override
-    public void setParameters(Map<String, Object> params)
-    {
-        super.setParameters(params);
-        Object val = params.get("message");
-        if (val != null && val instanceof String)
-            message = (String) val;
     }
 
     /**

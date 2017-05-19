@@ -91,56 +91,6 @@ public class TestActor extends Actor
     }
 
     /**
-     * Sets a series of parameters for this test actor. This
-     * below specifies the list of parameters:
-     * <table>
-     * <tr>
-     * <th>Name</th>
-     * <th>Type</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td><code>back</code></td>
-     * <td><code>Color</code></td>
-     * <td>Background color of actor</td>
-     * </tr>
-     * <tr>
-     * <td><code>level</code></td>
-     * <td><code>int</code></td>
-     * <td>Dominance level of actor</td>
-     * </tr>
-     * <tr>
-     * <td><code>killer</code></td>
-     * <td><code>boolean</code></td>
-     * <td>Determines whether if actor will kill others</td>
-     * </tr>
-     * <tr>
-     * <td><code>wall</code></td>
-     * <td><code>boolean</code></td>
-     * <td>Determines whether if actor acts wall-like</td>
-     * </tr>
-     * </table>
-     * Note: unlike other components, this does not check for type-safe on
-     * parameters, since this is only a test component and not used for
-     * production.
-     *
-     * @param params the parameter object.
-     */
-    @Override
-    public void setParameters(Map<String, Object> params)
-    {
-        super.setParameters(params);
-        if (params.containsKey("back"))
-            setBack((Color) params.get("back"));
-        if (params.containsKey("level"))
-            setDomLevel((Integer) params.get("level"));
-        if (params.containsKey("killer"))
-            setKiller((Boolean) params.get("killer"));
-        if (params.containsKey("wall"))
-            setWall((Boolean) params.get("wall"));
-    }
-
-    /**
      * Checks if this actor can interact with other actor. Does not execute
      * any actions (i.e. killing).
      *

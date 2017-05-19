@@ -1,8 +1,7 @@
 package turtle.comp;
 
+import turtle.attributes.NotAttribute;
 import turtle.core.*;
-
-import java.util.Map;
 
 /**
  * Button.java
@@ -21,7 +20,7 @@ public class Button extends Actor
     public static final int DEFAULT_IMAGE = 64;
     private static final int BUTTON_OFFSET_IMAGE = 64;
 
-    private final Location linkedLocation;
+    private Location linkedLocation;
     private ColorType color;
 
     /**
@@ -38,11 +37,18 @@ public class Button extends Actor
     /**
      * @return the location of the linked factory (if any exists there).
      */
-    public Location getLinkedLocation()
+    public Location getLinked()
     {
         return linkedLocation;
     }
 
+    /**
+     * @param linkedLocation the new location to link to
+     */
+    public void setLinked(Location linkedLocation)
+    {
+        this.linkedLocation = linkedLocation;
+    }
 
     /**
      * Interacts with other actors, triggering the associated factory (if any).
@@ -80,6 +86,7 @@ public class Button extends Actor
      * mean anything for this actor.
      */
     @Override
+    @NotAttribute
     public void setHeading(int heading)
     {
         //Does nothing
@@ -131,44 +138,5 @@ public class Button extends Actor
         return FIXTURE;
     }
 
-    /**
-     * Sets a series of parameters for an factory. This
-     * below specifies the list of parameters:
-     * <table>
-     * <tr>
-     * <th>Name</th>
-     * <th>Type</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td><code>color</code></td>
-     * <td><code>int</code></td>
-     * <td>This sets the color index (0-based) of this button.</td>
-     * </tr>
-     * <tr>
-     * <td><code>linked</code></td>
-     * <td><code>Location</code></td>
-     * <td>This sets the linked location of button. </td>
-     * </tr>
-     * </table>
-     *
-     * @param params the parameter object.
-     */
-    @Override
-    public void setParameters(Map<String, Object> params)
-    {
-        super.setParameters(params);
-        Object val = params.get("color");
-        if (val != null && val instanceof Integer)
-        {
-            ColorType colors[] = ColorType.values();
-            int ind = (Integer) val;
-            if (ind >= 0 && ind < colors.length)
-                setColor(colors[ind]);
-        }
-        val = params.get("linked");
-        if (val != null && val instanceof Location)
-            linkedLocation.setLocation((Location) val);
-    }
 
 }

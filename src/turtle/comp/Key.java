@@ -52,38 +52,6 @@ public class Key extends Item
     }
 
     /**
-     * Sets a series of parameters for this key actor. This
-     * class has one parameter attribute that has functionality:
-     * <table>
-     * <tr>
-     * <th>Name</th>
-     * <th>Type</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td><code>color</code></td>
-     * <td><code>int</code></td>
-     * <td>This sets the color index (0-based) of this key.</td>
-     * </tr>
-     * </table>
-     *
-     * @param params the parameter object.
-     */
-    @Override
-    public void setParameters(Map<String, Object> params)
-    {
-        super.setParameters(params);
-        Object val = params.get("color");
-        if (val != null && val instanceof Integer)
-        {
-            ColorType colors[] = ColorType.values();
-            int ind = (Integer) val;
-            if (ind >= 0 && ind < colors.length)
-                setColor(colors[ind]);
-        }
-    }
-
-    /**
      * Checks whether if this item is identical as another. This will
      * say true if other item is key and has same color.
      *

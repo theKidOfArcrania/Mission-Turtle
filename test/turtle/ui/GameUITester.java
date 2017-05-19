@@ -286,6 +286,7 @@ public class GameUITester extends Application
         test.setFoodRequirement(FOOD_REQ);
         test.setTimeLimit(TIME_LIMIT);
 
+        ColorType[] values = ColorType.values();
         addCellSpecs(test, EXIT_LOC, COMP_IND_EXIT, params);
         fillCells(test);
         for (int r = 0; r < TEST_SIZE; r++)
@@ -293,7 +294,7 @@ public class GameUITester extends Application
             {
                 if (r % CYCLE_PATTERN != 1)
                 {
-                    int rand = (int) (Math.random() * ColorType.values().length);
+                    ColorType rand = values[(int)(Math.random() * values.length)];
                     Location loc = new Location(r, c);
                     if (Math.random() < KEY_CHANCE)
                     {

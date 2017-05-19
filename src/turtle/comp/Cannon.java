@@ -103,14 +103,6 @@ public class Cannon extends Mover
      *
      * @param params the parameter object.
      */
-    @Override
-    public void setParameters(Map<String, Object> params)
-    {
-        super.setParameters(params);
-        Object val = params.get("period");
-        if (val != null && val instanceof Integer)
-            setPeriod((Integer) val);
-    }
 
     /**
      * @return the period of firing one projectile

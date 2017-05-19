@@ -85,7 +85,7 @@ public class Factory extends Cell
     /**
      * @return the current component id that is being cloned.
      */
-    public short getComponentCloned()
+    public short getCloned()
     {
         return componentCloned;
     }
@@ -97,8 +97,7 @@ public class Factory extends Cell
      * @throws IllegalArgumentException if the component id is not a valid
      *                                  actor.
      */
-    //TODO: accept negative.
-    public void setComponentCloned(short componentCloned)
+    public void setCloned(short componentCloned)
     {
         Class<Component> comp = getTileSet().componentAt(componentCloned);
         if (!Actor.class.isAssignableFrom(comp))
@@ -156,71 +155,6 @@ public class Factory extends Cell
             clonedImg.setRotate(0);
         setRotate(heading * RIGHT_ANGLE);
         this.heading = heading;
-    }
-
-    /**
-     * Sets a series of parameters for an factory. This
-     * below specifies the list of parameters:
-     * <table>
-     * <tr>
-     * <th>Name</th>
-     * <th>Type</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td><code>cloned</code></td>
-     * <td><code>int</code></td>
-     * <td>This sets the component id to clone, or -1 to clone nothing</td>
-     * </tr>
-     * <tr>
-     * <td><code>color</code></td>
-     * <td><code>int</code></td>
-     * <td>This sets the color index (0-based) of this button.</td>
-     * </tr>
-     * <tr>
-     * <td><code>heading</code></td>
-     * <td><code>int</code></td>
-     * <td>This sets the facing direction of the factory. </td>
-     * </tr>
-     * </table>
-     *
-     * @param params the parameter object.
-     */
-    @Override
-    public void setParameters(Map<String, Object> params)
-    {
-        super.setParameters(params);
-
-        Object val = params.get("color");
-        if (val != null && val instanceof Integer)
-        {
-            ColorType colors[] = ColorType.values();
-            int ind = (Integer) val;
-            if (ind >= 0 && ind < colors.length)
-                setColor(colors[ind]);
-        }
-
-        val = params.get("heading");
-        //TODO: replace Integer with Number.
-        if (val != null && val instanceof Integer)
-        {
-            int dir = (Integer) val;
-            if (dir >= NORTH && dir <= WEST)
-                setHeading(dir);
-        }
-
-        val = params.get("cloned");
-        if (val != null && val instanceof Number)
-        {
-            short id = ((Number) val).shortValue();
-            TileSet ts = getTileSet();
-            if (id >= -1 && id < ts.getComponentCount())
-            {
-                Class<Component> comp = getTileSet().componentAt(id);
-                if (Actor.class.isAssignableFrom(comp))
-                    setComponentCloned(id);
-            }
-        }
     }
 
     /**

@@ -16,9 +16,6 @@ public class Projectile extends Enemy
 {
     public static final int DEFAULT_IMAGE = 39;
 
-    private static final DominanceLevel ENEMY_PLUS =
-            new DominanceLevel("Enemy+", ENEMY.getDominanceValue() + 50);
-
     /**
      * Constructs a projectile.
      */

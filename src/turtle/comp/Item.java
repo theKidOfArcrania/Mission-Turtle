@@ -1,5 +1,6 @@
 package turtle.comp;
 
+import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
@@ -49,8 +50,21 @@ public abstract class Item extends Actor
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @return always north (since it is facing that direction always).
      */
     @Override
+    @NotAttribute
+    public int getHeading()
+    {
+        return NORTH;
+    }
+
+    /**
+     * This overrides the Actor's setHeading since a heading does not
+     * mean anything for this actor.
+     */
+    @Override
+    @NotAttribute
     public void setHeading(int heading)
     {
         //Does nothing

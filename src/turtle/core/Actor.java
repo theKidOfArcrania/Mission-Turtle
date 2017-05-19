@@ -143,37 +143,6 @@ public abstract class Actor extends Component
     public abstract DominanceLevel dominanceLevelFor(Actor other);
 
     /**
-     * Sets a series of parameters for an actor. This
-     * below specifies the list of parameters:
-     * <table>
-     * <tr>
-     * <th>Name</th>
-     * <th>Type</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td><code>heading</code></td>
-     * <td><code>int</code></td>
-     * <td>This sets the facing direction of the actor. </td>
-     * </tr>
-     * </table>
-     *
-     * @param params the parameter object.
-     */
-    @Override
-    public void setParameters(Map<String, Object> params)
-    {
-        super.setParameters(params);
-        Object val = params.get("heading");
-        if (val != null && val instanceof Integer)
-        {
-            int dir = (Integer) val;
-            if (dir >= NORTH && dir <= WEST)
-                setHeading(dir);
-        }
-    }
-
-    /**
      * Executes move for an actor in a specified direction. Convenience
      * method for {@link #traverseDirection(int, boolean)}.
      *

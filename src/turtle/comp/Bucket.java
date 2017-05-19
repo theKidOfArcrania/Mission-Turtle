@@ -1,5 +1,6 @@
 package turtle.comp;
 
+import turtle.attributes.NotAttribute;
 import turtle.core.Component;
 
 import java.util.Map;
@@ -63,38 +64,24 @@ public class Bucket extends Mover
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @return always north (since it is facing that direction always).
      */
     @Override
-    public void setHeading(int heading)
+    @NotAttribute
+    public int getHeading()
     {
-        //Does nothing
+        return NORTH;
     }
 
     /**
-     * Sets a series of parameters for this bucket actor. This
-     * class has one parameter attribute that has functionality:
-     * <table>
-     * <tr>
-     * <th>Name</th>
-     * <th>Type</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td><code>filled</code></td>
-     * <td><code>boolean</code></td>
-     * <td>This sets the state whether if the bucket is filled or empty</td>
-     * </tr>
-     * </table>
-     *
-     * @param params the parameter object.
+     * This overrides the Actor's setHeading since a heading does not
+     * mean anything for this actor.
      */
     @Override
-    public void setParameters(Map<String, Object> params)
+    @NotAttribute
+    public void setHeading(int heading)
     {
-        super.setParameters(params);
-        Object val = params.get("filled");
-        if (val != null && val instanceof Boolean)
-            setFilled((Boolean) val);
+        //Does nothing
     }
 
 

@@ -5,6 +5,8 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import turtle.attributes.Attributable;
+import turtle.attributes.AttributeSet;
 
 import java.util.Map;
 import java.util.Random;
@@ -19,8 +21,27 @@ import java.util.Random;
  *         Date: 4/26/17
  *         Period: 2
  */
-public abstract class Component extends Pane
+public abstract class Component extends Pane implements Attributable
 {
+
+    /**
+     * Utility method used to shuffle an array.
+     *
+     * @param arr the array to shuffle
+     * @param rng the random generator to shuffle with.
+     */
+    public static void shuffle(int[] arr, Random rng)
+    {
+        for (int i = 0; i < SHUFFLE * arr.length; i++)
+        {
+            int a = rng.nextInt(arr.length);
+            int b = rng.nextInt(arr.length);
+            int tmp = arr[a];
+            arr[a] = arr[b];
+            arr[b] = tmp;
+        }
+    }
+
     /**
      * The default number of frames to wait to change one image in an
      * animation sequence.
@@ -43,6 +64,8 @@ public abstract class Component extends Pane
     private final ImageView img;
     private final Location headLoc;
     private final Location trailLoc;
+    private final AttributeSet<Component> attributes;
+
     private Grid parent;
     private long curFrame;
     private int currentImage;
@@ -50,6 +73,8 @@ public abstract class Component extends Pane
     private int[] imageFrames;
     private int changeRate;
     private boolean animationCycle;
+
+
     /**
      * Constructs a new component with the image background.
      */
@@ -65,24 +90,8 @@ public abstract class Component extends Pane
 
         setImageFrame(-1);
         curFrame = 0;
-    }
 
-    /**
-     * Utility method used to shuffle an array.
-     *
-     * @param arr the array to shuffle
-     * @param rng the random generator to shuffle with.
-     */
-    public static void shuffle(int[] arr, Random rng)
-    {
-        for (int i = 0; i < SHUFFLE * arr.length; i++)
-        {
-            int a = rng.nextInt(arr.length);
-            int b = rng.nextInt(arr.length);
-            int tmp = arr[a];
-            arr[a] = arr[b];
-            arr[b] = tmp;
-        }
+        attributes = new AttributeSet<>(this);
     }
 
     /**
@@ -130,17 +139,10 @@ public abstract class Component extends Pane
         setViewport(imageFrames[0]);
     }
 
-    /**
-     * Changes any parameters (if any) associated with this component.
-     * Any subclasses overriding this method is STRONLY advised to
-     * call <code>super.setParameters</code> (or any of such derivative)
-     * in order that the parameters are set properly.
-     *
-     * @param params parameters in a map to dynamically set attributes.
-     */
-    public void setParameters(Map<String, Object> params)
+    @Override
+    public AttributeSet<Component> getAttributeSet()
     {
-        //Does nothing
+        return attributes;
     }
 
     /**
@@ -198,6 +200,32 @@ public abstract class Component extends Pane
     }
 
     /**
+     * Obtains next step of incrementing a value
+     *
+     * @param from intial value
+     * @param to   the goal value to achieve
+     * @param step the increment value per step
+     * @return the next value to increment to.
+     * @throws IllegalArgumentException if step is zero.
+     */
+    private double increment(double from, double to, double step)
+    {
+        if (step == 0)
+            throw new IllegalArgumentException("Step must be non-zero.");
+        if (from == to)
+            return to;
+        if (from < to ^ step > 0)
+            return increment(from, to, -step);
+
+        double after = from + step;
+        if (after > to ^ from > to)
+            // Incremented pass the target.
+            return to;
+        else
+            return after;
+    }
+
+    /**
      * Determines whether if this component is moving.
      *
      * @return true if moving, false if it is still
@@ -208,57 +236,14 @@ public abstract class Component extends Pane
     }
 
     /**
-     * Sets the image of this component to the given index and disables
-     * any current animations.
-     *
-     * @param index the index from the TileSet of frames.
-     * @throws IndexOutOfBoundsException if image frame index is out of bounds.
+     * Layouts all nodes in the center by default, spanning full size.
      */
-    public void setImageFrame(int index)
+    @Override
+    protected void layoutChildren()
     {
-        setViewport(index);
-        animationOffset = -1;
-        imageFrames = null;
-        changeRate = -1;
-    }
-
-    /**
-     * Updates a frame of animation for a Component.
-     * Note: Subclasses should ALWAYS call <code>super.updateFrame()</code>
-     * in order that all the super classes get updated as well.
-     *
-     * @param frame current frame number
-     */
-    public void updateFrame(long frame)
-    {
-        curFrame = frame;
-        updateAnimation(frame);
-        move();
-    }
-
-    /**
-     * Updates the current image to step forward one frame if it is in a sequence
-     * of animation.
-     *
-     * @param frame the current frame number.
-     */
-    private void updateAnimation(long frame)
-    {
-        if (animationOffset != -1 && (frame - animationOffset) % changeRate == 0)
-        {
-            int stepInd = (int) ((frame - animationOffset) / changeRate);
-            if (animationCycle)
-            {
-                stepInd %= imageFrames.length;
-                setViewport(imageFrames[stepInd]);
-            } else
-            {
-                if (stepInd >= imageFrames.length - 1)
-                    setImageFrame(imageFrames[imageFrames.length - 1]);
-                else
-                    setViewport(imageFrames[stepInd]);
-            }
-        }
+        for (Node n : getManagedChildren())
+            layoutInArea(n, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
+                    VPos.CENTER);
     }
 
     /**
@@ -288,29 +273,18 @@ public abstract class Component extends Pane
     }
 
     /**
-     * Obtains next step of incrementing a value
+     * Sets the image of this component to the given index and disables
+     * any current animations.
      *
-     * @param from intial value
-     * @param to   the goal value to achieve
-     * @param step the increment value per step
-     * @return the next value to increment to.
-     * @throws IllegalArgumentException if step is zero.
+     * @param index the index from the TileSet of frames.
+     * @throws IndexOutOfBoundsException if image frame index is out of bounds.
      */
-    private double increment(double from, double to, double step)
+    public void setImageFrame(int index)
     {
-        if (step == 0)
-            throw new IllegalArgumentException("Step must be non-zero.");
-        if (from == to)
-            return to;
-        if (from < to ^ step > 0)
-            return increment(from, to, -step);
-
-        double after = from + step;
-        if (after > to ^ from > to)
-            // Incremented pass the target.
-            return to;
-        else
-            return after;
+        setViewport(index);
+        animationOffset = -1;
+        imageFrames = null;
+        changeRate = -1;
     }
 
     /**
@@ -329,13 +303,41 @@ public abstract class Component extends Pane
     }
 
     /**
-     * Layouts all nodes in the center by default, spanning full size.
+     * Updates the current image to step forward one frame if it is in a sequence
+     * of animation.
+     *
+     * @param frame the current frame number.
      */
-    @Override
-    protected void layoutChildren()
+    private void updateAnimation(long frame)
     {
-        for (Node n : getManagedChildren())
-            layoutInArea(n, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
-                    VPos.CENTER);
+        if (animationOffset != -1 && (frame - animationOffset) % changeRate == 0)
+        {
+            int stepInd = (int) ((frame - animationOffset) / changeRate);
+            if (animationCycle)
+            {
+                stepInd %= imageFrames.length;
+                setViewport(imageFrames[stepInd]);
+            } else
+            {
+                if (stepInd >= imageFrames.length - 1)
+                    setImageFrame(imageFrames[imageFrames.length - 1]);
+                else
+                    setViewport(imageFrames[stepInd]);
+            }
+        }
+    }
+
+    /**
+     * Updates a frame of animation for a Component.
+     * Note: Subclasses should ALWAYS call <code>super.updateFrame()</code>
+     * in order that all the super classes get updated as well.
+     *
+     * @param frame current frame number
+     */
+    public void updateFrame(long frame)
+    {
+        curFrame = frame;
+        updateAnimation(frame);
+        move();
     }
 }

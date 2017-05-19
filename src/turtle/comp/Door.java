@@ -3,6 +3,7 @@ package turtle.comp;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
@@ -147,43 +148,23 @@ public class Door extends Actor
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @return always north (since it is facing that direction always).
      */
     @Override
+    @NotAttribute
+    public int getHeading()
+    {
+        return NORTH;
+    }
+
+    /**
+     * This overrides the Actor's setHeading since a heading does not
+     * mean anything for this actor.
+     */
+    @Override
+    @NotAttribute
     public void setHeading(int heading)
     {
         //Does nothing
     }
-
-    /**
-     * Sets a series of parameters for this door. This
-     * class has one parameter attribute that has functionality:
-     * <table>
-     * <tr>
-     * <th>Name</th>
-     * <th>Type</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td><code>color</code></td>
-     * <td><code>int</code></td>
-     * <td>This sets the color index (0-based) of this door.</td>
-     * </tr>
-     * </table>
-     *
-     * @param params the parameter object.
-     */
-    @Override
-    public void setParameters(Map<String, Object> params)
-    {
-        super.setParameters(params);
-        Object val = params.get("color");
-        if (val != null && val instanceof Integer)
-        {
-            ColorType colors[] = ColorType.values();
-            int ind = (Integer) val;
-            if (ind >= 0 && ind < colors.length)
-                setColor(colors[ind]);
-        }
-    }
-
 }

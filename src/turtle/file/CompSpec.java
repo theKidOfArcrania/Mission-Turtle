@@ -94,7 +94,8 @@ public class CompSpec
         try
         {
             Component c = clsComp.newInstance();
-            c.setParameters(params);
+            for (Map.Entry<String, Object> ent : params.entrySet())
+                c.setAttribute(ent.getKey(), ent.getValue());
             c.getHeadLocation().setLocation(loc);
             c.getTrailingLocation().setLocation(loc);
             return c;

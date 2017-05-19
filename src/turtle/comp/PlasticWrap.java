@@ -1,5 +1,6 @@
 package turtle.comp;
 
+import turtle.attributes.NotAttribute;
 import turtle.core.Component;
 import turtle.core.Grid;
 
@@ -42,6 +43,29 @@ public class PlasticWrap extends Enemy
     public boolean die(Component attacker)
     {
         return !(attacker instanceof Water) && super.die(attacker);
+    }
+
+    /**
+     * This overrides the Actor's setHeading since a heading does not
+     * mean anything for this actor.
+     * @return always north (since it is facing that direction always).
+     */
+    @Override
+    @NotAttribute
+    public int getHeading()
+    {
+        return NORTH;
+    }
+
+    /**
+     * This overrides the Actor's setHeading since a heading does not
+     * mean anything for this actor.
+     */
+    @Override
+    @NotAttribute
+    public void setHeading(int heading)
+    {
+        //Does nothing
     }
 
     /**
