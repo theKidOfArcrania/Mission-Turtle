@@ -343,6 +343,17 @@ public class TMXToMTP {
 							"color property: '" + prop + "' --> '" + val + "'");
 					return null;
 				}
+			case "short":
+				try
+				{
+					return Short.parseShort(parts[1]);
+				}
+				catch (NumberFormatException e)
+				{
+					System.err.println("WARNING: " + loc + " has an invalid " +
+							"short property: '" + prop + "' --> '" + val + "'");
+					return null;
+				}
 			case "int":
 				try
 				{
