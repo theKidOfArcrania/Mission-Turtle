@@ -21,6 +21,8 @@ public class Grid extends Pane
 {
 
     private final Random rng;
+    private long rngSeed;
+
     private final int rows;
     private final int cols;
     private final int cellSize;
@@ -30,6 +32,8 @@ public class Grid extends Pane
     private final Pane pnlStage;
     private Player player;
     private int foodLeft;
+    private int lastMove;
+    private Recording recording;
 
     /**
      * Creates a new grid with the following dimensions
@@ -40,6 +44,9 @@ public class Grid extends Pane
     public Grid(int rows, int cols)
     {
         rng = new Random();
+        setRNGSeed(rng.nextLong());
+
+        recording = new Recording();
 
         cellSize = Component.DEFAULT_SET.getFrameSize();
 
@@ -52,6 +59,8 @@ public class Grid extends Pane
 
         pnlBase = new ComponentPane();
         pnlStage = new ComponentPane();
+
+        lastMove = -1;
 
         getChildren().addAll(pnlBase, pnlStage);
     }
@@ -105,6 +114,14 @@ public class Grid extends Pane
     public Player getPlayer()
     {
         return player;
+    }
+
+    /**
+     * @return the recording associated with this grid object.
+     */
+    public Recording getRecording()
+    {
+        return recording;
     }
 
     /**
@@ -205,6 +222,25 @@ public class Grid extends Pane
     }
 
     /**
+     * Obtains the move that the player has made within the current frame.
+     * @return a directional movement, or -1 if none has been made.
+     */
+    public int getLastMove()
+    {
+        return lastMove;
+    }
+
+    /**
+     * This obtains the rng seed used to make this game have randomly
+     * generated elements unique at each game, yet replayable at a later time.
+     * @return the current seed for this grid's random number generator.
+     */
+    public long getRNGSeed()
+    {
+        return rngSeed;
+    }
+
+    /**
      * Sets the grid's random number generator seed to a specified value.
      * This is often done when the program is replaying a particular game.
      *
@@ -213,6 +249,7 @@ public class Grid extends Pane
     public void setRNGSeed(long seed)
     {
         rng.setSeed(seed);
+        rngSeed = seed;
     }
 
     /**
@@ -245,6 +282,25 @@ public class Grid extends Pane
     public boolean moveActor(Actor comp, int row, int col)
     {
         return checkVisit(comp, row, col, true);
+    }
+
+    /**
+     * Moves the player in the specified direction.
+     * @param moveDir the direction to move in.
+     * @throws IllegalArgumentException if an illegal direction is provided.
+     */
+    public void movePlayer(int moveDir)
+    {
+        if (moveDir < Actor.NORTH || moveDir > Actor.WEST)
+            throw new IllegalArgumentException("Illegal direction");
+
+        Player p = getPlayer();
+        if (p == null || !p.isMoving())
+            return;
+
+        lastMove = moveDir;
+        p.setHeading(moveDir);
+        p.traverseDirection(moveDir);
     }
 
     /**
@@ -383,6 +439,11 @@ public class Grid extends Pane
      */
     public void updateFrame(long frame)
     {
+        if (!recording.isStarted())
+            recording.startRecording(this);
+        recording.updateFrame(frame);
+        lastMove = -1;
+
         //Avoid concurrency issues.
         List<Node> base = new ArrayList<>(pnlBase.getChildren());
         List<Node> stage = new ArrayList<>(pnlStage.getChildren());

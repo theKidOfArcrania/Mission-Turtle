@@ -91,11 +91,11 @@ public class Level
             throw new IllegalStateException("Level has not been loaded yet.");
 
         Grid g = new Grid(rows, cols);
+        g.setFoodRequirement(foodReq);
         for (CompSpec spec : cells)
             g.placeCell((Cell) spec.createComponent());
         for (CompSpec spec : actors)
             g.placeActor((Actor) spec.createComponent());
-        g.setFoodRequirement(foodReq);
         return g;
     }
 

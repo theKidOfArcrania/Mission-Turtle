@@ -17,6 +17,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import turtle.file.LevelPack;
+import turtle.core.Recording;
 
 /**
  * MainApp.java
@@ -287,16 +288,17 @@ public class MainApp extends Application
      *
      * @param pack  the level pack of the level
      * @param level the level index to save
-     * @param time  the time completed in.
-     * @throws IOException              if an error occurs while saving level status
-     * @throws IllegalArgumentException if illegal argument is supplied.
+     * @param rec   the recording of the game play
+     * @throws IOException if an error occurs while saving level status
      */
-    void completeLevel(LevelPack pack, int level, int time) throws IOException
+    void completeLevel(LevelPack pack, int level, Recording rec)
+            throws IOException
     {
-        if (level < 0 || level >= pack.getLevelCount())
-            throw new IllegalArgumentException("Level index is out of bounds.");
-        if (time <= 0 && time != RESULT_NO_TIME_LIMIT)
-            throw new IllegalArgumentException("Invalid time completion");
+        //TODO: save recording.
+
+        int time = pack.getLevel(level).getTimeLimit();
+        if (time != RESULT_NO_TIME_LIMIT)
+            time -= rec.getRecordingFrames() / GameUI.FRAMES_PER_SEC;
 
         RandomAccessFile raf = openLevelSaveFile(pack);
         long offset = Long.BYTES * level;

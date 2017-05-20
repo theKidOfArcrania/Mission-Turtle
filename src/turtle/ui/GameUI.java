@@ -27,6 +27,7 @@ import turtle.core.Grid;
 import turtle.core.GridView;
 import turtle.file.Level;
 import turtle.file.LevelPack;
+import turtle.core.Recording;
 
 /**
  * GameUI.java
@@ -39,6 +40,8 @@ import turtle.file.LevelPack;
  */
 public class GameUI extends VBox
 {
+    public static final int FRAMES_PER_SEC = 30;
+
     private static final String SECT_BREAK = "   ";
     private static final int FPS_UPDATE_RATE = 10;
     
@@ -56,8 +59,7 @@ public class GameUI extends VBox
     private static final int LABEL_MIN_WIDTH = 50;
     private static final double FPS_WIDTH = 60.0;
     private static final double FRAME_WIDTH = 10.0;
-    
-    private static final int FRAMES_PER_SEC = 30;
+
     private static final Duration FADE_DURATION = Duration.seconds(.5);
     
     private static final Duration CAROUSEL_DELAY = Duration.seconds(1.0);
@@ -281,6 +283,8 @@ public class GameUI extends VBox
 
         if (status != null)
         {
+            Recording r = view.getGrid().getRecording();
+            r.stop();
             stopGame();
 
             boolean allowNext = success && currentLevelNum <
@@ -329,7 +333,8 @@ public class GameUI extends VBox
 
             if (timeLeft > prevScore)
             {
-                app.completeLevel(currentPack, currentLevelNum, timeLeft);
+                app.completeLevel(currentPack, currentLevelNum,
+                        view.getGrid().getRecording());
                 return "Wowzers! New High Score!";
             } else if (prevScore != MainApp.RESULT_NO_TIME_LIMIT)
                 return "Impressive... but not as good as your previous score.";
@@ -810,6 +815,30 @@ public class GameUI extends VBox
     private void updateFrame(long frame)
     {
         //Move player.
+        Player p = view.getPlayer();
+        if (p == null)
+            return;
+        int moveDir = getMovingDirection();
+        if (moveDir != -1)
+            view.getGrid().movePlayer(moveDir);
+
+        //Update grid stuff.
+        view.updateFrame(frame);
+        if (timeLeft != -1 && (frame + 1) % FRAMES_PER_SEC == 0)
+            timeLeft--;
+        updateUI();
+        if (frame % FPS_UPDATE_RATE == 0)
+            lblFps.setText(String.format("Fps: %.3f", runner.getFps()));
+
+        checkPlayerStatus(p);
+    }
+
+    /**
+     * Obtains the user's currently selected moving direction.
+     * @return a cardinal direction or -1 if no direction is selected.
+     */
+    private int getMovingDirection()
+    {
         int moveDir = -1;
         if (moving[dirPrevPressed])
             moveDir = dirPrevPressed;
@@ -824,25 +853,7 @@ public class GameUI extends VBox
                 }
             }
         }
-
-        Player p = view.getPlayer();
-        if (p == null)
-            return;
-        if (moveDir != -1 && !p.isMoving())
-        {
-            p.setHeading(moveDir);
-            p.traverseDirection(moveDir);
-        }
-
-        //Update grid stuff.
-        view.updateFrame(frame);
-        if (timeLeft != -1 && frame % FRAMES_PER_SEC == 0)
-            timeLeft--;
-        updateUI();
-        if (frame % FPS_UPDATE_RATE == 0)
-            lblFps.setText(String.format("Fps: %.3f", runner.getFps()));
-
-        checkPlayerStatus(p);
+        return moveDir;
     }
 
     /**
