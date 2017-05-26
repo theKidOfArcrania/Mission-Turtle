@@ -1,5 +1,8 @@
 /bin/
 *.fxml
-.idea/
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/libraries
+**/*.iws
 Mission Turtle.iml
 /out/

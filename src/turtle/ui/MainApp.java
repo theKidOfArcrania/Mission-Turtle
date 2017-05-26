@@ -1,8 +1,11 @@
 package turtle.ui;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +19,11 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import turtle.file.AsyncRandomFile;
 import turtle.file.LevelPack;
 import turtle.core.Recording;
+
+import static java.nio.file.StandardOpenOption.*;
 
 /**
  * MainApp.java
@@ -36,9 +42,11 @@ public class MainApp extends Application
 
     private static final Preferences prefs = Preferences.userNodeForPackage(
             MainApp.class);
+
+    private static final int SAVE_ENTRY_SIZE = 13;
     
     private final HashMap<UUID, LevelPack> loadedPacks;
-    private final HashMap<UUID, RandomAccessFile> saveStatus;
+    private final HashMap<UUID, AsyncRandomFile> saveStatus;
     private final StackPane root;
     private final StartUI startUI;
     private final GameUI gameUI;
@@ -64,6 +72,20 @@ public class MainApp extends Application
     }
 
     /**
+     * Checks whether if a level has been unlocked or not
+     *
+     * @param pack  the level pack
+     * @param level the index of level to check
+     * @return true if unlocked, false if still locked.
+     * @throws IllegalArgumentException if illegal argument is supplied.
+     */
+    public boolean checkLevelUnlock(LevelPack pack, int level)
+    {
+        AsyncRandomFile arf = openLevelSaveFile(pack);
+
+    }
+
+    /**
      * Checks whether if a level has been completed or not, and in how much
      * time it is completed.
      *
@@ -80,15 +102,20 @@ public class MainApp extends Application
 
         try
         {
-            RandomAccessFile raf = openLevelSaveFile(pack);
-            long offset = Long.BYTES * level;
-            if (raf.length() < offset + Long.BYTES)
-                raf.setLength(offset + Long.BYTES);
-            raf.seek(offset);
-            if (raf.readInt() == 0)
+            AsyncRandomFile arf = openLevelSaveFile(pack);
+            long offset = SAVE_ENTRY_SIZE * level;
+            if (arf.length() <= offset)
+                return;
+
+            DataInputStream dis = new DataInputStream(new BufferedInputStream
+                (arf.obtainInputStream(offset)));
+
+            if (arf.length() < offset + Long.BYTES)
+            arf.seek(offset);
+            if (arf.readInt() == 0)
                 return RESULT_NOT_DONE;
             else
-                return raf.readInt();
+                return arf.readInt();
         }
         catch (IOException e)
         {
@@ -256,8 +283,8 @@ public class MainApp extends Application
     {
         try
         {
-            for (RandomAccessFile raf : saveStatus.values())
-                raf.close();
+            for (AsyncRandomFile arf : saveStatus.values())
+                arf.close();
             saveStatus.clear();
 
             boolean success = true;
@@ -300,13 +327,14 @@ public class MainApp extends Application
         if (time != RESULT_NO_TIME_LIMIT)
             time -= rec.getRecordingFrames() / GameUI.FRAMES_PER_SEC;
 
-        RandomAccessFile raf = openLevelSaveFile(pack);
+        AsyncRandomFile arf = openLevelSaveFile(pack);
+        BufferedInputStream
         long offset = Long.BYTES * level;
-        if (raf.length() < offset + Long.BYTES)
-            raf.setLength(offset + Long.BYTES);
-        raf.seek(offset);
-        raf.writeInt(1);
-        raf.writeInt(time);
+        if (arf.length() < offset + Long.BYTES)
+            arf.setLength(offset + Long.BYTES);
+        arf.seek(offset);
+        arf.writeInt(1);
+        arf.writeInt(time);
     }
 
 
@@ -315,19 +343,29 @@ public class MainApp extends Application
      * This will open a new file if one did not exist yet.
      *
      * @param pack the associated level pack.
-     * @return an opened
+     * @return an opened file channel of the level save data
      * @throws IOException if an error occurs in opening file.
      */
-    private RandomAccessFile openLevelSaveFile(LevelPack pack) throws IOException
+    private AsyncRandomFile openLevelSaveFile(LevelPack pack) throws IOException
     {
         UUID id = pack.getLevelPackID();
         if (!saveStatus.containsKey(id))
         {
-            File dir = new File(System.getProperty("user.home"), ".turtle");
-            if (!dir.exists() && !dir.mkdir())
-                System.err.println("Unable to create .turtle directory");
-            saveStatus.put(id, new RandomAccessFile(new File(dir,
-                    pack.getLevelPackID() + ".sav"), "rw"));
+            Path dir = Paths.get(System.getProperty("user.home"), ".turtle");
+            if (!Files.isDirectory(dir))
+            {
+                try
+                {
+                    Files.createDirectory(dir);
+                }
+                catch (IOException e)
+                {
+                    throw new IOException("Unable to create .turtle directory");
+                }
+            }
+            AsyncRandomFile arf = new AsyncRandomFile(
+                    dir.resolve(pack.getLevelPackID() + ".sav"));
+            saveStatus.put(id, arf);
         }
         return saveStatus.get(id);
     }
