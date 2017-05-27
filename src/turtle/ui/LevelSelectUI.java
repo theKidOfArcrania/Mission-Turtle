@@ -187,7 +187,6 @@ public class LevelSelectUI extends VBox
      */
     private void initLevelsUI(LevelPack pack)
     {
-        boolean reachable = true;
         levels.getChildren().clear();
 
         selectedPack = pack;
@@ -195,38 +194,27 @@ public class LevelSelectUI extends VBox
 
         for (int i = 0; i < pack.getLevelCount(); i++)
         {
-            final int num = i;
-            /** Handles mouse event when user clicks a menu button*/
+            boolean unlocked = app.checkLevelUnlock(pack, i);
+
             String name = (i + 1) + " - " + pack.getLevel(i).getName();
-            if (!reachable)
+            if (i > 0 && unlocked)
                 name = "\uD83D\uDD12 " + name;
             int status = app.checkLevelCompletion(pack, i);
             name += getStatus(status);
 
-            Label button = MenuUI.createButton(name, false,
-                    reachable, new EventHandler<MouseEvent>()
-                    {
-                        /**
-                         * Handles the event and selects the current level.
-                         * @param event the event associated with click.
-                         */
-                        @Override
-                        public void handle(MouseEvent event)
-                        {
-                            for (Node n : levels.getChildren())
-                                setSelectedState(n, n == event.getSource());
-                            if (event.getClickCount() > 1)
-                                app.startGame(pack, num);
-                            selectedPack = pack;
-                            selectedLevel = num;
-                        }
+            int num = i;
+            Label button = MenuUI.createButton(name, false, unlocked,
+                    (event) -> {
+                        for (Node n : levels.getChildren())
+                            setSelectedState(n, n == event.getSource());
+                        if (event.getClickCount() > 1)
+                            app.startGame(pack, num);
+                        selectedPack = pack;
+                        selectedLevel = num;
                     });
             button.getStyleClass().add("litem");
             button.setAlignment(Pos.CENTER_LEFT);
             levels.getChildren().add(button);
-
-            if (status == MainApp.RESULT_NOT_DONE)
-                reachable = false;
         }
         levels.getChildren().add(new Pane());
     }

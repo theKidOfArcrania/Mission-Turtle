@@ -118,9 +118,8 @@ public class Recording
      * Utility method for compressing data.
      * @param data the data to compress
      * @return a compressed byte array
-     * @throws IOException if any I/O error occurs
      */
-    private static byte[] compress(byte[] data) throws IOException {
+    private static byte[] compress(byte[] data) {
         Deflater deflater = new Deflater();
         deflater.setInput(data);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length);
@@ -169,10 +168,20 @@ public class Recording
      */
     public Recording()
     {
+        reset();
+    }
+
+    /**
+     * Resets this recording object
+     */
+    public void reset()
+    {
         moves = new HashMap<>();
         started = false;
         maxFrame = -1;
         rngSeed = -1;
+
+        grid = null;
     }
 
     /**

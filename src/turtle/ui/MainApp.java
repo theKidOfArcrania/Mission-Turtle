@@ -1,11 +1,6 @@
 package turtle.ui;
 
 import java.io.*;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.FileLock;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,11 +14,12 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import turtle.file.AsyncRandomFile;
 import turtle.file.LevelPack;
 import turtle.core.Recording;
+import turtle.file.LevelPackSaveData;
+import turtle.file.LevelSaveData;
 
-import static java.nio.file.StandardOpenOption.*;
+import static turtle.file.LevelSaveData.*;
 
 /**
  * MainApp.java
@@ -40,18 +36,18 @@ public class MainApp extends Application
     public static final int RESULT_NO_TIME_LIMIT = -1;
     public static final int RESULT_NOT_DONE = -2;
 
+
     private static final Preferences prefs = Preferences.userNodeForPackage(
             MainApp.class);
-
-    private static final int SAVE_ENTRY_SIZE = 13;
     
     private final HashMap<UUID, LevelPack> loadedPacks;
-    private final HashMap<UUID, AsyncRandomFile> saveStatus;
+    private final HashMap<UUID, LevelPackSaveData> saveStatus;
     private final StackPane root;
     private final StartUI startUI;
     private final GameUI gameUI;
     
     private LevelSelectUI selectUI;
+
     /**
      * Constructs a new MainApp.
      */
@@ -81,8 +77,17 @@ public class MainApp extends Application
      */
     public boolean checkLevelUnlock(LevelPack pack, int level)
     {
-        AsyncRandomFile arf = openLevelSaveFile(pack);
-
+        try
+        {
+            LevelSaveData levelData = obtainLevelPackSaveData(pack)
+                    .getLevel(level);
+            return levelData.isUnlocked();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -102,20 +107,11 @@ public class MainApp extends Application
 
         try
         {
-            AsyncRandomFile arf = openLevelSaveFile(pack);
-            long offset = SAVE_ENTRY_SIZE * level;
-            if (arf.length() <= offset)
-                return;
-
-            DataInputStream dis = new DataInputStream(new BufferedInputStream
-                (arf.obtainInputStream(offset)));
-
-            if (arf.length() < offset + Long.BYTES)
-            arf.seek(offset);
-            if (arf.readInt() == 0)
+            LevelSaveData levelData = obtainLevelPackSaveData(pack)
+                    .getLevel(level);
+            if (!levelData.isCompleted())
                 return RESULT_NOT_DONE;
-            else
-                return arf.readInt();
+            return levelData.getScore();
         }
         catch (IOException e)
         {
@@ -283,8 +279,8 @@ public class MainApp extends Application
     {
         try
         {
-            for (AsyncRandomFile arf : saveStatus.values())
-                arf.close();
+            for (LevelPackSaveData packData : saveStatus.values())
+                packData.forceClose();
             saveStatus.clear();
 
             boolean success = true;
@@ -310,6 +306,23 @@ public class MainApp extends Application
     }
 
     /**
+     * Unlocks a particular level from a pack so that it can be accessible in
+     * level select UI. This should only be called by GameUITester,
+     * otherwise, this will automatically be called when the previous level
+     * is completed.
+     *
+     * @param pack the level pack to select.
+     * @param level the level number to unlock.
+     * @throws IOException if an error occurs while trying to write to file
+     *
+     */
+    void unlockLevel(LevelPack pack, int level) throws IOException
+    {
+        obtainLevelPackSaveData(pack).getLevel(level).setStatus
+                (MASK_UNLOCKED, MASK_UNLOCKED);
+    }
+
+    /**
      * Saves the information that the user has completed a particular level
      * from a particular level pack. This is internally called by GameUI.
      *
@@ -321,52 +334,35 @@ public class MainApp extends Application
     void completeLevel(LevelPack pack, int level, Recording rec)
             throws IOException
     {
-        //TODO: save recording.
+        LevelPackSaveData packData = obtainLevelPackSaveData(pack);
+        LevelSaveData saveData = packData.getLevel(level);
 
         int time = pack.getLevel(level).getTimeLimit();
         if (time != RESULT_NO_TIME_LIMIT)
             time -= rec.getRecordingFrames() / GameUI.FRAMES_PER_SEC;
 
-        AsyncRandomFile arf = openLevelSaveFile(pack);
-        BufferedInputStream
-        long offset = Long.BYTES * level;
-        if (arf.length() < offset + Long.BYTES)
-            arf.setLength(offset + Long.BYTES);
-        arf.seek(offset);
-        arf.writeInt(1);
-        arf.writeInt(time);
-    }
+        saveData.setScore(time);
+        saveData.setStatus(MASK_COMPLETE | MASK_UNLOCKED, MASK_COMPLETE |
+                MASK_UNLOCKED);
+        saveData.setRecording(rec);
 
+        if (level != pack.getLevelCount() - 1 && !checkLevelUnlock(pack, level))
+            packData.getLevel(level + 1).setStatus(MASK_UNLOCKED, MASK_UNLOCKED);
+    }
 
     /**
      * Obtains the opened level-pack save data for the level pack.
      * This will open a new file if one did not exist yet.
      *
      * @param pack the associated level pack.
-     * @return an opened file channel of the level save data
+     * @return the loaded level-pack save data.
      * @throws IOException if an error occurs in opening file.
      */
-    private AsyncRandomFile openLevelSaveFile(LevelPack pack) throws IOException
+    private LevelPackSaveData obtainLevelPackSaveData(LevelPack pack) throws IOException
     {
         UUID id = pack.getLevelPackID();
         if (!saveStatus.containsKey(id))
-        {
-            Path dir = Paths.get(System.getProperty("user.home"), ".turtle");
-            if (!Files.isDirectory(dir))
-            {
-                try
-                {
-                    Files.createDirectory(dir);
-                }
-                catch (IOException e)
-                {
-                    throw new IOException("Unable to create .turtle directory");
-                }
-            }
-            AsyncRandomFile arf = new AsyncRandomFile(
-                    dir.resolve(pack.getLevelPackID() + ".sav"));
-            saveStatus.put(id, arf);
-        }
+            saveStatus.put(id, new LevelPackSaveData(pack));
         return saveStatus.get(id);
     }
 

@@ -630,10 +630,7 @@ public class GameUITester extends Application
     {
         for (LevelPack pack : app.getLevelPacks())
             for (int i = 0; i < pack.getLevelCount(); i++)
-            {
-            	if (app.checkLevelCompletion(pack, i) == MainApp.RESULT_NOT_DONE)
-            		app.completeLevel(pack, i, MainApp.RESULT_NO_TIME_LIMIT);
-            }
+                app.unlockLevel(pack, i);
     }
 
 }

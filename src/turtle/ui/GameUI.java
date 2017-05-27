@@ -456,12 +456,13 @@ public class GameUI extends VBox
                 break;
             case ACTION_NEXT:
                 if (controlDown && currentLevelNum < currentPack.
-                        getLevelCount() - 1 && app.checkLevelCompletion
-                        (currentPack, currentLevelNum) != MainApp.RESULT_NOT_DONE)
+                        getLevelCount() - 1 && app.checkLevelUnlock
+                        (currentPack, currentLevelNum + 1))
                     initLevel(currentLevelNum + 1);
                 return;
             case ACTION_PREVIOUS:
-                if (controlDown && currentLevelNum > 0)
+                if (controlDown && currentLevelNum > 0 && app.checkLevelUnlock
+                        (currentPack, currentLevelNum - 1))
                     initLevel(currentLevelNum - 1);
         }
     }
