@@ -344,7 +344,7 @@ public class MainApp extends Application
         saveData.setScore(time);
         saveData.setStatus(MASK_COMPLETE | MASK_UNLOCKED, MASK_COMPLETE |
                 MASK_UNLOCKED);
-        saveData.setRecording(rec);
+        saveData.setRecordingData(rec);
 
         if (level != pack.getLevelCount() - 1 && !checkLevelUnlock(pack, level))
             packData.getLevel(level + 1).setStatus(MASK_UNLOCKED, MASK_UNLOCKED);

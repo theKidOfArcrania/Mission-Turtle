@@ -290,7 +290,7 @@ public class AsyncRandomFile
      */
     public void waitForWrites()
     {
-        while (outstandingWrites.isEmpty())
+        while (!outstandingWrites.isEmpty())
         {
             Future<Integer> waiting = outstandingWrites.poll();
             while (!waiting.isDone())

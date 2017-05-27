@@ -101,7 +101,7 @@ public class Recording
                 case SIZE_SHORT: out.writeShort((short)repetition); break;
                 case SIZE_INT: out.writeInt((int)repetition); break;
                 case SIZE_LONG: out.writeLong(repetition); break;
-                default: throw new IOException("Illegal data size mode");
+                default: throw new InternalError("Illegal size mode");
             }
             out.writeByte(direction);
         }
@@ -235,12 +235,11 @@ public class Recording
      * Saves the recording into a series of bytes.
      * @return a byte representing the recording.
      * @throws IOException if an I/O error occurs while saving recording
-     * @throws IllegalStateException if no recording is loaded yet.
      */
     public byte[] saveRecording() throws IOException
     {
         if (maxFrame == -1)
-            throw new IllegalStateException("No recording has been loaded.");
+            return new byte[0];
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
 

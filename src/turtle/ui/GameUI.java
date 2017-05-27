@@ -416,7 +416,8 @@ public class GameUI extends VBox
             if (keyDown)
                 dirPrevPressed = action;
             startGame();
-        } else
+        }
+        else
         {
             boolean controlDown = event.isControlDown() || !started;
             if (!keyDown)

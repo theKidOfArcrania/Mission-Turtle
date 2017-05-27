@@ -20,7 +20,7 @@ public class LevelSaveData
 
     private byte status;
     private int score;
-    private Recording recording;
+    private byte[] recordingData;
 
     private volatile boolean dirty;
     private volatile boolean cleaning;
@@ -32,7 +32,8 @@ public class LevelSaveData
     {
         status = 0;
         score = 0;
-        recording = new Recording();
+        recordingData = new byte[0];
+        cleaning = dirty = false;
     }
 
     /**
@@ -109,23 +110,31 @@ public class LevelSaveData
     }
 
     /**
-     * Getter method for recording.
+     * Obtains a new recordingData loaded from the current data.
      *
-     * @return the current value of recording.
+     * @return the recorded moves
+     * @throws IOException if an error occurs while parsing recordingData.
      */
-    public Recording getRecording()
+    public Recording createRecording() throws IOException
     {
-        return recording;
+        Recording rec = new Recording();
+        if (recordingData.length > 0)
+            rec.loadRecording(recordingData);
+        return rec;
     }
 
     /**
-     * Setter method for recording.
+     * Setter method for recordingData.
      *
-     * @param recording the value of recording to set.
+     * @param recordingData a recording to set to
      */
-    public void setRecording(Recording recording)
+    public void setRecordingData(Recording recordingData)
     {
-        this.recording = recording;
+        try {
+            this.recordingData = recordingData.saveRecording();
+        } catch (IOException e) {
+            throw new Error(e);
+        }
         dirty = true;
     }
 
@@ -143,9 +152,8 @@ public class LevelSaveData
             dos.writeByte(status);
             dos.writeInt(score);
 
-            byte[] recdata = recording.saveRecording();
-            dos.writeInt(recdata.length);
-            dos.write(recdata);
+            dos.writeInt(recordingData.length);
+            dos.write(recordingData);
             dirty = false;
         }
         finally
@@ -168,14 +176,9 @@ public class LevelSaveData
             status = dis.readByte();
             score = dis.readInt();
 
-            byte[] recdata = new byte[dis.readInt()];
-
-            recording.reset();
-            if (recdata.length != 0)
-            {
-                dis.readFully(recdata);
-                recording.loadRecording(recdata);
-            }
+            recordingData = new byte[dis.readInt()];
+            if (recordingData.length != 0)
+                dis.readFully(recordingData);
 
             dirty = false;
         }

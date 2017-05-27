@@ -197,7 +197,7 @@ public class LevelSelectUI extends VBox
             boolean unlocked = app.checkLevelUnlock(pack, i);
 
             String name = (i + 1) + " - " + pack.getLevel(i).getName();
-            if (i > 0 && unlocked)
+            if (i > 0 && !unlocked)
                 name = "\uD83D\uDD12 " + name;
             int status = app.checkLevelCompletion(pack, i);
             name += getStatus(status);

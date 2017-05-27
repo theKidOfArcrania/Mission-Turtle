@@ -99,9 +99,9 @@ public class LevelPackSaveData implements Closeable
                     .obtainOutputStream(0)));
             dos.writeInt(SAVE_FILE_SIG);
             dos.writeInt(levelData.size());
-
             for (LevelSaveData level : levelData)
                 level.saveData(dos);
+            dos.flush();
         }
         catch (IOException e)
         {

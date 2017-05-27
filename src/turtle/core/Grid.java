@@ -295,7 +295,7 @@ public class Grid extends Pane
             throw new IllegalArgumentException("Illegal direction");
 
         Player p = getPlayer();
-        if (p == null || !p.isMoving())
+        if (p == null || p.isMoving())
             return;
 
         lastMove = moveDir;
