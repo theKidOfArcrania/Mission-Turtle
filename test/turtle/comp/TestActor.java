@@ -1,7 +1,5 @@
 package turtle.comp;
 
-import java.util.Map;
-
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
@@ -111,7 +109,7 @@ public class TestActor extends Actor
     }
 
     /**
-     * Interacts with other actor. Logs the interaction that occured.
+     * Interacts with other actor. Logs the interaction that occurred.
      *
      * @param other the other actor to interact with.
      * @return true to allow interact, false if not allowed

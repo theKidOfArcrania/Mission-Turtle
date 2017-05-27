@@ -3,7 +3,6 @@ package turtle.comp;
 import turtle.attributes.NotAttribute;
 import turtle.core.Component;
 
-import java.util.Map;
 import java.util.Random;
 
 /**

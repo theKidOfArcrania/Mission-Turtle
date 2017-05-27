@@ -1,11 +1,9 @@
 package turtle.core;
 
-import java.util.Map;
-
 /**
  * Actor.java
  * <p>
- * Represents a movable/ interactable grid component that is readily mutable.
+ * Represents a movable/ interactive grid component that is readily mutable.
  * The biggest difference between an actor and a cell is that actors are transparent
  * having an ability to show through the bottom cell layer.
  *

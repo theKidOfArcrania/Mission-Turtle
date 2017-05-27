@@ -5,8 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 
-import java.util.function.IntConsumer;
-
 /**
  * DialogBoxUITest.java
  * This tests the functionality of the dialog-box UI.
@@ -37,21 +35,10 @@ public class DialogBoxUITest extends Application
         DialogBoxUI root = new DialogBoxUI("Test test test:",
                 "Menu", "Cancel");
 
-        /**
-         * Listens for a user response (index of button pressed).
-         */
-        root.onResponse(new IntConsumer()
+        root.onResponse(value ->
         {
-            /**
-             * Called when user responds
-             * @param value the index of response.
-             */
-            @Override
-            public void accept(int value)
-            {
-                System.out.println("You entered index " + value);
-                primaryStage.hide();
-            }
+            System.out.println("You entered index " + value);
+            primaryStage.hide();
         });
         Scene s = new Scene(root, WIDTH, HEIGHT);
         s.getStylesheets().add("/turtle/ui/styles.css");

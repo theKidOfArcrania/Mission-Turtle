@@ -211,26 +211,7 @@ public class GameUITester extends Application
             }
         }
 
-        /**
-         * Compares methods by their name, sorting by A-Z
-         */
-        tests.sort(new Comparator<Method>()
-        {
-
-            /**
-             * Compares two methods, effectively by alphabetical order via name
-             * @param o1 the first method
-             * @param o2 the second method
-             * @return negative value if first method comes first in alpha order,
-             * 		zero if both are equal,
-             * 		positive value if second method cones first in alpha order.
-             */
-            @Override
-            public int compare(Method o1, Method o2)
-            {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
+        tests.sort(Comparator.comparing(Method::getName));
         return tests;
     }
 
@@ -327,20 +308,20 @@ public class GameUITester extends Application
      */
     private LevelPack testBuckets()
     {
-        final Location BUCKT_A = new Location(1, 1);
-        final Location BUCKT_B = new Location(1, 3);
-        final Location BUCKT_C = new Location(1, 5);
+        final Location BUCKET_A = new Location(1, 1);
+        final Location BUCKET_B = new Location(1, 3);
+        final Location BUCKET_C = new Location(1, 5);
 
         LevelPack testPack = new LevelPack("Test Pack");
         Level test = new Level("Test Level", TEST_SIZE, TEST_SIZE);
 
         HashMap<String, Object> params = new HashMap<>();
         addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
-        addActorSpecs(test, BUCKT_A, COMP_IND_BUCKET, params);
-        addActorSpecs(test, BUCKT_B, COMP_IND_BUCKET, params);
+        addActorSpecs(test, BUCKET_A, COMP_IND_BUCKET, params);
+        addActorSpecs(test, BUCKET_B, COMP_IND_BUCKET, params);
 
         params.put("filled", true);
-        addActorSpecs(test, BUCKT_C, COMP_IND_BUCKET, params);
+        addActorSpecs(test, BUCKET_C, COMP_IND_BUCKET, params);
 
         fillCells(test);
         testPack.addLevel(test);
@@ -371,7 +352,7 @@ public class GameUITester extends Application
         params.put("heading", Actor.EAST);
         addCellSpecs(test, FACT_A, COMP_IND_FACTORY, params);
 
-        System.out.print("Input a comonent ID to clone (9 is default): ");
+        System.out.print("Input a component ID to clone (9 is default): ");
         if (in.hasNextShort())
             params.put("cloned", in.nextShort());
         else
@@ -614,7 +595,7 @@ public class GameUITester extends Application
      * Tests the loading functionality.
      *
      * @return the loaded test level-pack.
-     * @throws IOException if an error occurs while reading levelpack.
+     * @throws IOException if an error occurs while reading level pack.
      */
     private LevelPack testLoading() throws IOException
     {
@@ -630,10 +611,7 @@ public class GameUITester extends Application
     {
         for (LevelPack pack : app.getLevelPacks())
             for (int i = 0; i < pack.getLevelCount(); i++)
-            {
-            	if (app.checkLevelCompletion(pack, i) == MainApp.RESULT_NOT_DONE)
-            		app.completeLevel(pack, i, MainApp.RESULT_NO_TIME_LIMIT);
-            }
+                app.unlockLevel(pack, i);
     }
 
 }

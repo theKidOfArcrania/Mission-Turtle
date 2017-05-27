@@ -44,21 +44,7 @@ public class MenuUI extends VBox
         setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
 
-        /** Filters out any mouse clicks in this menu UI.*/
-        setOnMouseClicked(new EventHandler<Event>()
-        {
-
-            /**
-             * Consumes all mouse click events.
-             * @param event associated event object with click.
-             */
-            @Override
-            public void handle(Event event)
-            {
-                event.consume();
-            }
-
-        });
+        setOnMouseClicked(Event::consume);
     }
 
     /**

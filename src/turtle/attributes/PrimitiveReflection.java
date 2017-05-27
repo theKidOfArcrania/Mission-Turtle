@@ -7,14 +7,14 @@ package turtle.attributes;
  * @author Henry Wang
  */
 public class PrimitiveReflection {
-	private static boolean DEFAULT_BOOLEAN = false;
-	private static byte DEFAULT_BYTE = 0;
-	private static char DEFAULT_CHAR = 0;
-	private static short DEFAULT_SHORT = 0;
-	private static int DEFAULT_INT = 0;
-	private static long DEFAULT_LONG = 0;
-	private static float DEFAULT_FLOAT = 0;
-	private static double DEFAULT_DOUBLE = 0;
+	private static final boolean DEFAULT_BOOLEAN = false;
+	private static final byte DEFAULT_BYTE = 0;
+	private static final char DEFAULT_CHAR = 0;
+	private static final short DEFAULT_SHORT = 0;
+	private static final int DEFAULT_INT = 0;
+	private static final long DEFAULT_LONG = 0;
+	private static final float DEFAULT_FLOAT = 0;
+	private static final double DEFAULT_DOUBLE = 0;
 
 	/**
 	 * Obtains the primitive version of the wrapper class.

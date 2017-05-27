@@ -38,7 +38,7 @@ public class Water extends Cell
 
         top = new ImageView();
         TileSet ts = getTileSet();
-        top.setImage(ts.getImageset());
+        top.setImage(ts.getImageSet());
         top.setViewport(ts.frameAt(-1));
         this.getChildren().add(top);
     }

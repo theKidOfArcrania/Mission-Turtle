@@ -101,7 +101,7 @@ public class Recording
                 case SIZE_SHORT: out.writeShort((short)repetition); break;
                 case SIZE_INT: out.writeInt((int)repetition); break;
                 case SIZE_LONG: out.writeLong(repetition); break;
-                default: throw new IOException("Illegal data size mode");
+                default: throw new InternalError("Illegal size mode");
             }
             out.writeByte(direction);
         }
@@ -118,9 +118,8 @@ public class Recording
      * Utility method for compressing data.
      * @param data the data to compress
      * @return a compressed byte array
-     * @throws IOException if any I/O error occurs
      */
-    private static byte[] compress(byte[] data) throws IOException {
+    private static byte[] compress(byte[] data) {
         Deflater deflater = new Deflater();
         deflater.setInput(data);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length);
@@ -156,30 +155,72 @@ public class Recording
     }
 
     private HashMap<Long, Integer> moves;
-    
-    private Grid grid;
     private long rngSeed;
+    private long maxFrame;
+
+    private Grid grid;
 
     private boolean started;
     private boolean recording;
-    private long maxFrame;
     
     /**
      * Creates a new blank recording
      */
     public Recording()
     {
+        reset();
+    }
+
+    /**
+     * @return true if this recording has some data loaded, false if this is
+     * a blank recording.
+     */
+    public boolean isLoaded()
+    {
+        return maxFrame > -1;
+    }
+
+    /**
+     * @return true if this is recording, false if this is doing a playback
+     */
+    public boolean isRecording()
+    {
+        return !recording || !started;
+    }
+
+    /**
+     * Resets this recording object
+     */
+    public void reset()
+    {
         moves = new HashMap<>();
         started = false;
         maxFrame = -1;
         rngSeed = -1;
+
+        grid = null;
+    }
+
+    /**
+     * Loads the recording from another recording. This does not start this
+     * recording automatically.
+     * @param other the other recording to load from.
+     * @throws IllegalStateException if other recording is not loaded.
+     */
+    public void loadRecording(Recording other)
+    {
+        if (!other.isLoaded())
+            throw new IllegalStateException("Other recording not loaded.");
+        maxFrame = other.maxFrame;
+        moves.clear();
+        moves.putAll(other.moves);
+        rngSeed = other.rngSeed;
     }
 
     /**
      * Loads the recording from a series of bytes.
      * @param data a byte representing the recording.
      * @throws IOException if the given data bytes is corrupted.
-     * @throws IllegalStateException if no recording is loaded yet.
      */
     public void loadRecording(byte[] data) throws IOException
     {
@@ -190,15 +231,16 @@ public class Recording
             DataInputStream dis = new DataInputStream(bais);
 
             rngSeed = dis.readLong();
+            maxFrame = dis.readLong();
             CompactMove[] entries = new CompactMove[dis.readInt()];
             for (int i = 0; i < entries.length; i++)
                 (entries[i] = new CompactMove()).read(dis);
-            decompactMoves(entries);
+            expandMoves(entries);
         }
         catch (DataFormatException e)
         {
             e.printStackTrace();
-            throw new IOException("Compression has been corrupted");
+            throw new IOException("Compression has been corrupted.");
         }
     }
 
@@ -209,9 +251,9 @@ public class Recording
      */
     public void startRecording(Grid grid)
     {
-        Objects.requireNonNull(grid, "Grid must be non-null");
+        Objects.requireNonNull(grid, "Grid must be non-null.");
         if (started)
-            throw new IllegalStateException("This recording has already started");
+            throw new IllegalStateException("This recording has already started.");
 
         this.grid = grid;
         rngSeed = grid.getRNGSeed();
@@ -226,16 +268,16 @@ public class Recording
      * Saves the recording into a series of bytes.
      * @return a byte representing the recording.
      * @throws IOException if an I/O error occurs while saving recording
-     * @throws IllegalStateException if no recording is loaded yet.
      */
     public byte[] saveRecording() throws IOException
     {
-        if (maxFrame == -1)
-            throw new IllegalStateException("No recording has been loaded.");
+        if (!isLoaded())
+            return new byte[0];
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
 
         dos.writeLong(rngSeed);
+        dos.writeLong(maxFrame);
         CompactMove[] entries = compactMoves();
         dos.writeInt(entries.length);
         for (CompactMove move : entries)
@@ -254,10 +296,9 @@ public class Recording
     {
         Objects.requireNonNull(grid, "Grid must be non-null");
         if (started)
-            throw new IllegalStateException("This recording has already started");
-        if (maxFrame == -1)
-            throw new IllegalStateException("No recording has been loaded " +
-                    "yet.");
+            throw new IllegalStateException("This recording has already started.");
+        if (!isLoaded())
+            throw new IllegalStateException("Recording not loaded yet.");
 
         this.grid = grid;
         grid.setRNGSeed(rngSeed);
@@ -292,10 +333,13 @@ public class Recording
         if (!started)
             throw new IllegalStateException("This recording has not started yet.");
         if (recording)
+        {
             moves.put(frame, grid.getLastMove());
+            maxFrame = frame;
+        }
         else if (moves.containsKey(frame))
             grid.movePlayer(moves.get(frame));
-        maxFrame = frame;
+
     }
 
     /**
@@ -354,11 +398,11 @@ public class Recording
     }
 
     /**
-     * Decompacts a series of compact-move elements and copies it into our
-     * moves.
+     * Expands a series of compact-move elements and copies it into our
+     * moves list.
      * @param compMoves the list of compact-move elements.
      */
-    private void decompactMoves(CompactMove[] compMoves)
+    private void expandMoves(CompactMove[] compMoves)
     {
         moves.clear();
 

@@ -1,7 +1,6 @@
 package turtle.comp;
 
 import turtle.core.Actor;
-import turtle.core.DominanceLevel;
 
 /**
  * Projectile.java

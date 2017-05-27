@@ -1,22 +1,19 @@
 package turtle.ui;
 
 import static turtle.ui.GameMenuUI.*;
+import static turtle.ui.GameUI.PlayState.*;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
-import java.util.function.IntConsumer;
 
 import javafx.animation.*;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -40,6 +37,14 @@ import turtle.core.Recording;
  */
 public class GameUI extends VBox
 {
+    /**
+     * Represents a possible value of game states we can be in at the point.
+     */
+    enum PlayState
+    {
+        RUNNING, PAUSED, HALTED, STOPPED
+    }
+
     public static final int FRAMES_PER_SEC = 30;
 
     private static final String SECT_BREAK = "   ";
@@ -50,9 +55,10 @@ public class GameUI extends VBox
     private static final int ACTION_RESTART = -3;
     private static final int ACTION_NEXT = -4;
     private static final int ACTION_PREVIOUS = -5;
+    private static final int ACTION_PLAYBACK = -6;
     
     private static final double SEMI_TRANS_ALPHA = .5;
-    private static final Color DARKGRAY = Color.web("#505050");
+    private static final Color DARK_GRAY = Color.web("#505050");
     
     private static final double GAP_INSET = 5.0;
     private static final double LARGE_GAP_INSET = 20.0;
@@ -94,9 +100,8 @@ public class GameUI extends VBox
     private LevelPack currentPack;
     private int timeLeft;
 
-    private boolean halted;
-    private boolean started;
-    private boolean paused;
+    private boolean playback;
+    private PlayState state;
     private int currentLevelNum;
 
     /**
@@ -112,9 +117,7 @@ public class GameUI extends VBox
         view = new GridView(null);
         runner = new GameTimer();
 
-        started = false;
-        paused = false;
-        halted = false;
+        state = STOPPED;
 
         msgScroller = null;
         doubled = false;
@@ -132,29 +135,13 @@ public class GameUI extends VBox
         setFocusTraversable(true);
         requestFocus();
 
-        /**
-         * Event handler that listens to all key events that occurs.
-         */
-        addEventFilter(KeyEvent.ANY, new EventHandler<KeyEvent>()
-        {
-            /**
-             * Called when a key event occurs.
-             *
-             * @param event an event object describing the key event that
-             *              occurred.
-             */
-            @Override
-            public void handle(KeyEvent event)
-            {
-                handleKey(event);
-            }
-        });
+        addEventFilter(KeyEvent.ANY, this::handleKey);
     }
 
     /**
      * Creates a spacer pane used for layouts.
      *
-     * @return a pane with a specfic spacing
+     * @return a pane with a specific spacing
      */
     private static Pane createSpacer()
     {
@@ -205,27 +192,13 @@ public class GameUI extends VBox
             prompt = "Are you sure you want to restart?";
 
         DialogBoxUI dlg = new DialogBoxUI(prompt, "Yes", "No");
-
-        /**
-         * Listens to the user's response to confirm this exiting.
-         */
-        dlg.onResponse(new IntConsumer()
-        {
-
-            /**
-             * Called when user presses a response button.
-             * @param value the button id pressed
-             */
-            @Override
-            public void accept(int value)
+        dlg.onResponse(value -> {
+            app.hideDialog(dlg);
+            pnlMenuBack.setVisible(false);
+            if (value == 0)
             {
-                app.hideDialog(dlg);
-                pnlMenuBack.setVisible(false);
-                if (value == 0)
-                {
-                    stopGame();
-                    executeMenu(id);
-                }
+                stopGame();
+                executeMenu(id);
             }
         });
         app.showDialog(dlg);
@@ -244,11 +217,11 @@ public class GameUI extends VBox
             case ID_RESTART:
                 initLevel(currentLevelNum);
                 break;
-            case ID_LEVELSELECT:
+            case ID_LEVEL_SELECT:
                 pnlMenuBack.setVisible(false);
                 app.showLevelSelect();
                 break;
-            case ID_MAINMENU:
+            case ID_MAIN_MENU:
                 pnlMenuBack.setVisible(false);
                 app.showMainMenu();
                 break;
@@ -263,8 +236,9 @@ public class GameUI extends VBox
      * Checks player's current game status (whether if player won or lost).
      *
      * @param p the player to check status against.
+     * @param frame the current animation frame.
      */
-    private void checkPlayerStatus(Player p)
+    private void checkPlayerStatus(Player p, long frame)
     {
         String status = null;
         boolean success = false;
@@ -272,20 +246,26 @@ public class GameUI extends VBox
         if (p.isWinner())
         {
             status = "Success! Level Completed!";
-            if (timeLeft != MainApp.RESULT_NO_TIME_LIMIT)
-                status += "\nYour time bonus: " + timeLeft;
-            status += "\n" + saveProgress();
+            if (!view.getGrid().getRecording().isRecording())
+            {
+                if (timeLeft != MainApp.RESULT_NO_TIME_LIMIT)
+                    status += "\nYour time bonus: " + timeLeft;
+                status += "\n" + saveProgress();
+            }
             success = true;
-        } else if (p.isDead())
+        }
+        else if (p.isDead())
             status = "You Died!";
         else if (timeLeft == 0)
             status = "Time's Up!";
+        else if (playback && view.getGrid().getRecording().
+                getRecordingFrames() < frame - Actor.BIG_FRAME)
+            status = "Recording has finished.";
 
         if (status != null)
         {
-            Recording r = view.getGrid().getRecording();
-            r.stop();
             stopGame();
+            state = HALTED;
 
             boolean allowNext = success && currentLevelNum <
                     currentPack.getLevelCount() - 1;
@@ -296,26 +276,13 @@ public class GameUI extends VBox
                 options = new String[]{"Menu", "Restart"};
 
             DialogBoxUI prompt = new DialogBoxUI(status, options);
-
-            /**
-             * Listens for a user response (index of button pressed).
-             */
-            prompt.onResponse(new IntConsumer()
+            prompt.onResponse(value ->
             {
-                /**
-                 * Called when user responds. Delegates to handleLevelDialog.
-                 * @param value the index of response.
-                 */
-                @Override
-                public void accept(int value)
-                {
-                    handleLevelDialog(value);
-                    app.hideDialog(prompt);
-                }
+                handleLevelDialog(value);
+                app.hideDialog(prompt);
             });
 
             app.showDialog(prompt);
-            halted = true;
         }
     }
 
@@ -401,7 +368,7 @@ public class GameUI extends VBox
      */
     private void handleKey(KeyEvent event)
     {
-        if (halted)
+        if (state == HALTED)
             return;
         if (event.getEventType() == KeyEvent.KEY_TYPED)
             return;
@@ -410,21 +377,20 @@ public class GameUI extends VBox
 
         boolean keyDown = event.getEventType() == KeyEvent.KEY_PRESSED;
         int action = mappedKeys.get(event.getCode());
-        if (action >= 0)
+        if (action >= 0 && !playback && state != PAUSED)
         {
             moving[action] = keyDown;
             if (keyDown)
                 dirPrevPressed = action;
             startGame();
-        } else
+        }
+        else
         {
-            boolean controlDown = event.isControlDown() || !started;
+            boolean controlDown = event.isControlDown() || state == STOPPED;
             if (!keyDown)
                 return;
             handleAction(action, controlDown);
         }
-
-
     }
 
     /**
@@ -438,31 +404,65 @@ public class GameUI extends VBox
         switch (action)
         {
             case ACTION_PAUSE:
-
-                if (pnlMenuBack.isVisible())
+                if (state == PAUSED)
                     handleGameMenu(ID_RESUME);
                 else
                 {
                     pauseGame();
                     pnlMenuBack.setVisible(true);
                 }
-                break;
+                return;
             case ACTION_START:
                 startGame();
-                break;
+                return;
             case ACTION_RESTART:
                 if (controlDown)
+                {
+                    if (state == PAUSED)
+                        handleGameMenu(ID_RESUME);
                     initLevel(currentLevelNum);
-                break;
+                }
+                return;
             case ACTION_NEXT:
                 if (controlDown && currentLevelNum < currentPack.
-                        getLevelCount() - 1 && app.checkLevelCompletion
-                        (currentPack, currentLevelNum) != MainApp.RESULT_NOT_DONE)
+                        getLevelCount() - 1 && app.checkLevelUnlock
+                        (currentPack, currentLevelNum + 1))
+                {
+                    if (state == PAUSED)
+                        handleGameMenu(ID_RESUME);
                     initLevel(currentLevelNum + 1);
+                }
                 return;
             case ACTION_PREVIOUS:
-                if (controlDown && currentLevelNum > 0)
+                if (controlDown && currentLevelNum > 0 && app.checkLevelUnlock
+                        (currentPack, currentLevelNum - 1))
+                {
+                    if (state == PAUSED)
+                        handleGameMenu(ID_RESUME);
                     initLevel(currentLevelNum - 1);
+                }
+                return;
+            case ACTION_PLAYBACK:
+                if (state == STOPPED && app.checkLevelCompletion(currentPack,
+                        currentLevelNum) != MainApp.RESULT_NOT_DONE)
+                {
+                    //TODO: check if solution is valid.
+                    Recording rec = app.getLevelRecording(currentPack,
+                            currentLevelNum);
+                    if (rec == null)
+                    {
+                        app.invalidateLevelRecording(currentPack,
+                                currentLevelNum);
+                        app.showDialog(new DialogBoxUI("Unable to load the " +
+                                "solution for this level.", "Okay"));
+                        return;
+                    }
+                    Grid g = view.getGrid();
+                    g.getRecording().loadRecording(rec);
+                    g.getRecording().startPlayback(g);
+                    startGame();
+                    playback = true;
+                }
         }
     }
 
@@ -493,20 +493,10 @@ public class GameUI extends VBox
         lblMenu.setPadding(new Insets(0, GAP_INSET, 0, GAP_INSET));
         HBox.setMargin(lblMenu, new Insets(0, GAP_INSET, 0, GAP_INSET));
 
-        /** Handler called when user clicks menu button. */
-        lblMenu.setOnMouseClicked(new EventHandler<MouseEvent>()
+        lblMenu.setOnMouseClicked(event ->
         {
-
-            /**
-             * Shows the game menu dialog when the user clicks button.
-             * @param event the associated event with click.
-             */
-            @Override
-            public void handle(MouseEvent event)
-            {
-                pauseGame();
-                pnlMenuBack.setVisible(true);
-            }
+            pauseGame();
+            pnlMenuBack.setVisible(true);
         });
 
         pnlBar.getChildren().addAll(lblPackName, lblLevelName,
@@ -528,25 +518,11 @@ public class GameUI extends VBox
         pnlMenuBack.setVisible(false);
         pnlMenuBack.getChildren().add(pnlMenuDialog);
 
-        /** Exits menu dialog when clicked */
-        pnlMenuBack.setOnMouseClicked(new EventHandler<MouseEvent>()
-        {
-
-            /**
-             * Exits menu dialog as if user clicked "Resume"
-             * @param event associated mouse click event object
-             */
-            @Override
-            public void handle(MouseEvent event)
-            {
-                handleGameMenu(ID_RESUME);
-            }
-
-        });
+        pnlMenuBack.setOnMouseClicked(event -> handleGameMenu(ID_RESUME));
 
         pnlFrame = new StackPane();
         setVgrow(pnlFrame, javafx.scene.layout.Priority.ALWAYS);
-        pnlFrame.setBackground(new Background(new BackgroundFill(DARKGRAY,
+        pnlFrame.setBackground(new Background(new BackgroundFill(DARK_GRAY,
                 null, null)));
         pnlFrame.setCacheShape(true);
         pnlFrame.setEffect(new InnerShadow());
@@ -565,8 +541,8 @@ public class GameUI extends VBox
     private boolean initLevel(int index)
     {
         stopGame();
-        halted = false;
 
+        playback = false;
         currentLevelNum = index;
         Level lvl = currentPack.getLevel(index);
         try
@@ -675,6 +651,7 @@ public class GameUI extends VBox
         mappedKeys.put(KeyCode.R, ACTION_RESTART);
         mappedKeys.put(KeyCode.N, ACTION_NEXT);
         mappedKeys.put(KeyCode.P, ACTION_PREVIOUS);
+        mappedKeys.put(KeyCode.TAB, ACTION_PLAYBACK);
     }
 
     /**
@@ -702,21 +679,13 @@ public class GameUI extends VBox
             fade.setToValue(0);
             fade.play();
 
-            /** Removes the label when the animation is finished. */
-            fade.setOnFinished(new EventHandler<ActionEvent>()
+
+            fade.setOnFinished(event ->
             {
-                /**
-                 * Removes the component when the finish action occurs.
-                 * @param event the associated event object with the action.
-                 */
-                @Override
-                public void handle(ActionEvent event)
-                {
-                    pnlMessagePanel.getChildren().remove(msg);
-                    fade.setOnFinished(null); //Prevent memory leakage.
-                    if (msgScroller != null)
-                        msgScroller = null;
-                }
+                pnlMessagePanel.getChildren().remove(msg);
+                fade.setOnFinished(null); //Prevent memory leakage.
+                if (msgScroller != null)
+                    msgScroller = null;
             });
         }
     }
@@ -761,9 +730,15 @@ public class GameUI extends VBox
      */
     private void stopGame()
     {
+        state = STOPPED;
+
         runner.stop();
-        started = false;
-        paused = false;
+        if (view.getGrid() != null)
+        {
+            Recording r = view.getGrid().getRecording();
+            if (r != null)
+                r.stop();
+        }
 
         for (int i = 0; i < moving.length; i++)
             moving[i] = false;
@@ -775,10 +750,10 @@ public class GameUI extends VBox
      */
     private void pauseGame()
     {
-        if (paused || !started)
+        if (state != RUNNING)
             return;
+        state = PAUSED;
         runner.pause();
-        paused = true;
 
         for (int i = 0; i < moving.length; i++)
             moving[i] = false;
@@ -786,14 +761,14 @@ public class GameUI extends VBox
 
     /**
      * Resumes the game after a pause. Does nothing if it
-     * already is unpaused, or if game hasn't started.
+     * is not currently paused.
      */
     private void resumeGame()
     {
-        if (!paused || !started)
+        if (state != PAUSED)
             return;
+        state = RUNNING;
         runner.start();
-        paused = false;
     }
 
     /**
@@ -802,9 +777,11 @@ public class GameUI extends VBox
      */
     private void startGame()
     {
-        if (halted || !started)
+        if (state == STOPPED)
+        {
             runner.start();
-        started = true;
+            state = RUNNING;
+        }
     }
 
     /**
@@ -830,7 +807,7 @@ public class GameUI extends VBox
         if (frame % FPS_UPDATE_RATE == 0)
             lblFps.setText(String.format("Fps: %.3f", runner.getFps()));
 
-        checkPlayerStatus(p);
+        checkPlayerStatus(p, frame);
     }
 
     /**
@@ -953,8 +930,8 @@ public class GameUI extends VBox
                     frameTimes.remove();
                 frameTimes.add(time - prevTime);
                 double fps = 0;
-                for (long ftime : frameTimes)
-                    fps += ftime * NANO_TO_SECONDS;
+                for (long frameTime : frameTimes)
+                    fps += frameTime * NANO_TO_SECONDS;
                 fps = frameTimes.size() / fps;
                 this.fps = fps;
             }

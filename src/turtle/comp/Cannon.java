@@ -3,8 +3,6 @@ package turtle.comp;
 import turtle.core.Grid;
 import turtle.core.Location;
 
-import java.util.Map;
-
 /**
  * Cannon.java
  * <p>
@@ -78,31 +76,6 @@ public class Cannon extends Mover
         p.getTrailingLocation().setLocation(row, col);
         parent.placeActor(p);
     }
-
-    /**
-     * Sets a series of parameters for this cannon actor. This
-     * below specifies the list of parameters:
-     * <table>
-     * <tr>
-     * <th>Name</th>
-     * <th>Type</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td><code>heading</code></td>
-     * <td><code>int</code></td>
-     * <td>This sets the facing direction of the actor. </td>
-     * </tr>
-     * <tr>
-     * <td><code>period</code></td>
-     * <td><code>int</code></td>
-     * <td>This sets number of big frames to wait in between
-     * shooting consecutive projectiles</td>
-     * </tr>
-     * </table>
-     *
-     * @param params the parameter object.
-     */
 
     /**
      * @return the period of firing one projectile

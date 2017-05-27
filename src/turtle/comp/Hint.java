@@ -5,8 +5,6 @@ import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
-import java.util.Map;
-
 /**
  * Hint.java
  * <p>

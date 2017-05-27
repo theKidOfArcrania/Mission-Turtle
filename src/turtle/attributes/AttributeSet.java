@@ -21,7 +21,7 @@ public class AttributeSet<A extends Attributable>
     private static final String GET_PREFIX = "get";
     private static final String IS_PREFIX = "is";
     private static final String SET_PREFIX = "set";
-    private static HashMap<Class<?>, Attribute[]> attributeCache = new
+    private static final HashMap<Class<?>, Attribute[]> attributeCache = new
             HashMap<>();
     private final Hashtable<String, Attribute> attrs = new Hashtable<>();
     private final A attributable;

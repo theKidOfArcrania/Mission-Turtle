@@ -8,7 +8,6 @@ import javafx.scene.layout.Pane;
 import turtle.attributes.Attributable;
 import turtle.attributes.AttributeSet;
 
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -82,7 +81,7 @@ public abstract class Component extends Pane implements Attributable
     {
         ts = DEFAULT_SET;
 
-        img = new ImageView(ts.getImageset());
+        img = new ImageView(ts.getImageSet());
         this.getChildren().add(img);
 
         headLoc = new Location();
@@ -202,7 +201,7 @@ public abstract class Component extends Pane implements Attributable
     /**
      * Obtains next step of incrementing a value
      *
-     * @param from intial value
+     * @param from initial value
      * @param to   the goal value to achieve
      * @param step the increment value per step
      * @return the next value to increment to.

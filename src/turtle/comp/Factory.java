@@ -4,7 +4,6 @@ import javafx.scene.image.ImageView;
 import turtle.core.*;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 import static turtle.core.Actor.*;
 
@@ -55,7 +54,7 @@ public class Factory extends Cell
         clonedImg = new ImageView();
         clonedImg.setFitHeight(size);
         clonedImg.setFitWidth(size);
-        clonedImg.setImage(ts.getImageset());
+        clonedImg.setImage(ts.getImageSet());
         clonedImg.setViewport(ts.frameAt(-1));
         this.getChildren().add(clonedImg);
 

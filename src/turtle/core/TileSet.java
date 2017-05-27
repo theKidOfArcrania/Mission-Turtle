@@ -49,7 +49,7 @@ public class TileSet
      *
      * @return the image tile-set.
      */
-    public Image getImageset()
+    public Image getImageSet()
     {
         return tileset;
     }

@@ -82,7 +82,7 @@ public class Level
     /**
      * Creates the grid that is specified by this level data.
      *
-     * @return an interactable live Grid.
+     * @return an interactive live Grid.
      * @throws IllegalStateException if level is not loaded yet.
      */
     public Grid createLevel()

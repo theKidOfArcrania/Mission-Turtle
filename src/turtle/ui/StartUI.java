@@ -1,10 +1,5 @@
 package turtle.ui;
 
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
-
-import java.util.function.IntConsumer;
-
 /**
  * StartUI.java
  * <p>
@@ -19,7 +14,7 @@ public class StartUI extends MenuUI
 {
 
     public static final int ID_PLAY = 0;
-    public static final int ID_LEVELSELECT = 1;
+    public static final int ID_LEVEL_SELECT = 1;
     public static final int ID_RESET = 2;
     public static final int ID_EXIT = 3;
 
@@ -43,21 +38,8 @@ public class StartUI extends MenuUI
         for (int i = 0; i < NAMES.length; i++)
         {
             final int id = i;
-            /** Handles mouse event when user clicks a menu button*/
             getChildren().add(MenuUI.createButton(NAMES[i], true, true,
-                    new EventHandler<MouseEvent>()
-                    {
-                        /**
-                         * Handles the event by delegating to the
-                         * {@link StartUI#handleCommand(int)}  function.
-                         * @param event the event associated with click.
-                         */
-                        @Override
-                        public void handle(MouseEvent event)
-                        {
-                            handleCommand(id);
-                        }
-                    }));
+                    event -> handleCommand(id)));
         }
 
         final int MENU_WIDTH = 400;
@@ -76,7 +58,7 @@ public class StartUI extends MenuUI
             case ID_PLAY:
                 app.startPreviousGame();
                 break;
-            case ID_LEVELSELECT:
+            case ID_LEVEL_SELECT:
                 app.showLevelSelect();
                 break;
             case ID_RESET:
@@ -98,29 +80,17 @@ public class StartUI extends MenuUI
     {
         DialogBoxUI dlg = new DialogBoxUI(prompt, "Yes", "No");
 
-        /**
-         * Listens to the user's response to confirm this exiting.
-         */
-        dlg.onResponse(new IntConsumer()
+        dlg.onResponse(value ->
         {
-
-            /**
-             * Called when user presses a response button.
-             * @param value the button id pressed
-             */
-            @Override
-            public void accept(int value)
+            app.hideDialog(dlg);
+            if (value == 0)
             {
-                app.hideDialog(dlg);
-                if (value == 0)
-                {
-                    if (command == ID_EXIT)
-                        System.exit(0);
-                    else if (command == ID_RESET)
-                        app.resetScores();
-                }
-
+                if (command == ID_EXIT)
+                    System.exit(0);
+                else if (command == ID_RESET)
+                    app.resetScores();
             }
+
         });
         app.showDialog(dlg);
     }

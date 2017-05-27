@@ -237,7 +237,7 @@ public class GridView extends Pane
     }
 
     /**
-     * Delegate method that queries the interactable player.
+     * Delegate method that queries the interactive player.
      *
      * @return the player of the grid contained inside this grid-view.
      */

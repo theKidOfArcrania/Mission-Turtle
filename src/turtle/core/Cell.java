@@ -51,7 +51,8 @@ public abstract class Cell extends Component
      * @param other      the other cell to transform into.
      * @param waitFrames the number of frames to wait for transformation.
      * @throws IllegalStateException    if this cell isn't added to anything.
-     * @throws IllegalArgumentException if cell to transform to is alraedy added to grid.
+     * @throws IllegalArgumentException if cell to transform to is already
+     * added to grid.
      */
     public void transformTo(Cell other, int waitFrames)
     {

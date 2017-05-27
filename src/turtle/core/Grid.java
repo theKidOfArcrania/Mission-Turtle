@@ -20,8 +20,7 @@ import java.util.*;
 public class Grid extends Pane
 {
 
-    private final Random rng;
-    private long rngSeed;
+    private final StatefulRandom rng;
 
     private final int rows;
     private final int cols;
@@ -33,7 +32,7 @@ public class Grid extends Pane
     private Player player;
     private int foodLeft;
     private int lastMove;
-    private Recording recording;
+    private final Recording recording;
 
     /**
      * Creates a new grid with the following dimensions
@@ -43,8 +42,7 @@ public class Grid extends Pane
      */
     public Grid(int rows, int cols)
     {
-        rng = new Random();
-        setRNGSeed(rng.nextLong());
+        rng = new StatefulRandom();
 
         recording = new Recording();
 
@@ -146,27 +144,8 @@ public class Grid extends Pane
             }
         }
 
-        /**
-         * Compares two actors in reverse dominance order,
-         * relative to each other.
-         */
-        residents.sort(new Comparator<Actor>()
-        {
-            /**
-             * Compares each actor
-             * @param a1 first actor
-             * @param a2 second actor
-             * @return negative for "less than", 0 for equals, positive
-             * 	for "more than".
-             */
-            @Override
-            public int compare(Actor a1, Actor a2)
-            {
-                return a2.dominanceLevelFor(visitor).compareTo(
-                        a1.dominanceLevelFor(visitor));
-            }
-
-        });
+        residents.sort((a1, a2) -> a2.dominanceLevelFor(visitor).compareTo(
+                        a1.dominanceLevelFor(visitor)));
         return residents;
     }
 
@@ -234,10 +213,11 @@ public class Grid extends Pane
      * This obtains the rng seed used to make this game have randomly
      * generated elements unique at each game, yet replayable at a later time.
      * @return the current seed for this grid's random number generator.
+     * @see StatefulRandom#getSeed()
      */
     public long getRNGSeed()
     {
-        return rngSeed;
+        return rng.getSeed();
     }
 
     /**
@@ -245,11 +225,11 @@ public class Grid extends Pane
      * This is often done when the program is replaying a particular game.
      *
      * @param seed the new seed to set to
+     * @see StatefulRandom#setSeed(long)
      */
     public void setRNGSeed(long seed)
     {
         rng.setSeed(seed);
-        rngSeed = seed;
     }
 
     /**
@@ -258,7 +238,7 @@ public class Grid extends Pane
      *
      * @return grid's random number generator
      */
-    public Random getRNG()
+    public StatefulRandom getRNG()
     {
         return rng;
     }
@@ -295,7 +275,7 @@ public class Grid extends Pane
             throw new IllegalArgumentException("Illegal direction");
 
         Player p = getPlayer();
-        if (p == null || !p.isMoving())
+        if (p == null || p.isMoving())
             return;
 
         lastMove = moveDir;

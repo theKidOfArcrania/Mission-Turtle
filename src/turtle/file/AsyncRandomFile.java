@@ -41,7 +41,7 @@ public class AsyncRandomFile
         private long pos;
 
         /**
-         * Creates a new wrapper inputstream.
+         * Creates a new wrapper input stream.
          * @param pos the position to start reading from.
          */
         public WrapperInputStream(long pos)
@@ -120,7 +120,7 @@ public class AsyncRandomFile
         private long pos;
 
         /**
-         * Creates a new wrapper inputstream.
+         * Creates a new wrapper input stream.
          * @param pos the position to start reading from.
          */
         public WrapperOutputStream(long pos)
@@ -157,14 +157,13 @@ public class AsyncRandomFile
         }
 
         /**
-         * Flushes all data to the underlying system. This will currently
-         * write all the outstanding writes within this file to the
-         * underlying channel.
+         * Flushes all data to the underlying system. This will do nothing as
+         * all the writes are done asynchronously. If any writes be written
+         * you must use the {@link #waitForWrites()} method.
          */
         @Override
         public void flush()
         {
-            waitForWrites();
         }
     }
 
@@ -210,6 +209,17 @@ public class AsyncRandomFile
     public long length() throws IOException
     {
         return chann.size();
+    }
+
+    /**
+     * Truncates the size of this file.
+     * @param size the size to truncate to.
+     * @throws IOException if an I/O error occurs while setting length
+     * @see AsynchronousFileChannel#truncate(long)
+     */
+    public void truncate(long size) throws IOException
+    {
+        chann.truncate(size);
     }
 
     /**
@@ -270,7 +280,7 @@ public class AsyncRandomFile
      * @param position the position to start writing from.
      * @return a output stream wrapper
      */
-    public OutputStream obtainOututStream(long position)
+    public OutputStream obtainOutputStream(long position)
     {
         return new WrapperOutputStream(position);
     }
@@ -280,7 +290,7 @@ public class AsyncRandomFile
      */
     public void waitForWrites()
     {
-        while (outstandingWrites.isEmpty())
+        while (!outstandingWrites.isEmpty())
         {
             Future<Integer> waiting = outstandingWrites.poll();
             while (!waiting.isDone())

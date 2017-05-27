@@ -23,7 +23,7 @@ import turtle.file.LevelPack;
 /**
  * TMXToMTP.java
  * 
- * This utility class includes a interactable prompt to help convert TMX files 
+ * This utility class includes a interactive prompt to help convert TMX files
  * from "Tiled" into a binary MTP file for the main program to use.
  * 
  * @author Henry
@@ -45,13 +45,16 @@ public class TMXToMTP {
 	 * Date: 5/6/17
 	 * Period: 2
 	 */
-	@SuppressWarnings("javadoc")
 	public enum LayerType
 	{
 		ACTOR(Actor.class), CELL(Cell.class);
 		
-		private Class<? extends Component> clazz;
+		private final Class<? extends Component> clazz;
 
+		/**
+		 * Constructs a new LayerType
+		 * @param clazz the class referred to.
+		 */
 		LayerType(Class<? extends Component> clazz)
 		{
 			this.clazz = clazz;
@@ -288,10 +291,10 @@ public class TMXToMTP {
 				
 				for (String prop : tleProps.stringPropertyNames())
 				{
-					String sval = tleProps.getProperty(prop);
-					if (sval.isEmpty())
+					String sVal = tleProps.getProperty(prop);
+					if (sVal.isEmpty())
 						continue;
-					Object val = parseValue(tleLoc, prop, sval);
+					Object val = parseValue(tleLoc, prop, sVal);
 					if (val != null)
 						props.put(prop, val);
 				}
@@ -309,7 +312,7 @@ public class TMXToMTP {
 	 * @param loc the location string of this value.
 	 * @param prop the property name of this value.
 	 * @param val the value itself 
-	 * @return an demarshalled object represented by the string
+	 * @return an unmarshalled object represented by the string
 	 */
 	private static Object parseValue(String loc, String prop, String val)
 	{

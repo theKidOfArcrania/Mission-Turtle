@@ -1,8 +1,5 @@
 package turtle.ui;
 
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
-
 /**
  * MenuUI.java
  * <p>
@@ -17,8 +14,8 @@ public class GameMenuUI extends MenuUI
 {
     public static final int ID_RESUME = 0;
     public static final int ID_RESTART = 1;
-    public static final int ID_LEVELSELECT = 2;
-    public static final int ID_MAINMENU = 3;
+    public static final int ID_LEVEL_SELECT = 2;
+    public static final int ID_MAIN_MENU = 3;
     public static final int ID_EXIT = 4;
 
     private static final String[] NAMES = {"Resume", "Restart Level",
@@ -39,21 +36,8 @@ public class GameMenuUI extends MenuUI
         for (int i = 0; i < NAMES.length; i++)
         {
             final int id = i;
-            /** Handles mouse event when user clicks a menu button*/
             getChildren().add(MenuUI.createButton(NAMES[i], true, true,
-                    new EventHandler<MouseEvent>()
-                    {
-                        /**
-                         * Handles the event by delegating to the
-                         * {@link turtle.ui.GameUI#handleGameMenu(int)} function.
-                         * @param event the event associated with click.
-                         */
-                        @Override
-                        public void handle(MouseEvent event)
-                        {
-                            parent.handleGameMenu(id);
-                        }
-                    }));
+                    event -> parent.handleGameMenu(id)));
         }
 
         setPrefWidth(MENU_WIDTH);

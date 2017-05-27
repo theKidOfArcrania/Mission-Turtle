@@ -1,12 +1,10 @@
 package turtle.ui;
 
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -64,6 +62,11 @@ public class DialogBoxUI extends Pane
         getChildren().add(pnlDialog);
     }
 
+    public IntConsumer getOnResponse()
+    {
+        return respondHand;
+    }
+
     /**
      * Initializes the buttons panel UI
      *
@@ -85,23 +88,10 @@ public class DialogBoxUI extends Pane
 
             int curIndex = i;
 
-            /**
-             * Handles event when user clicks on this button.
-             */
-            button.setOnMouseClicked(new EventHandler<MouseEvent>()
+            button.setOnMouseClicked(event ->
             {
-
-                /**
-                 * This handles the click event. Propagates to respond handler
-                 * if there is one.
-                 * @param event the event associated with the mouse click.
-                 */
-                @Override
-                public void handle(MouseEvent event)
-                {
-                    if (respondHand != null)
-                        respondHand.accept(curIndex);
-                }
+                if (respondHand != null)
+                    respondHand.accept(curIndex);
             });
 
             pnlButtons.getChildren().add(button);

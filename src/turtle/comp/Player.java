@@ -1,7 +1,5 @@
 package turtle.comp;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.scene.transform.Rotate;
 import turtle.core.Actor;
 import turtle.core.Component;
@@ -56,27 +54,14 @@ public class Player extends Actor
 
         itemOpacity = SEMI_TRANSPARENT;
 
-        /**
-         * Changes transparency of the item slots to lower whenever the user
-         * is directly hovering his mouse over turtle.
-         */
-        hoverProperty().addListener(new InvalidationListener()
+        hoverProperty().addListener(observable ->
         {
-
-            /**
-             * Called whenever the hover property is changed.
-             * @param observable the property observable
-             */
-            @Override
-            public void invalidated(Observable observable)
-            {
-                if (isHover())
-                    itemOpacity = 1;
-                else
-                    itemOpacity = SEMI_TRANSPARENT;
-                for (ItemSlot slot : slots)
-                    slot.setOpacity(itemOpacity);
-            }
+            if (isHover())
+                itemOpacity = 1;
+            else
+                itemOpacity = SEMI_TRANSPARENT;
+            for (ItemSlot slot : slots)
+                slot.setOpacity(itemOpacity);
         });
     }
 
@@ -233,7 +218,7 @@ public class Player extends Actor
 
     /**
      * Resets message if the sender sent this message (i.e. it has not
-     * already been overriden by someone else.
+     * already been overridden by someone else.
      *
      * @param sender the component that sent the message
      */

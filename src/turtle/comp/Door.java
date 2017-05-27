@@ -1,8 +1,5 @@
 package turtle.comp;
 
-import java.util.Map;
-import java.util.function.Predicate;
-
 import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
@@ -122,24 +119,8 @@ public class Door extends Actor
     {
         if (other instanceof Player)
         {
-            /**
-             * Searches for a key that matches this color.
-             */
-            Item itm = ((Player) other).useItem(new Predicate<Item>()
-            {
-
-                /**
-                 * Tests whether if this item will be usable to this door.
-                 * @param t the item to test.
-                 * @return true if it works, false if it doesn't.
-                 */
-                @Override
-                public boolean test(Item t)
-                {
-                    return t instanceof Key && ((Key) t).getColor() ==
-                            getColor();
-                }
-            });
+            Item itm = ((Player) other).useItem(
+                    t -> t instanceof Key && ((Key) t).getColor() == getColor());
             return itm != null;
         }
         return false;

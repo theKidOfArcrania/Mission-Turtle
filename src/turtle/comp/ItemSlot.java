@@ -72,7 +72,7 @@ public class ItemSlot extends Pane
         if (items.size() == 0)
         {
             TileSet ts = itm.getTileSet();
-            itemRep.setImage(ts.getImageset());
+            itemRep.setImage(ts.getImageSet());
             itemRep.setViewport(ts.frameAt(itm.getItemImage()));
         } else if (!items.get(0).identical(itm))
             return false;

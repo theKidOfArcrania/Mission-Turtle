@@ -1,13 +1,11 @@
 package turtle.ui;
 
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -84,7 +82,7 @@ public class LevelSelectUI extends VBox
     }
 
     /**
-     * Initializes the interactable buttons to go back and play.
+     * Initializes the interactive buttons to go back and play.
      *
      * @return the buttons pane
      */
@@ -94,36 +92,14 @@ public class LevelSelectUI extends VBox
         buttons.setPadding(new Insets(MARGINS));
         buttons.setHgap(MARGINS);
         buttons.getChildren().addAll(
-                /** Handles mouse event when user selects back button*/
-                MenuUI.createButton("Back", true, true, new
-                        EventHandler<MouseEvent>()
-                        {
-                            /**
-                             * Handles the click event.
-                             * @param event the event associated with click.
-                             */
-                            @Override
-                            public void handle(MouseEvent event)
-                            {
-                                app.showMainMenu();
-                            }
-                        }),
 
-                /** Handles mouse event when user selects play button*/
-                MenuUI.createButton("Play!", true, true, new
-                        EventHandler<MouseEvent>()
-                        {
-                            /**
-                             * Handles the click event.
-                             * @param event the event associated with click.
-                             */
-                            @Override
-                            public void handle(MouseEvent event)
-                            {
-                                if (selectedPack != null && selectedLevel != -1)
-                                    app.startGame(selectedPack, selectedLevel);
-                            }
-                        }));
+                MenuUI.createButton("Back", true, true, event -> app.showMainMenu()),
+
+                MenuUI.createButton("Play!", true, true, event ->
+                {
+                    if (selectedPack != null && selectedLevel != -1)
+                        app.startGame(selectedPack, selectedLevel);
+                }));
         return buttons;
     }
 
@@ -157,21 +133,12 @@ public class LevelSelectUI extends VBox
 
         for (LevelPack pck : app.getLevelPacks())
         {
-            /** Handles mouse event when user selects a level pack*/
             Label button = MenuUI.createButton(pck.getName(), true,
-                    true, new EventHandler<MouseEvent>()
+                    true, event ->
                     {
-                        /**
-                         * Handles the event and selects the current level pack.
-                         * @param event the event associated with click.
-                         */
-                        @Override
-                        public void handle(MouseEvent event)
-                        {
-                            for (Node n : packs.getChildren())
-                                setSelectedState(n, n == event.getSource());
-                            initLevelsUI(pck);
-                        }
+                        for (Node n : packs.getChildren())
+                            setSelectedState(n, n == event.getSource());
+                        initLevelsUI(pck);
                     }
             );
             button.getStyleClass().add("litem");
@@ -187,7 +154,6 @@ public class LevelSelectUI extends VBox
      */
     private void initLevelsUI(LevelPack pack)
     {
-        boolean reachable = true;
         levels.getChildren().clear();
 
         selectedPack = pack;
@@ -195,38 +161,27 @@ public class LevelSelectUI extends VBox
 
         for (int i = 0; i < pack.getLevelCount(); i++)
         {
-            final int num = i;
-            /** Handles mouse event when user clicks a menu button*/
+            boolean unlocked = i == 0 || app.checkLevelUnlock(pack, i);
+
             String name = (i + 1) + " - " + pack.getLevel(i).getName();
-            if (!reachable)
+            if (!unlocked)
                 name = "\uD83D\uDD12 " + name;
             int status = app.checkLevelCompletion(pack, i);
             name += getStatus(status);
 
-            Label button = MenuUI.createButton(name, false,
-                    reachable, new EventHandler<MouseEvent>()
-                    {
-                        /**
-                         * Handles the event and selects the current level.
-                         * @param event the event associated with click.
-                         */
-                        @Override
-                        public void handle(MouseEvent event)
-                        {
-                            for (Node n : levels.getChildren())
-                                setSelectedState(n, n == event.getSource());
-                            if (event.getClickCount() > 1)
-                                app.startGame(pack, num);
-                            selectedPack = pack;
-                            selectedLevel = num;
-                        }
+            int num = i;
+            Label button = MenuUI.createButton(name, false, unlocked,
+                    (event) -> {
+                        for (Node n : levels.getChildren())
+                            setSelectedState(n, n == event.getSource());
+                        if (event.getClickCount() > 1)
+                            app.startGame(pack, num);
+                        selectedPack = pack;
+                        selectedLevel = num;
                     });
             button.getStyleClass().add("litem");
             button.setAlignment(Pos.CENTER_LEFT);
             levels.getChildren().add(button);
-
-            if (status == MainApp.RESULT_NOT_DONE)
-                reachable = false;
         }
         levels.getChildren().add(new Pane());
     }
@@ -239,13 +194,13 @@ public class LevelSelectUI extends VBox
      */
     private void setSelectedState(Node n, boolean selected)
     {
-        Collection<String> stylClss = n.getStyleClass();
+        Collection<String> classes = n.getStyleClass();
         if (selected)
         {
-            if (!stylClss.contains("selected"))
-                stylClss.add("selected");
+            if (!classes.contains("selected"))
+                classes.add("selected");
         } else
-            stylClss.remove("selected");
+            classes.remove("selected");
     }
 
     /**
