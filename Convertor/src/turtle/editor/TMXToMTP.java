@@ -192,6 +192,16 @@ public class TMXToMTP {
 			return;
 		if (!file.contains("."))
 			file += ".mtp";
+
+		try
+        {
+            LevelPack prev = new LevelPack(new File(file));
+            pck.setLevelPackID(prev.getLevelPackID());
+        }
+        catch (Exception e)
+        {
+            //Does nothing
+        }
 		pck.savePack(new File(file));
 	}
 
@@ -355,6 +365,18 @@ public class TMXToMTP {
 				{
 					System.err.println("WARNING: " + loc + " has an invalid " +
 							"short property: '" + prop + "' --> '" + val + "'");
+					return null;
+				}
+			case "direction":
+				try
+				{
+					int num = Integer.parseInt(parts[1]);
+					return Direction.values()[num];
+				}
+				catch (Exception e)
+				{
+					System.err.println("WARNING: " + loc + " has an invalid " +
+							"direction property: '" + prop + "' --> '" + val + "'");
 					return null;
 				}
 			case "int":

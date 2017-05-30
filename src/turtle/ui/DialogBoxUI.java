@@ -62,6 +62,10 @@ public class DialogBoxUI extends Pane
         getChildren().add(pnlDialog);
     }
 
+    /**
+     * Obtains the handler when user responds
+     * @return the response handler.
+     */
     public IntConsumer getOnResponse()
     {
         return respondHand;

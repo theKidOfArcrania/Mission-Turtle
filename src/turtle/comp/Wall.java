@@ -14,19 +14,8 @@ import turtle.core.Cell;
  */
 public class Wall extends Cell
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 51;
-    private static final int WALL_IMAGE = 51;
-
-    /**
-     * Constructs a new Wall by initializing the image.
-     */
-    public Wall()
-    {
-        setImageFrame(WALL_IMAGE);
-    }
+    private static final long serialVersionUID = 8320404363899499817L;
 
     /**
      * Executes a pass when an visitor actor comes to this cell. This

@@ -1,5 +1,6 @@
 package turtle.core;
 
+import javafx.animation.FadeTransition;
 import javafx.geometry.HPos;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
@@ -9,6 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
+import javafx.util.Duration;
 import turtle.comp.Player;
 
 /**
@@ -28,7 +30,8 @@ public class GridView extends Pane
     private static final double INTERNAL_PADDING = 20;
     private static final double CORNER_RADIUS = 5.0;
     private static final double SCREEN_PADDING = 200.0;
-    
+    private static final Duration FADE_DURATION = Duration.seconds(.25);
+
     private final int rows;
     private final int cols;
     private Grid viewed;
@@ -62,20 +65,31 @@ public class GridView extends Pane
     {
         viewed = grid;
         getChildren().clear();
+        initGrid0(grid);
+    }
 
-        int cellSize = DEF_CELL_SIZE;
-        if (grid != null)
-            cellSize = grid.getCellSize();
+    /**
+     * Similar to {@link #initGrid(Grid)}, except this will show a fade-in
+     * transition from the previous grid to this grid.
+     * @param grid the grid to initialize with.
+     */
+    public void fadeInitGrid(Grid grid)
+    {
+        if (viewed == null)
+        {
+            initGrid(grid);
+            return;
+        }
 
-        Rectangle clip = new Rectangle(0, 0, cellSize * cols, cellSize * rows);
-        clip.setArcHeight(CORNER_RADIUS);
-        clip.setArcWidth(CORNER_RADIUS);
-        setClip(clip);
+        Grid old = viewed;
+        FadeTransition fadeOut = new FadeTransition(FADE_DURATION, old);
+        fadeOut.setFromValue(1);
+        fadeOut.setToValue(0);
+        fadeOut.setOnFinished(evt -> getChildren().remove(old));
+        fadeOut.play();
 
-        if (grid != null)
-            getChildren().add(grid);
-        layoutChildren();
-        updatePos();
+        viewed = grid;
+        initGrid0(grid);
     }
 
     /**
@@ -215,6 +229,27 @@ public class GridView extends Pane
         double off = point - viewSize / 2;
         return Math.min(Math.max(-INTERNAL_PADDING, off),
                 (maxSize + INTERNAL_PADDING) - viewSize);
+    }
+
+    /**
+     * Initializes the grid itself.
+     * @param grid the grid to initialize.
+     */
+    private void initGrid0(Grid grid)
+    {
+        int cellSize = DEF_CELL_SIZE;
+        if (grid != null)
+            cellSize = grid.getCellSize();
+
+        Rectangle clip = new Rectangle(0, 0, cellSize * cols, cellSize * rows);
+        clip.setArcHeight(CORNER_RADIUS);
+        clip.setArcWidth(CORNER_RADIUS);
+        setClip(clip);
+
+        if (grid != null)
+            getChildren().add(0, grid);
+        layoutChildren();
+        updatePos();
     }
 
     /**

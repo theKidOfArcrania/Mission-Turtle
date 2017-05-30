@@ -19,6 +19,7 @@ public class DialogBoxUITest extends Application
     public static final int WIDTH = 800;
     public static final int HEIGHT = 600;
 
+    @SuppressWarnings("JavaDoc")
     public static void main(String[] args)
     {
         Application.launch(args);

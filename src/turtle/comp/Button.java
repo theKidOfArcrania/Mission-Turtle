@@ -14,11 +14,9 @@ import turtle.core.*;
  */
 public class Button extends Actor
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 64;
-    private static final int BUTTON_OFFSET_IMAGE = 64;
+    private static final int BUTTON_OFFSET_IMAGE = DEFAULT_IMAGE;
+    private static final long serialVersionUID = 129820630612883091L;
 
     private Location linkedLocation;
     private ColorType color;
@@ -28,9 +26,8 @@ public class Button extends Actor
      */
     public Button()
     {
-        setImageFrame(DEFAULT_IMAGE);
         linkedLocation = new Location();
-        setColor(ColorType.RED);
+        setColor(ColorType.YELLOW);
     }
 
 
@@ -84,10 +81,11 @@ public class Button extends Actor
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @param heading the direction of heading
      */
     @Override
     @NotAttribute
-    public void setHeading(int heading)
+    public void setHeading(Direction heading)
     {
         //Does nothing
     }

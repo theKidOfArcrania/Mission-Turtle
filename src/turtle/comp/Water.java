@@ -5,6 +5,9 @@ import turtle.core.Actor;
 import turtle.core.Cell;
 import turtle.core.TileSet;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 /**
  * Water.java
  * <p>
@@ -21,12 +24,15 @@ public class Water extends Cell
      */
     public static final int DEFAULT_IMAGE = 12;
 
-    private static final int[] ANIMATION_FRAME = {12, 13, 14, 15, 16};
+    private static final int[] ANIMATION_FRAME = {DEFAULT_IMAGE, 13, 14, 15, 16};
     private static final int[] TRANSFORM_ANIMATION_FRAME = {30, 29, 28, 27, 26};
     private static final int MAX_TRANSFORM = TRANSFORM_ANIMATION_FRAME.length *
             DEF_ANIMATION_FRAME_CHANGE;
-    private final ImageView top;
+    private static final long serialVersionUID = 991189208764206004L;
     private int frameCount;
+    private int topFrame;
+
+    private transient ImageView top;
 
     /**
      * Constructs a Water tile and initializes UI.
@@ -36,11 +42,8 @@ public class Water extends Cell
         animateFrames(ANIMATION_FRAME, true);
         frameCount = -1;
 
-        top = new ImageView();
-        TileSet ts = getTileSet();
-        top.setImage(ts.getImageSet());
-        top.setViewport(ts.frameAt(-1));
-        this.getChildren().add(top);
+        topFrame = -1;
+        initTopImage();
     }
 
     /**
@@ -80,8 +83,9 @@ public class Water extends Cell
         {
             if (frameCount >= DEF_ANIMATION_FRAME_CHANGE)
             {
-                top.setViewport(getTileSet().frameAt(TRANSFORM_ANIMATION_FRAME
-                        [frameCount / DEF_ANIMATION_FRAME_CHANGE - 1]));
+                topFrame = TRANSFORM_ANIMATION_FRAME
+                        [frameCount / DEF_ANIMATION_FRAME_CHANGE - 1];
+                top.setViewport(getTileSet().frameAt(topFrame));
             }
             if (frameCount < MAX_TRANSFORM)
                 frameCount++;
@@ -99,5 +103,31 @@ public class Water extends Cell
     public boolean checkPass(Actor visitor)
     {
         return true;
+    }
+
+    /**
+     * Initializes the top image.
+     */
+    private void initTopImage()
+    {
+        top = new ImageView();
+        TileSet ts = getTileSet();
+        top.setImage(ts.getImageSet());
+        top.setViewport(getTileSet().frameAt(topFrame));
+        this.getChildren().add(top);
+    }
+
+    /**
+     * Reads this object from the provided input stream.
+     *
+     * @param in the input stream to read from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found.
+     */
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        initTopImage();
     }
 }

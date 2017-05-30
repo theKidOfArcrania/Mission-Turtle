@@ -1,5 +1,8 @@
 package turtle.core;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 /**
  * Actor.java
  * <p>
@@ -15,12 +18,6 @@ public abstract class Actor extends Component
 {
     public static final int DYING_FRAMES = 10;
 
-    //Directions
-    public static final int NORTH = 0;
-    public static final int EAST = 1;
-    public static final int SOUTH = 2;
-    public static final int WEST = 3;
-
     /**
      * Angle measurement for right angle
      */
@@ -35,10 +32,12 @@ public abstract class Actor extends Component
     public static final DominanceLevel ITEM = new DominanceLevel("Item", 300);
     public static final DominanceLevel FIXTURE = new DominanceLevel("Fixture", 400);
 
+    private static final long serialVersionUID = -8229684437846026366L;
+
     private boolean dying;
     private boolean dead;
     private int dieFrame;
-    private int heading;
+    private Direction heading;
 
     /**
      * Constructs a new actor.
@@ -46,6 +45,7 @@ public abstract class Actor extends Component
     public Actor()
     {
         dying = false;
+        heading = Direction.NORTH;
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class Actor extends Component
     /**
      * @return the current direction heading
      */
-    public int getHeading()
+    public Direction getHeading()
     {
         return heading;
     }
@@ -82,13 +82,10 @@ public abstract class Actor extends Component
      * actor to that direction.
      *
      * @param heading the new direction heading to set
-     * @throws IllegalArgumentException if a illegal direction is given.
      */
-    public void setHeading(int heading)
+    public void setHeading(Direction heading)
     {
-        if (heading < NORTH || heading > WEST)
-            throw new IllegalArgumentException("Illegal direction");
-        setRotate(heading * RIGHT_ANGLE);
+        setRotate(heading.ordinal() * RIGHT_ANGLE);
         this.heading = heading;
     }
 
@@ -142,12 +139,12 @@ public abstract class Actor extends Component
 
     /**
      * Executes move for an actor in a specified direction. Convenience
-     * method for {@link #traverseDirection(int, boolean)}.
+     * method for {@link #traverseDirection(Direction, boolean)}.
      *
      * @param direction direction to move in.
      * @return true if successful, false otherwise.
      */
-    public boolean traverseDirection(int direction)
+    public boolean traverseDirection(Direction direction)
     {
         return traverseDirection(direction, true);
     }
@@ -159,7 +156,7 @@ public abstract class Actor extends Component
      * @param execute   determine whether to execute move or just check move
      * @return true if successful, false otherwise.
      */
-    public boolean traverseDirection(int direction, boolean execute)
+    public boolean traverseDirection(Direction direction, boolean execute)
     {
         if (isDying())
             return false;
@@ -168,32 +165,13 @@ public abstract class Actor extends Component
         if (parent == null)
             return false;
 
-        Location loc = getHeadLocation();
-        int row = loc.getRow();
-        int col = loc.getColumn();
-
-        switch (direction)
-        {
-            case NORTH:
-                row--;
-                break;
-            case EAST:
-                col++;
-                break;
-            case SOUTH:
-                row++;
-                break;
-            case WEST:
-                col--;
-                break;
-            default:
-                return false;
-        }
+        Location loc = new Location(getHeadLocation());
+        direction.traverse(loc);
 
         if (execute)
-            return parent.moveActor(this, row, col);
+            return parent.moveActor(this, loc.getRow(), loc.getColumn());
         else
-            return parent.checkMove(this, row, col);
+            return parent.checkMove(this, loc.getRow(), loc.getColumn());
     }
 
     /**
@@ -225,5 +203,19 @@ public abstract class Actor extends Component
     {
         setOpacity(1 - ((double) dieFrame / DYING_FRAMES));
         return dieFrame >= DYING_FRAMES;
+    }
+
+    /**
+     * Reads this object from the provided input stream.
+     *
+     * @param in the input stream to read from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found.
+     */
+    private void readObject(ObjectInputStream in)
+         throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        setHeading(getHeading());
     }
 }

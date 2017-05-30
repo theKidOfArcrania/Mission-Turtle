@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import turtle.comp.Player;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -17,9 +18,10 @@ import java.util.*;
  *         Date: 4/27/17
  *         Period: 2
  */
-public class Grid extends Pane
+public class Grid extends Pane implements Serializable
 {
 
+    private static final long serialVersionUID = 7918941519839716716L;
     private final StatefulRandom rng;
 
     private final int rows;
@@ -27,12 +29,16 @@ public class Grid extends Pane
     private final int cellSize;
     private final Cell[][] base;
     private final HashMap<Actor, Location> actorLocs;
-    private final Pane pnlBase;
-    private final Pane pnlStage;
+
+    private transient Pane pnlBase;
+    private transient Pane pnlStage;
+
     private Player player;
     private int foodLeft;
-    private int lastMove;
+    private int timeLeft;
+    private Direction lastMove;
     private final Recording recording;
+
 
     /**
      * Creates a new grid with the following dimensions
@@ -43,24 +49,44 @@ public class Grid extends Pane
     public Grid(int rows, int cols)
     {
         rng = new StatefulRandom();
-
         recording = new Recording();
-
         cellSize = Component.DEFAULT_SET.getFrameSize();
 
         this.rows = rows;
         this.cols = cols;
         foodLeft = 0;
+        timeLeft = -1;
 
         base = new Cell[rows][cols];
         actorLocs = new HashMap<>();
 
+        lastMove = null;
+
         pnlBase = new ComponentPane();
         pnlStage = new ComponentPane();
-
-        lastMove = -1;
-
         getChildren().addAll(pnlBase, pnlStage);
+    }
+
+    /**
+     * Copies all current state of grid into a new grid.
+     * @return a new Grid copy.
+     * @throws IOException if something cannot be copied via serialization
+     */
+    public Grid deepCopy() throws IOException
+    {
+        try
+        {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+            ObjectInputStream ois = new ObjectInputStream(new
+                    ByteArrayInputStream(baos.toByteArray()));
+            return (Grid)ois.readObject();
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new IOException(e);
+        }
     }
 
     /**
@@ -166,6 +192,36 @@ public class Grid extends Pane
     }
 
     /**
+     * Decrements time left by one second. This will only do it if the
+     * current value is positive.
+     */
+    public void decrementTime()
+    {
+        if (timeLeft > 0)
+            timeLeft--;
+    }
+
+    /**
+     * Getter method for remaining time.
+     *
+     * @return the current amount of seconds left on clock.
+     */
+    public int getTimeLeft()
+    {
+        return timeLeft;
+    }
+
+    /**
+     * Setter method for remaining time
+     *
+     * @param timeLeft the new amount of seconds left.
+     */
+    public void setTimeLeft(int timeLeft)
+    {
+        this.timeLeft = timeLeft;
+    }
+
+    /**
      * Determines whether if a row/column location is a valid location, i.e.
      * is a location within this grid's bounds.
      *
@@ -202,9 +258,9 @@ public class Grid extends Pane
 
     /**
      * Obtains the move that the player has made within the current frame.
-     * @return a directional movement, or -1 if none has been made.
+     * @return a directional movement, or null if none has been made.
      */
-    public int getLastMove()
+    public Direction getLastMove()
     {
         return lastMove;
     }
@@ -267,13 +323,9 @@ public class Grid extends Pane
     /**
      * Moves the player in the specified direction.
      * @param moveDir the direction to move in.
-     * @throws IllegalArgumentException if an illegal direction is provided.
      */
-    public void movePlayer(int moveDir)
+    public void movePlayer(Direction moveDir)
     {
-        if (moveDir < Actor.NORTH || moveDir > Actor.WEST)
-            throw new IllegalArgumentException("Illegal direction");
-
         Player p = getPlayer();
         if (p == null || p.isMoving())
             return;
@@ -422,7 +474,7 @@ public class Grid extends Pane
         if (!recording.isStarted())
             recording.startRecording(this);
         recording.updateFrame(frame);
-        lastMove = -1;
+        lastMove = null;
 
         //Avoid concurrency issues.
         List<Node> base = new ArrayList<>(pnlBase.getChildren());
@@ -520,6 +572,36 @@ public class Grid extends Pane
         visitor.getHeadLocation().setLocation(row, col);
 
         return true;
+    }
+
+    /**
+     * Reads this object from the provided input stream.
+     *
+     * @param in the input stream to read from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found.
+     */
+    private void readObject(java.io.ObjectInputStream in)
+            throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+
+        pnlBase = new ComponentPane();
+        pnlStage = new ComponentPane();
+        getChildren().addAll(pnlBase, pnlStage);
+
+        for (Cell[] row : base)
+            for (Cell cell : row)
+                if (cell != null)
+                    pnlBase.getChildren().add(cell);
+
+        PriorityQueue<Actor> stage = new PriorityQueue<>(Comparator.comparing
+                (actor -> actor.dominanceLevelFor(null), Comparator
+                        .reverseOrder()));
+        stage.addAll(actorLocs.keySet());
+        while (!stage.isEmpty())
+            pnlStage.getChildren().add(stage.poll());
+        pnlStage.getChildren().addAll(stage);
     }
 
     /**

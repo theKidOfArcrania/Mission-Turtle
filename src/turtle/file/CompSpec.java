@@ -24,7 +24,7 @@ public class CompSpec
     private final TileSet tileset;
     private final Location loc;
     private final short slot;
-    private final Map<String, Object> params;
+    private final HashMap<String, Object> params;
 
     /**
      * Creates a CompSpec initialized with the component specifications

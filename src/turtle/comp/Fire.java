@@ -22,6 +22,7 @@ public class Fire extends Cell
     public static final int DEFAULT_IMAGE = 18;
     private static final int[] ANIMATE_FRAMES = {18, 19, 20};
     private static final int[] TRANSFORM_FRAMES = {19, 21, 22, 23, 24, 25, 26};
+    private static final long serialVersionUID = 8374356983860533042L;
 
     private boolean smoking;
 

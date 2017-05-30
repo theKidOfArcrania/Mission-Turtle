@@ -18,6 +18,7 @@ public class StatefulRandom extends Random
     public static final long MASK = (1L << 48) - 1;
     public static final int MAX_BITS = 48;
     public static final long ADDEND = 0xBL;
+    private static final long serialVersionUID = -3171683136036560219L;
 
     private final AtomicLong seed;
     private final AtomicLong state;

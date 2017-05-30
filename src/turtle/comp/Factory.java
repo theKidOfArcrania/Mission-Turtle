@@ -3,6 +3,7 @@ package turtle.comp;
 import javafx.scene.image.ImageView;
 import turtle.core.*;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 import static turtle.core.Actor.*;
@@ -23,31 +24,40 @@ public class Factory extends Cell
      * The default image for this component
      */
     public static final int DEFAULT_IMAGE = 70;
-    private static final int FACTORY_OFFSET_IMAGE = 70;
-
+    private static final int FACTORY_OFFSET_IMAGE = DEFAULT_IMAGE;
     private static final double RATIO_CLONE_IMG = .8;
-    private final ImageView clonedImg;
+    private static final long serialVersionUID = -8544196441607182765L;
+
     private boolean headingMatters = false;
-    private int heading;
+    private Direction heading;
     private short componentCloned;
     private long currentFrame;
     private long cloning;
 
     private ColorType color;
 
+    private transient ImageView clonedImg;
+
     /**
      * Constructs a new factory.
      */
     public Factory()
     {
-        heading = Actor.NORTH;
+        heading = Direction.NORTH;
         headingMatters = false;
         cloning = -1;
         currentFrame = 0;
         componentCloned = -1;
 
-        setImageFrame(DEFAULT_IMAGE);
+        initCloneImg();
+        setColor(ColorType.YELLOW);
+    }
 
+    /**
+     * Initializes the clone image-view UI.
+     */
+    private void initCloneImg()
+    {
         TileSet ts = getTileSet();
         double size = ts.getFrameSize() * RATIO_CLONE_IMG;
 
@@ -57,8 +67,6 @@ public class Factory extends Cell
         clonedImg.setImage(ts.getImageSet());
         clonedImg.setViewport(ts.frameAt(-1));
         this.getChildren().add(clonedImg);
-
-        setColor(ColorType.RED);
     }
 
     /**
@@ -131,7 +139,7 @@ public class Factory extends Cell
     /**
      * @return the current direction heading
      */
-    public int getHeading()
+    public Direction getHeading()
     {
         return heading;
     }
@@ -142,17 +150,14 @@ public class Factory extends Cell
      * factory will clone its actors.
      *
      * @param heading the new direction heading to set
-     * @throws IllegalArgumentException if a illegal direction is given.
      */
-    public void setHeading(int heading)
+    public void setHeading(Direction heading)
     {
-        if (heading < NORTH || heading > WEST)
-            throw new IllegalArgumentException("Illegal direction");
         if (!headingMatters)
-            clonedImg.setRotate(-heading * RIGHT_ANGLE);
+            clonedImg.setRotate(-heading.ordinal() * RIGHT_ANGLE);
         else
             clonedImg.setRotate(0);
-        setRotate(heading * RIGHT_ANGLE);
+        setRotate(heading.ordinal() * RIGHT_ANGLE);
         this.heading = heading;
     }
 
@@ -212,35 +217,16 @@ public class Factory extends Cell
 
         cloning = -1;
 
-        Location loc = getHeadLocation();
-        int row = loc.getRow();
-        int col = loc.getColumn();
-
-        switch (getHeading())
-        {
-            case NORTH:
-                row--;
-                break;
-            case EAST:
-                col++;
-                break;
-            case SOUTH:
-                row++;
-                break;
-            case WEST:
-                col--;
-                break;
-            default:
-                return;
-        }
+        Location loc = new Location(getHeadLocation());
+        heading.traverse(loc);
 
         try
         {
             Class<Component> comp = getTileSet().componentAt(componentCloned);
             Actor clone = (Actor) comp.newInstance();
             clone.setHeading(heading);
-            clone.getHeadLocation().setLocation(row, col);
-            clone.getTrailingLocation().setLocation(row, col);
+            clone.getHeadLocation().setLocation(loc);
+            clone.getTrailingLocation().setLocation(loc);
             parent.placeActor(clone);
         }
         catch (InstantiationException | IllegalAccessException e)
@@ -262,11 +248,11 @@ public class Factory extends Cell
         try
         {
             a = (Actor) actor.newInstance();
-            int before = a.getHeading();
-            if (before == NORTH)
-                a.setHeading(EAST);
+            Direction before = a.getHeading();
+            if (before == Direction.NORTH)
+                a.setHeading(Direction.EAST);
             else
-                a.setHeading(NORTH);
+                a.setHeading(Direction.NORTH);
             return a.getHeading() != before;
         }
         catch (InstantiationException | IllegalAccessException e)
@@ -274,6 +260,21 @@ public class Factory extends Cell
             e.printStackTrace();
             return false;
         }
+    }
 
+    /**
+     * Reads this object from the provided input stream.
+     *
+     * @param in the input stream to read from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found.
+     */
+    private void readObject(java.io.ObjectInputStream in)
+            throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        initCloneImg();
+        setCloned(getCloned());
+        setHeading(getHeading());
     }
 }

@@ -8,6 +8,8 @@ import java.util.Objects;
  * Attribute.java
  *
  * Holds the getters/setters of a particular attribute.
+ *
+ * @author Henry Wang
  */
 public class Attribute
 {

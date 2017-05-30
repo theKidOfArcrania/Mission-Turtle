@@ -8,6 +8,8 @@ import javafx.scene.layout.Pane;
 import turtle.attributes.Attributable;
 import turtle.attributes.AttributeSet;
 
+import java.io.*;
+import java.lang.reflect.Field;
 import java.util.Random;
 
 /**
@@ -20,8 +22,43 @@ import java.util.Random;
  *         Date: 4/26/17
  *         Period: 2
  */
-public abstract class Component extends Pane implements Attributable
+public abstract class Component extends Pane implements Attributable,
+        Serializable
 {
+    /**
+     * Obtains the default image of this class. If this class does not define
+     * a default image, this will search up the hierarchy until the field is
+     * found.
+     * @param comp the class of the component
+     * @return an index of the default image.
+     */
+    public static int getDefaultImage(Class<? extends Component> comp)
+    {
+        if (!Component.class.isAssignableFrom(comp))
+            throw new IllegalArgumentException("Class provided must be a " +
+                    "subclass to Component");
+
+        Class<?> check = comp;
+        do
+        {
+            try
+            {
+                Field fld = check.getField("DEFAULT_IMAGE");
+                if (fld.getType() == int.class)
+                    return fld.getInt(null);
+            }
+            catch (NoSuchFieldException | IllegalAccessException e)
+            {
+                //Does nothing
+            }
+        }
+        while ((check = check.getSuperclass()) != Component.class);
+        return DEFAULT_IMAGE;
+    }
+
+    public static final int DEFAULT_IMAGE = -1;
+    private static final int INVALID_IMAGE_FRAME = -2;
+    private static final long serialVersionUID = -65657197093045828L;
 
     /**
      * Utility method used to shuffle an array.
@@ -42,28 +79,34 @@ public abstract class Component extends Pane implements Attributable
     }
 
     /**
-     * The default number of frames to wait to change one image in an
-     * animation sequence.
+     * Utility method used to shuffle an array.
+     *
+     * @param arr the array to shuffle
+     * @param rng the random generator to shuffle with.
      */
+    public static void shuffle(Object[] arr, Random rng)
+    {
+        for (int i = 0; i < SHUFFLE * arr.length; i++)
+        {
+            int a = rng.nextInt(arr.length);
+            int b = rng.nextInt(arr.length);
+            Object tmp = arr[a];
+            arr[a] = arr[b];
+            arr[b] = tmp;
+        }
+    }
+
     public static final int DEF_ANIMATION_FRAME_CHANGE = 4;
-
-    /**
-     * The default tile-set to use.
-     */
     public static final TileSet DEFAULT_SET = new TileSet();
-
-    /**
-     * The number of frames equating to a big frame
-     * (defined as the player moving one frame.
-     */
     public static final int BIG_FRAME = 10;
-
     private static final int SHUFFLE = 50;
-    private final TileSet ts;
-    private final ImageView img;
+
     private final Location headLoc;
     private final Location trailLoc;
     private final AttributeSet<Component> attributes;
+
+    private transient TileSet ts;
+    private transient ImageView img;
 
     private Grid parent;
     private long curFrame;
@@ -75,22 +118,34 @@ public abstract class Component extends Pane implements Attributable
 
 
     /**
-     * Constructs a new component with the image background.
+     * Constructs a new component with the image background. This will
+     * automatically map to the default image defined by the class.
      */
     protected Component()
     {
-        ts = DEFAULT_SET;
-
-        img = new ImageView(ts.getImageSet());
-        this.getChildren().add(img);
+        initTileSet(DEFAULT_SET);
 
         headLoc = new Location();
         trailLoc = new Location();
 
-        setImageFrame(-1);
+        setImageFrame(getDefaultImage(getClass()));
         curFrame = 0;
 
         attributes = new AttributeSet<>(this);
+    }
+
+    /**
+     * Initializes the tile-set and image-view. This should ONLY be called
+     * exactly once in the component's lifetime.
+     *
+     * @param ts the tileset to initialize to.
+     */
+    private void initTileSet(TileSet ts)
+    {
+        this.ts = ts;
+        currentImage = INVALID_IMAGE_FRAME;
+        img = new ImageView(ts.getImageSet());
+        this.getChildren().add(img);
     }
 
     /**
@@ -172,17 +227,6 @@ public abstract class Component extends Pane implements Attributable
     }
 
     /**
-     * Sets a new parent grid. This should only be called internally
-     * by Grid when this is added.
-     *
-     * @param parent the new parent grid to set to
-     */
-    protected void setParentGrid(Grid parent)
-    {
-        this.parent = parent;
-    }
-
-    /**
      * @return the current tileset used by component
      */
     public TileSet getTileSet()
@@ -196,6 +240,67 @@ public abstract class Component extends Pane implements Attributable
     public Location getTrailingLocation()
     {
         return trailLoc;
+    }
+
+    /**
+     * Determines whether if this component is moving.
+     *
+     * @return true if moving, false if it is still
+     */
+    public boolean isMoving()
+    {
+        return !headLoc.equals(trailLoc);
+    }
+
+    /**
+     * Sets the image of this component to the given index and disables
+     * any current animations.
+     *
+     * @param index the index from the TileSet of frames.
+     * @throws IndexOutOfBoundsException if image frame index is out of bounds.
+     */
+    public void setImageFrame(int index)
+    {
+        setViewport(index);
+        animationOffset = -1;
+        imageFrames = null;
+        changeRate = -1;
+    }
+
+    /**
+     * Updates a frame of animation for a Component.
+     * Note: Subclasses should ALWAYS call <code>super.updateFrame()</code>
+     * in order that all the super classes get updated as well.
+     *
+     * @param frame current frame number
+     */
+    public void updateFrame(long frame)
+    {
+        curFrame = frame;
+        updateAnimation(frame);
+        move();
+    }
+
+    /**
+     * Sets a new parent grid. This should only be called internally
+     * by Grid when this is added.
+     *
+     * @param parent the new parent grid to set to
+     */
+    protected void setParentGrid(Grid parent)
+    {
+        this.parent = parent;
+    }
+
+    /**
+     * Layouts all nodes in the center by default, spanning full size.
+     */
+    @Override
+    protected void layoutChildren()
+    {
+        for (Node n : getManagedChildren())
+            layoutInArea(n, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
+                    VPos.CENTER);
     }
 
     /**
@@ -225,27 +330,6 @@ public abstract class Component extends Pane implements Attributable
     }
 
     /**
-     * Determines whether if this component is moving.
-     *
-     * @return true if moving, false if it is still
-     */
-    public boolean isMoving()
-    {
-        return !headLoc.equals(trailLoc);
-    }
-
-    /**
-     * Layouts all nodes in the center by default, spanning full size.
-     */
-    @Override
-    protected void layoutChildren()
-    {
-        for (Node n : getManagedChildren())
-            layoutInArea(n, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
-                    VPos.CENTER);
-    }
-
-    /**
      * Moves this component one frame step in the direction it is moving if any.
      */
     private void move()
@@ -269,21 +353,6 @@ public abstract class Component extends Pane implements Attributable
                     trailLoc.setLocation(headLoc);
             }
         }
-    }
-
-    /**
-     * Sets the image of this component to the given index and disables
-     * any current animations.
-     *
-     * @param index the index from the TileSet of frames.
-     * @throws IndexOutOfBoundsException if image frame index is out of bounds.
-     */
-    public void setImageFrame(int index)
-    {
-        setViewport(index);
-        animationOffset = -1;
-        imageFrames = null;
-        changeRate = -1;
     }
 
     /**
@@ -316,7 +385,8 @@ public abstract class Component extends Pane implements Attributable
             {
                 stepInd %= imageFrames.length;
                 setViewport(imageFrames[stepInd]);
-            } else
+            }
+            else
             {
                 if (stepInd >= imageFrames.length - 1)
                     setImageFrame(imageFrames[imageFrames.length - 1]);
@@ -326,17 +396,47 @@ public abstract class Component extends Pane implements Attributable
         }
     }
 
+
     /**
-     * Updates a frame of animation for a Component.
-     * Note: Subclasses should ALWAYS call <code>super.updateFrame()</code>
-     * in order that all the super classes get updated as well.
+     * Reads this object from the provided input stream.
      *
-     * @param frame current frame number
+     * @param in the input stream to read from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found.
      */
-    public void updateFrame(long frame)
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException
     {
-        curFrame = frame;
-        updateAnimation(frame);
-        move();
+        in.defaultReadObject();
+        setTranslateX(in.readDouble());
+        setTranslateY(in.readDouble());
+
+        int frame = currentImage;
+        try
+        {
+            Component c = getClass().newInstance();
+            initTileSet(c.getTileSet());
+        }
+        catch (InstantiationException | IllegalAccessException e)
+        {
+            e.printStackTrace();
+            throw new IOException("Unable to obtain default Component " +
+                    "constructor");
+        }
+        setViewport(frame);
+    }
+
+    /**
+     * Writes this object to the provided output stream.
+     *
+     * @param out the output stream to read to
+     * @throws IOException if an I/O error occurs
+     */
+    private void writeObject(ObjectOutputStream out)
+            throws IOException
+    {
+        out.defaultWriteObject();
+        out.writeDouble(getTranslateX());
+        out.writeDouble(getTranslateY());
     }
 }

@@ -7,6 +7,10 @@ import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 /**
  * TestActor.java
  * <p>
@@ -18,7 +22,9 @@ import turtle.core.DominanceLevel;
  */
 public class TestActor extends Actor
 {
-    private Color back;
+    private static final long serialVersionUID = 2331309440051226520L;
+    public static final int COLOR_PARAMS = 4;
+    private transient Color back;
     private int level;
     private boolean killer;
     private boolean wall;
@@ -140,5 +146,38 @@ public class TestActor extends Actor
     private String getLogHeading()
     {
         return "@" + getHeadLocation() + "D" + level;
+    }
+
+    /**
+     * Reads this object from the provided input stream.
+     *
+     * @param in the input stream to read from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found.
+     */
+    private void readObject(ObjectInputStream in)
+         throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        Object data = in.readObject();
+        double[] color;
+        if (!(data instanceof double[]) || (color = (double[])data).length !=
+                COLOR_PARAMS)
+            throw new IOException("Unable to read background color");
+        back = new Color(color[3], color[0], color[1], color[2]);
+    }
+
+    /**
+     * Writes this object to the provided output stream.
+     *
+     * @param out the output stream to read to
+     * @throws IOException if an I/O error occurs
+     */
+    private void writeObject(ObjectOutputStream out)
+            throws IOException
+    {
+        out.defaultWriteObject();
+        out.writeObject(new double[] {back.getOpacity(), back.getRed(), back
+                .getGreen(), back.getBlue()});
     }
 }

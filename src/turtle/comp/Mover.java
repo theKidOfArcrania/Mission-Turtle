@@ -1,9 +1,6 @@
 package turtle.comp;
 
-import turtle.core.Actor;
-import turtle.core.DominanceLevel;
-import turtle.core.Grid;
-import turtle.core.Location;
+import turtle.core.*;
 
 /**
  * Mover.java
@@ -16,6 +13,8 @@ import turtle.core.Location;
  */
 public abstract class Mover extends Actor
 {
+
+    private static final long serialVersionUID = 2633910574669753448L;
 
     /**
      * Checks whether an interaction with another actor is possible.
@@ -33,8 +32,8 @@ public abstract class Mover extends Actor
         if (!(other instanceof Player))
             return false;
 
-        int dir = getPlayerVector();
-        return dir != -1 && traverseDirection(dir, false);
+        Direction dir = getPlayerVector();
+        return dir != null && traverseDirection(dir, false);
     }
 
     /**
@@ -57,8 +56,8 @@ public abstract class Mover extends Actor
         if (!(other instanceof Player))
             return false;
 
-        int dir = getPlayerVector();
-        return dir != -1 && traverseDirection(dir);
+        Direction dir = getPlayerVector();
+        return dir != null && traverseDirection(dir);
     }
 
     /**
@@ -85,11 +84,11 @@ public abstract class Mover extends Actor
      *
      * @return directionals 0 to 3, or -1 if there is no vector.
      */
-    protected int getPlayerVector()
+    protected Direction getPlayerVector()
     {
         Grid parent = getParentGrid();
         if (parent == null)
-            return -1;
+            return null;
 
         final int poss[] = {-1, 0, 0, 1, 1, 0, 0, -1};
 
@@ -107,8 +106,8 @@ public abstract class Mover extends Actor
         }
 
         if (dir >= poss.length)
-            return -1;
+            return null;
         else
-            return dir / 2;
+            return Direction.values()[dir / 2];
     }
 }

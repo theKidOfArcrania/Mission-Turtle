@@ -164,26 +164,13 @@ public class EqualGridPane extends Pane
     protected double computeMaxWidth(double height)
     {
         double cellWidth = 0;
-        int count = getManagedChildren().size();
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < getManagedChildren().size(); i++)
         {
             Node node = getManagedChildren().get(i);
             if (node.isManaged())
                 cellWidth = Math.max(cellWidth, node.maxWidth(-1));
         }
-        if (cellWidth == 0)
-            return getInsets().getLeft() + getInsets().getRight();
-        else
-        {
-            int rows = this.rows <= 1 ? 1 : this.rows;
-            int cols = count / rows;
-            if (columns > cols)
-                cols = columns;
-            else if (cols * rows != count)
-                cols++;
-            return cellWidth * cols + hgap * (cols - 1) + getInsets().getLeft()
-                    + getInsets().getRight();
-        }
+        return computeWidth(cellWidth);
     }
 
     /**
@@ -229,19 +216,7 @@ public class EqualGridPane extends Pane
             if (node.isManaged())
                 cellWidth = Math.max(cellWidth, node.minWidth(-1));
         }
-        if (cellWidth == 0)
-            return getInsets().getLeft() + getInsets().getRight();
-        else
-        {
-            int rows = this.rows <= 1 ? 1 : this.rows;
-            int cols = count / rows;
-            if (columns > cols)
-                cols = columns;
-            else if (cols * rows != count)
-                cols++;
-            return cellWidth * cols + hgap * (cols - 1) + getInsets().getLeft()
-                    + getInsets().getRight();
-        }
+        return computeWidth(cellWidth);
     }
 
     /**
@@ -288,6 +263,17 @@ public class EqualGridPane extends Pane
             cellWidth = Math.max(cellWidth, boundedSize(node.prefWidth(-1),
                     node.minWidth(-1), node.maxWidth(-1)));
         }
+        return computeWidth(cellWidth);
+    }
+
+    /**
+     * Computes a total width based on the per cell width
+     * @param cellWidth the cell width
+     * @return total width in pixels
+     */
+    private double computeWidth(double cellWidth)
+    {
+        int count = getManagedChildren().size();
         if (cellWidth == 0)
             return getInsets().getLeft() + getInsets().getRight();
         else

@@ -25,8 +25,8 @@ public class LevelPack
     private final RandomAccessFile raf;
     
     private final long[] levelOffsets;
-    private final UUID levelPackID;
     private final ArrayList<Level> levels;
+    private UUID levelPackID;
     private String name;
 
     /**
@@ -144,12 +144,11 @@ public class LevelPack
      * Loads a level from file and returns it.
      *
      * @param index index of level to load.
-     * @return the loaded level.
      * @throws IOException           if level fails to load from file.
      * @throws IllegalStateException if this LevelPack does not load from a
      *                               file.
      */
-    public Level loadLevel(int index) throws IOException
+    public void loadLevel(int index) throws IOException
     {
         if (!loadedMode)
             throw new IllegalStateException("No level to load");
@@ -157,7 +156,6 @@ public class LevelPack
         Level lvl = levels.get(index);
         if (!lvl.isLoaded())
             lvl.loadLevel(raf);
-        return lvl;
     }
 
 
@@ -226,6 +224,17 @@ public class LevelPack
             throw new IllegalStateException("Level pack is read-only in load "
                     + "mode");
         levels.remove(ind).parent = null;
+    }
+
+    /**
+     * Setter method for levelPackID. This id determines whether if two level
+     * pack is sufficiently similar.
+     *
+     * @param levelPackID the new unique pack identifier for this level pack.
+     */
+    public void setLevelPackID(UUID levelPackID)
+    {
+        this.levelPackID = levelPackID;
     }
 
     /**

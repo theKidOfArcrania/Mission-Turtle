@@ -1,5 +1,6 @@
 package turtle.comp;
 
+import turtle.core.Direction;
 import turtle.core.Grid;
 import turtle.core.Location;
 
@@ -15,14 +16,12 @@ import turtle.core.Location;
  */
 public class Child extends Enemy
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 62;
 
     private static final int WALK_FRAMES[] = {63, 62};
 
     private static final int CHARGE_DIST = 10;
+    private static final long serialVersionUID = -5302146650460128654L;
 
     private long lastMove;
     private boolean frenzyState;
@@ -33,7 +32,6 @@ public class Child extends Enemy
      */
     public Child()
     {
-        setImageFrame(DEFAULT_IMAGE);
         moving = false;
     }
 
@@ -82,7 +80,8 @@ public class Child extends Enemy
                 lastMove = frame;
             else
                 frenzyState = false;
-        } else
+        }
+        else
         {
             if (frame - lastMove == BIG_FRAME * 2)
             {
@@ -101,10 +100,10 @@ public class Child extends Enemy
                 }
             }
 
-            int[] choices = {NORTH, EAST, SOUTH, WEST};
+            Direction[] choices = Direction.values();
             shuffle(choices, g.getRNG());
-            int lastDir = NORTH;
-            for (int dir : choices)
+            Direction lastDir = Direction.NORTH;
+            for (Direction dir : choices)
             {
                 lastDir = dir;
                 if (traverseDirection(dir))
@@ -128,15 +127,15 @@ public class Child extends Enemy
         if (dc == 0)
         {
             if (dr > 0)
-                setHeading(SOUTH);
+                setHeading(Direction.SOUTH);
             else
-                setHeading(NORTH);
+                setHeading(Direction.NORTH);
         } else
         {
             if (dc > 0)
-                setHeading(EAST);
+                setHeading(Direction.EAST);
             else
-                setHeading(WEST);
+                setHeading(Direction.WEST);
         }
     }
 }

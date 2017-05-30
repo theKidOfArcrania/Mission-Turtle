@@ -5,6 +5,8 @@ import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -23,22 +25,25 @@ import java.util.function.Predicate;
  */
 public class Player extends Actor
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 40;
 
     private static final double ITEM_RADIUS = .65;
-
     private static final double SEMI_TRANSPARENT = .5;
-    private static final int FRAME_STILL = 40;
-    private static final int[] FRAME_ANIMATE = {41, 42, 43, 40};
+
+    private static final int FRAME_STILL = DEFAULT_IMAGE;
+    private static final int[] FRAME_ANIMATE = {41, 42, 43, DEFAULT_IMAGE};
+
+    private static final long serialVersionUID = -422294616581707080L;
+
     private final ArrayList<Item> pocket;
     private final ArrayList<ItemSlot> slots;
+
     private Component msgSender;
     private String msg;
+
     private boolean winner;
     private boolean moving;
+    @SuppressWarnings("CanBeFinal")
     private double itemOpacity;
 
     /**
@@ -48,21 +53,23 @@ public class Player extends Actor
     {
         winner = false;
         moving = false;
-        setImageFrame(FRAME_STILL);
         pocket = new ArrayList<>();
         slots = new ArrayList<>();
 
         itemOpacity = SEMI_TRANSPARENT;
+        initItemHover();
+    }
 
-        hoverProperty().addListener(observable ->
-        {
-            if (isHover())
-                itemOpacity = 1;
-            else
-                itemOpacity = SEMI_TRANSPARENT;
-            for (ItemSlot slot : slots)
-                slot.setOpacity(itemOpacity);
-        });
+    /**
+     * Checks whether an interaction with another actor is possible.
+     * This will always let actors pass through
+     *
+     * @param other the other actor to interact with.
+     * @return true to always allow others to enter.
+     */
+    public boolean checkInteract(Actor other)
+    {
+        return true;
     }
 
     /**
@@ -89,70 +96,13 @@ public class Player extends Actor
 
         ItemSlot newSlot = new ItemSlot();
         newSlot.addItem(itm);
-
-        Rotate negateRotate = new Rotate(0, Rotate.Z_AXIS);
-        negateRotate.angleProperty().bind(rotateProperty().negate());
-        negateRotate.pivotXProperty().bind(widthProperty().divide(2)
-                .subtract(newSlot.translateXProperty()));
-        negateRotate.pivotYProperty().bind(heightProperty().divide(2)
-                .subtract(newSlot.translateYProperty()));
-        newSlot.getTransforms().add(negateRotate);
-
-        newSlot.setOpacity(itemOpacity);
+        initItemSlot(newSlot);
 
         slots.add(newSlot);
         getChildren().add(newSlot);
+
         layoutSlots();
-
         return true;
-    }
-
-    /**
-     * @return a read-only list of items the user has stored.
-     */
-    public List<Item> getPocket()
-    {
-        return Collections.unmodifiableList(pocket);
-    }
-
-    /**
-     * Finds an item and removes the first such match for the player to use.
-     *
-     * @param usable a function used to identify which item is usable.
-     * @return the first item, or null if it cannot be found.
-     */
-    public Item useItem(Predicate<Item> usable)
-    {
-        Item found = null;
-        for (Item itm : pocket)
-            if (usable.test(itm))
-            {
-                found = itm;
-                break;
-            }
-
-        if (found != null)
-        {
-            pocket.remove(found);
-
-            Iterator<ItemSlot> itr = slots.iterator();
-            while (itr.hasNext())
-            {
-                ItemSlot slot = itr.next();
-                if (slot.removeItem(found))
-                {
-                    if (slot.isEmpty())
-                    {
-                        itr.remove();
-                        getChildren().remove(slot);
-                        layoutSlots();
-                    }
-                    break;
-                }
-            }
-        }
-
-        return found;
     }
 
     /**
@@ -191,6 +141,14 @@ public class Player extends Actor
         if (msg == null)
             return "";
         return msg;
+    }
+
+    /**
+     * @return a read-only list of items the user has stored.
+     */
+    public List<Item> getPocket()
+    {
+        return Collections.unmodifiableList(pocket);
     }
 
     /**
@@ -265,11 +223,84 @@ public class Player extends Actor
     }
 
     /**
+     * Finds an item and removes the first such match for the player to use.
+     *
+     * @param usable a function used to identify which item is usable.
+     * @return the first item, or null if it cannot be found.
+     */
+    public Item useItem(Predicate<Item> usable)
+    {
+        Item found = null;
+        for (Item itm : pocket)
+            if (usable.test(itm))
+            {
+                found = itm;
+                break;
+            }
+
+        if (found != null)
+        {
+            pocket.remove(found);
+
+            Iterator<ItemSlot> itr = slots.iterator();
+            while (itr.hasNext())
+            {
+                ItemSlot slot = itr.next();
+                if (slot.removeItem(found))
+                {
+                    if (slot.isEmpty())
+                    {
+                        itr.remove();
+                        getChildren().remove(slot);
+                        layoutSlots();
+                    }
+                    break;
+                }
+            }
+        }
+
+        return found;
+    }
+
+    /**
      * Flags that the player has won the game.
      */
     public void win()
     {
         winner = true;
+    }
+
+    /**
+     * Initializes the hover listener, which will change opacity of item
+     * slots if user hovers over player.
+     */
+    private void initItemHover()
+    {
+        hoverProperty().addListener(observable ->
+        {
+            if (isHover())
+                itemOpacity = 1;
+            else
+                itemOpacity = SEMI_TRANSPARENT;
+            for (ItemSlot slot : slots)
+                slot.setOpacity(itemOpacity);
+        });
+    }
+
+    /**
+     * Initializes an item slot and UI stuff.
+     * @param slot the slot to initialize
+     */
+    private void initItemSlot(ItemSlot slot)
+    {
+        Rotate negateRotate = new Rotate(0, Rotate.Z_AXIS);
+        negateRotate.angleProperty().bind(rotateProperty().negate());
+        negateRotate.pivotXProperty().bind(widthProperty().divide(2)
+                .subtract(slot.translateXProperty()));
+        negateRotate.pivotYProperty().bind(heightProperty().divide(2)
+                .subtract(slot.translateYProperty()));
+        slot.getTransforms().add(negateRotate);
+        slot.setOpacity(itemOpacity);
     }
 
     /**
@@ -288,14 +319,20 @@ public class Player extends Actor
     }
 
     /**
-     * Checks whether an interaction with another actor is possible.
-     * This will always let actors pass through
+     * Reads this object from the provided input stream.
      *
-     * @param other the other actor to interact with.
-     * @return true to always allow others to enter.
+     * @param in the input stream to read from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found.
      */
-    public boolean checkInteract(Actor other)
+    private void readObject(ObjectInputStream in)
+         throws IOException, ClassNotFoundException
     {
-        return true;
+        in.defaultReadObject();
+        initItemHover();
+        for (ItemSlot slot : slots)
+            initItemSlot(slot);
+        getChildren().addAll(slots);
+        layoutSlots();
     }
 }

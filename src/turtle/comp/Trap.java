@@ -2,6 +2,7 @@ package turtle.comp;
 
 import turtle.core.Actor;
 import turtle.core.Component;
+import turtle.core.Direction;
 import turtle.core.DominanceLevel;
 
 /**
@@ -16,20 +17,9 @@ import turtle.core.DominanceLevel;
  */
 public class Trap extends Actor
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 56;
-    private static final int TRAP_STILL_IMAGE = 56;
     private static final int[] ANIMATION_IMAGE = {57, 58, 59};
-
-    /**
-     * Constructs a new trap actor and initializes image.
-     */
-    public Trap()
-    {
-        setImageFrame(TRAP_STILL_IMAGE);
-    }
+    private static final long serialVersionUID = -2850122197270893076L;
 
     /**
      * Checks if an actor can pass through this trap.
@@ -92,9 +82,10 @@ public class Trap extends Actor
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @param heading the direction of heading
      */
     @Override
-    public void setHeading(int heading)
+    public void setHeading(Direction heading)
     {
         //Does nothing
     }

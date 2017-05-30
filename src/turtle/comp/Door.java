@@ -3,6 +3,7 @@ package turtle.comp;
 import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
+import turtle.core.Direction;
 import turtle.core.DominanceLevel;
 
 /**
@@ -17,11 +18,9 @@ import turtle.core.DominanceLevel;
  */
 public class Door extends Actor
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 0;
-    private static final int LOCK_OFFSET_IMAGE = 0;
+    private static final int LOCK_OFFSET_IMAGE = DEFAULT_IMAGE;
+    private static final long serialVersionUID = 4234019785119559213L;
 
     private ColorType color;
 
@@ -30,7 +29,7 @@ public class Door extends Actor
      */
     public Door()
     {
-        setColor(ColorType.RED);
+        setColor(ColorType.YELLOW);
     }
 
     /**
@@ -133,18 +132,19 @@ public class Door extends Actor
      */
     @Override
     @NotAttribute
-    public int getHeading()
+    public Direction getHeading()
     {
-        return NORTH;
+        return Direction.NORTH;
     }
 
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @param heading the direction of heading
      */
     @Override
     @NotAttribute
-    public void setHeading(int heading)
+    public void setHeading(Direction heading)
     {
         //Does nothing
     }

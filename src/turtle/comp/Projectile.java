@@ -1,6 +1,7 @@
 package turtle.comp;
 
 import turtle.core.Actor;
+import turtle.core.Direction;
 
 /**
  * Projectile.java
@@ -14,14 +15,7 @@ import turtle.core.Actor;
 public class Projectile extends Enemy
 {
     public static final int DEFAULT_IMAGE = 39;
-
-    /**
-     * Constructs a projectile.
-     */
-    public Projectile()
-    {
-        setImageFrame(DEFAULT_IMAGE);
-    }
+    private static final long serialVersionUID = 6061618040424557089L;
 
     /**
      * Kills everything in its path. If successful in killing, it will die as
@@ -64,10 +58,10 @@ public class Projectile extends Enemy
         if (!isMoving())
         {
             final int[] options = {0, 1, 3, 2};
-            int heading = getHeading();
+            Direction heading = getHeading();
             for (int turn : options)
             {
-                int newDir = (turn + heading) % options.length;
+                Direction newDir = heading.turn(turn);
                 if (traverseDirection(newDir, true) ||
                         turn == options[options.length - 1])
                 {

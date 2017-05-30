@@ -2,6 +2,7 @@ package turtle.comp;
 
 import turtle.attributes.NotAttribute;
 import turtle.core.Component;
+import turtle.core.Direction;
 
 import java.util.Random;
 
@@ -16,23 +17,11 @@ import java.util.Random;
  */
 public class Bucket extends Mover
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 31;
-
-    private static final int EMPTY_IMAGE = 31;
     private static final int[] ANIMATE_FRAMES = {32, 33, 34};
+    private static final long serialVersionUID = 3202659903623058965L;
 
     private boolean filled;
-
-    /**
-     * Constructs a Bucket and initializes image.
-     */
-    public Bucket()
-    {
-        setImageFrame(EMPTY_IMAGE);
-    }
 
     /**
      * Overrides die procedure, so that bucket will fill on contact of water
@@ -67,18 +56,19 @@ public class Bucket extends Mover
      */
     @Override
     @NotAttribute
-    public int getHeading()
+    public Direction getHeading()
     {
-        return NORTH;
+        return Direction.NORTH;
     }
 
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @param heading the direction of heading
      */
     @Override
     @NotAttribute
-    public void setHeading(int heading)
+    public void setHeading(Direction heading)
     {
         //Does nothing
     }
@@ -106,7 +96,7 @@ public class Bucket extends Mover
             shuffle(randomized, new Random());
             animateFrames(randomized, true);
         } else
-            setImageFrame(EMPTY_IMAGE);
+            setImageFrame(DEFAULT_IMAGE);
     }
 
 

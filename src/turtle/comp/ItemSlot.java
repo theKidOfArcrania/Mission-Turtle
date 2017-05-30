@@ -9,6 +9,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import turtle.core.TileSet;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -21,7 +24,7 @@ import java.util.ArrayList;
  *         Date: 5/5/17
  *         Period: 2
  */
-public class ItemSlot extends Pane
+public class ItemSlot extends Pane implements Serializable
 {
     private static final int SHADOW_RADIUS = 10;
     private static final double SHADOW_SPREAD = .8;
@@ -29,10 +32,12 @@ public class ItemSlot extends Pane
     private static final int HIGHLIGHT_RADIUS = 30;
 
     private static final int ITEM_SIZE = 30;
+    
+    private static final long serialVersionUID = 2756007054208351589L;
 
     private final ArrayList<Item> items;
-    private final ImageView itemRep;
-    private final Label number;
+    private transient ImageView itemRep;
+    private transient Label number;
 
     /**
      * Creates a new ItemUI and initializes UI.
@@ -40,7 +45,14 @@ public class ItemSlot extends Pane
     public ItemSlot()
     {
         items = new ArrayList<>();
+        initUI();
+    }
 
+    /**
+     * Initializes the UI of a item-slot
+     */
+    private void initUI()
+    {
         itemRep = new ImageView();
 
         itemRep.setFitWidth(ITEM_SIZE);
@@ -122,5 +134,28 @@ public class ItemSlot extends Pane
         layoutInArea(number, (width + ITEM_SIZE - numWidth) / 2,
                 (height + ITEM_SIZE - numHeight) / 2, numWidth, numHeight, 0,
                 HPos.CENTER, VPos.CENTER);
+    }
+
+    /**
+     * Reads this object from the provided input stream.
+     *
+     * @param in the input stream to read from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found.
+     */
+    private void readObject(ObjectInputStream in)
+         throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        initUI();
+
+        if (items.size() > 0)
+        {
+            Item itm = items.get(0);
+            TileSet ts = itm.getTileSet();
+            itemRep.setImage(ts.getImageSet());
+            itemRep.setViewport(ts.frameAt(itm.getItemImage()));
+        }
+        number.setText("" + items.size());
     }
 }

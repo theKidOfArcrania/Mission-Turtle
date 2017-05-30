@@ -12,8 +12,8 @@ import javafx.application.Application;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import turtle.comp.ColorType;
-import turtle.core.Actor;
 import turtle.core.Component;
+import turtle.core.Direction;
 import turtle.core.Location;
 import turtle.file.CompSpec;
 import turtle.file.Level;
@@ -349,7 +349,7 @@ public class GameUITester extends Application
         HashMap<String, Object> params = new HashMap<>();
         addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, params);
 
-        params.put("heading", Actor.EAST);
+        params.put("heading", Direction.EAST);
         addCellSpecs(test, FACT_A, COMP_IND_FACTORY, params);
 
         System.out.print("Input a component ID to clone (9 is default): ");
@@ -392,7 +392,7 @@ public class GameUITester extends Application
         HashMap<String, Object> params = new HashMap<>();
         addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, params);
 
-        params.put("heading", Actor.EAST);
+        params.put("heading", Direction.EAST);
         addActorSpecs(test, CANNON_LOC, COMP_IND_CANNON, params);
 
         params.clear();
@@ -442,8 +442,7 @@ public class GameUITester extends Application
             {
                 if (Math.random() < MOWER_CHANCE)
                 {
-                    params.put("heading", (int) (Math.random() *
-                            (Actor.WEST + 1)));
+                    params.put("heading", Direction.randomDirection());
                     addActorSpecs(test, new Location(r, c), COMP_IND_LAWNMOWER,
                             params);
                 }
@@ -471,7 +470,7 @@ public class GameUITester extends Application
         addCellSpecs(test, EXIT_LOC, COMP_IND_EXIT, new HashMap<>());
         fillCells(test);
         HashMap<String, Object> params = new HashMap<>();
-        params.put("heading", Actor.WEST);
+        params.put("heading", Direction.WEST);
         addActorSpecs(test, MOWER_LOC, COMP_IND_LAWNMOWER, params);
         addActorSpecs(test, BIRD_LOC, COMP_IND_BIRD, new HashMap<>());
         addActorSpecs(test, PLAYER_LOC, COMP_IND_PLAYER, new HashMap<>());

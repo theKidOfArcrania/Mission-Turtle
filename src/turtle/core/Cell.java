@@ -12,6 +12,7 @@ package turtle.core;
  */
 public abstract class Cell extends Component
 {
+    private static final long serialVersionUID = -1623749690326497639L;
     private int frameTransform;
     private Cell transformed;
 

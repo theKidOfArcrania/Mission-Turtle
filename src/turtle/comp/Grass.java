@@ -15,6 +15,7 @@ public class Grass extends Actor
 
     public static final int DEFAULT_IMAGE = 6;
     private static final int[] TRANSFORM_FRAMES = {6, 7, 8, 9, 10};
+    private static final long serialVersionUID = 160528400127855294L;
 
     private int fading;
 
@@ -24,7 +25,6 @@ public class Grass extends Actor
     public Grass()
     {
         fading = -1;
-        setImageFrame(DEFAULT_IMAGE);
     }
 
     /**

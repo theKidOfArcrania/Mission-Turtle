@@ -14,19 +14,8 @@ import turtle.core.Cell;
  */
 public class Sand extends Cell
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 26;
-    private static final int SAND_IMAGE = 26;
-
-    /**
-     * Constructs a new sand and initializing UI.
-     */
-    public Sand()
-    {
-        setImageFrame(SAND_IMAGE);
-    }
+    private static final long serialVersionUID = 2418338281295706831L;
 
     /**
      * Executes a pass when an visitor actor comes to this cell. This

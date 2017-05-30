@@ -19,12 +19,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import turtle.comp.Player;
-import turtle.core.Actor;
-import turtle.core.Grid;
-import turtle.core.GridView;
+import turtle.core.*;
 import turtle.file.Level;
 import turtle.file.LevelPack;
-import turtle.core.Recording;
 
 /**
  * GameUI.java
@@ -37,6 +34,7 @@ import turtle.core.Recording;
  */
 public class GameUI extends VBox
 {
+
     /**
      * Represents a possible value of game states we can be in at the point.
      */
@@ -46,16 +44,20 @@ public class GameUI extends VBox
     }
 
     public static final int FRAMES_PER_SEC = 30;
+    public static final int UNDO_RATE = 150; //You can undo every 5 seconds.
+    public static final int MAX_UNDOS = 5;
 
     private static final String SECT_BREAK = "   ";
     private static final int FPS_UPDATE_RATE = 10;
-    
+
+    private static final int ACTION_MOVE_START = 0;
     private static final int ACTION_START = -1;
     private static final int ACTION_PAUSE = -2;
     private static final int ACTION_RESTART = -3;
     private static final int ACTION_NEXT = -4;
     private static final int ACTION_PREVIOUS = -5;
     private static final int ACTION_PLAYBACK = -6;
+    private static final int ACTION_UNDO = -7;
     
     private static final double SEMI_TRANS_ALPHA = .5;
     private static final Color DARK_GRAY = Color.web("#505050");
@@ -71,14 +73,35 @@ public class GameUI extends VBox
     private static final Duration CAROUSEL_DELAY = Duration.seconds(1.0);
     private static final double CAROUSEL_SPEED = 100;
     private static final double SPACE_SIZE = 19.79296875;
-    
+
+    private static final Direction[] DIRECTIONS = Direction.values();
+
+    private class Move {
+        private final Grid grid;
+        private final long frame;
+
+        public Move(Grid grid, long frame) throws IOException
+        {
+            this.grid = grid.deepCopy();
+            this.frame = frame;
+        }
+
+        public void restore()
+        {
+            view.fadeInitGrid(grid);
+            runner.frame = frame + 1;
+        }
+    }
+
     private final GameMenuUI pnlMenuDialog;
     private final boolean[] moving;
     private final GridView view;
     private final GameTimer runner;
     private final EnumMap<KeyCode, Integer> mappedKeys;
     private final MainApp app;
-    
+
+    private final ArrayDeque<Move> undoStack;
+
     /* UI elements */
     private HBox pnlBar;
     private Label lblFps;
@@ -96,9 +119,8 @@ public class GameUI extends VBox
     private boolean doubled;
     
     /* Game-related stuff */
-    private int dirPrevPressed;
+    private Direction dirPrevPressed;
     private LevelPack currentPack;
-    private int timeLeft;
 
     private boolean playback;
     private PlayState state;
@@ -117,13 +139,14 @@ public class GameUI extends VBox
         view = new GridView(null);
         runner = new GameTimer();
 
+        undoStack = new ArrayDeque<>(MAX_UNDOS);
+
         state = STOPPED;
 
         msgScroller = null;
         doubled = false;
 
-        timeLeft = -1;
-        moving = new boolean[Actor.WEST + 1];
+        moving = new boolean[DIRECTIONS.length];
 
         currentLevelNum = 0;
 
@@ -240,23 +263,27 @@ public class GameUI extends VBox
      */
     private void checkPlayerStatus(Player p, long frame)
     {
+        Grid g = view.getGrid();
+        if (g == null)
+            return;
+
         String status = null;
         boolean success = false;
 
         if (p.isWinner())
         {
             status = "Success! Level Completed!";
-            if (!view.getGrid().getRecording().isRecording())
+            if (!g.getRecording().isRecording())
             {
-                if (timeLeft != MainApp.RESULT_NO_TIME_LIMIT)
-                    status += "\nYour time bonus: " + timeLeft;
+                if (g.getTimeLeft() != MainApp.RESULT_NO_TIME_LIMIT)
+                    status += "\nYour time bonus: " + g.getTimeLeft();
                 status += "\n" + saveProgress();
             }
             success = true;
         }
         else if (p.isDead())
             status = "You Died!";
-        else if (timeLeft == 0)
+        else if (g.getTimeLeft() == 0)
             status = "Time's Up!";
         else if (playback && view.getGrid().getRecording().
                 getRecordingFrames() < frame - Actor.BIG_FRAME)
@@ -298,7 +325,7 @@ public class GameUI extends VBox
             int prevScore = app.checkLevelCompletion(currentPack,
                     currentLevelNum);
 
-            if (timeLeft > prevScore)
+            if (view.getGrid().getTimeLeft() > prevScore)
             {
                 app.completeLevel(currentPack, currentLevelNum,
                         view.getGrid().getRecording());
@@ -377,11 +404,12 @@ public class GameUI extends VBox
 
         boolean keyDown = event.getEventType() == KeyEvent.KEY_PRESSED;
         int action = mappedKeys.get(event.getCode());
-        if (action >= 0 && !playback && state != PAUSED)
+        if (action >= ACTION_MOVE_START && !playback && state != PAUSED)
         {
-            moving[action] = keyDown;
+            int dir = action - ACTION_MOVE_START;
+            moving[dir] = keyDown;
             if (keyDown)
-                dirPrevPressed = action;
+                dirPrevPressed = DIRECTIONS[dir];
             startGame();
         }
         else
@@ -404,7 +432,7 @@ public class GameUI extends VBox
         switch (action)
         {
             case ACTION_PAUSE:
-                if (state == PAUSED)
+                if (pnlMenuBack.isVisible())
                     handleGameMenu(ID_RESUME);
                 else
                 {
@@ -418,7 +446,7 @@ public class GameUI extends VBox
             case ACTION_RESTART:
                 if (controlDown)
                 {
-                    if (state == PAUSED)
+                    if (pnlMenuBack.isVisible())
                         handleGameMenu(ID_RESUME);
                     initLevel(currentLevelNum);
                 }
@@ -428,7 +456,7 @@ public class GameUI extends VBox
                         getLevelCount() - 1 && app.checkLevelUnlock
                         (currentPack, currentLevelNum + 1))
                 {
-                    if (state == PAUSED)
+                    if (pnlMenuBack.isVisible())
                         handleGameMenu(ID_RESUME);
                     initLevel(currentLevelNum + 1);
                 }
@@ -437,7 +465,7 @@ public class GameUI extends VBox
                 if (controlDown && currentLevelNum > 0 && app.checkLevelUnlock
                         (currentPack, currentLevelNum - 1))
                 {
-                    if (state == PAUSED)
+                    if (pnlMenuBack.isVisible())
                         handleGameMenu(ID_RESUME);
                     initLevel(currentLevelNum - 1);
                 }
@@ -462,6 +490,15 @@ public class GameUI extends VBox
                     g.getRecording().startPlayback(g);
                     startGame();
                     playback = true;
+                }
+                return;
+            case ACTION_UNDO:
+                if (state != STOPPED)
+                {
+                    if (pnlMenuBack.isVisible())
+                        handleGameMenu(ID_RESUME);
+                    if (!undoStack.isEmpty())
+                        undoStack.pop().restore();
                 }
         }
     }
@@ -558,8 +595,6 @@ public class GameUI extends VBox
             return false;
         }
 
-        timeLeft = lvl.getTimeLimit();
-
         if (lvl.getPack() == null || lvl.getPack().getName().isEmpty())
             lblPackName.setText("");
         else
@@ -571,6 +606,7 @@ public class GameUI extends VBox
 
         Grid g = lvl.createLevel();
         view.initGrid(g);
+        undoStack.clear();
 
         updateUI();
         return true;
@@ -637,14 +673,14 @@ public class GameUI extends VBox
      */
     private void mapKeys()
     {
-        mappedKeys.put(KeyCode.LEFT, Actor.WEST);
-        mappedKeys.put(KeyCode.A, Actor.WEST);
-        mappedKeys.put(KeyCode.UP, Actor.NORTH);
-        mappedKeys.put(KeyCode.W, Actor.NORTH);
-        mappedKeys.put(KeyCode.RIGHT, Actor.EAST);
-        mappedKeys.put(KeyCode.D, Actor.EAST);
-        mappedKeys.put(KeyCode.DOWN, Actor.SOUTH);
-        mappedKeys.put(KeyCode.S, Actor.SOUTH);
+        mappedKeys.put(KeyCode.LEFT, Direction.WEST.ordinal());
+        mappedKeys.put(KeyCode.A, Direction.WEST.ordinal());
+        mappedKeys.put(KeyCode.UP, Direction.NORTH.ordinal());
+        mappedKeys.put(KeyCode.W, Direction.NORTH.ordinal());
+        mappedKeys.put(KeyCode.RIGHT, Direction.EAST.ordinal());
+        mappedKeys.put(KeyCode.D, Direction.EAST.ordinal());
+        mappedKeys.put(KeyCode.DOWN, Direction.SOUTH.ordinal());
+        mappedKeys.put(KeyCode.S, Direction.SOUTH.ordinal());
         mappedKeys.put(KeyCode.ESCAPE, ACTION_PAUSE);
         mappedKeys.put(KeyCode.PAUSE, ACTION_PAUSE);
         mappedKeys.put(KeyCode.SPACE, ACTION_START);
@@ -652,6 +688,7 @@ public class GameUI extends VBox
         mappedKeys.put(KeyCode.N, ACTION_NEXT);
         mappedKeys.put(KeyCode.P, ACTION_PREVIOUS);
         mappedKeys.put(KeyCode.TAB, ACTION_PLAYBACK);
+        mappedKeys.put(KeyCode.Z, ACTION_UNDO);
     }
 
     /**
@@ -795,29 +832,43 @@ public class GameUI extends VBox
         Player p = view.getPlayer();
         if (p == null)
             return;
-        int moveDir = getMovingDirection();
-        if (moveDir != -1)
+        Direction moveDir = getMovingDirection();
+        if (moveDir != null)
             view.getGrid().movePlayer(moveDir);
 
         //Update grid stuff.
         view.updateFrame(frame);
-        if (timeLeft != -1 && (frame + 1) % FRAMES_PER_SEC == 0)
-            timeLeft--;
+        if ((frame + 1) % FRAMES_PER_SEC == 0)
+            view.getGrid().decrementTime();
         updateUI();
         if (frame % FPS_UPDATE_RATE == 0)
             lblFps.setText(String.format("Fps: %.3f", runner.getFps()));
 
         checkPlayerStatus(p, frame);
+
+        if (frame % UNDO_RATE == 0)
+        {
+            while (undoStack.size() >= MAX_UNDOS)
+                undoStack.removeLast();
+            try
+            {
+                undoStack.push(new Move(view.getGrid(), frame));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
      * Obtains the user's currently selected moving direction.
      * @return a cardinal direction or -1 if no direction is selected.
      */
-    private int getMovingDirection()
+    private Direction getMovingDirection()
     {
-        int moveDir = -1;
-        if (moving[dirPrevPressed])
+        Direction moveDir = null;
+        if (dirPrevPressed != null && moving[dirPrevPressed.ordinal()])
             moveDir = dirPrevPressed;
         else
         {
@@ -825,7 +876,7 @@ public class GameUI extends VBox
             {
                 if (moving[dir])
                 {
-                    moveDir = dir;
+                    moveDir = DIRECTIONS[dir];
                     break;
                 }
             }
@@ -838,14 +889,18 @@ public class GameUI extends VBox
      */
     private void updateUI()
     {
+        Grid g = view.getGrid();
+        if (g == null)
+            return;
+
         String newStr = "" + view.getGrid().getFoodRequirement();
         if (!newStr.equals(lblFood.getText()))
             lblFood.setText(newStr);
 
-        if (timeLeft == -1)
+        if (g.getTimeLeft() == -1)
             newStr = "---";
         else
-            newStr = "" + timeLeft;
+            newStr = "" + g.getTimeLeft();
         if (!newStr.equals(lblTime.getText()))
             lblTime.setText(newStr);
 

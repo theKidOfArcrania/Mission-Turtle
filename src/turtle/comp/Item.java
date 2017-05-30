@@ -3,6 +3,7 @@ package turtle.comp;
 import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
+import turtle.core.Direction;
 import turtle.core.DominanceLevel;
 
 /**
@@ -16,6 +17,8 @@ import turtle.core.DominanceLevel;
  */
 public abstract class Item extends Actor
 {
+
+    private static final long serialVersionUID = -6949433579943995314L;
 
     /**
      * Interacts with other actors, allowing the player to pick up this item.
@@ -54,18 +57,19 @@ public abstract class Item extends Actor
      */
     @Override
     @NotAttribute
-    public int getHeading()
+    public Direction getHeading()
     {
-        return NORTH;
+        return Direction.NORTH;
     }
 
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @param heading the direction of heading
      */
     @Override
     @NotAttribute
-    public void setHeading(int heading)
+    public void setHeading(Direction heading)
     {
         //Does nothing
     }

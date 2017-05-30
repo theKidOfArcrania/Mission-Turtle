@@ -92,6 +92,7 @@ public class Level
 
         Grid g = new Grid(rows, cols);
         g.setFoodRequirement(foodReq);
+        g.setTimeLeft(timeLimit);
         for (CompSpec spec : cells)
             g.placeCell((Cell) spec.createComponent());
         for (CompSpec spec : actors)

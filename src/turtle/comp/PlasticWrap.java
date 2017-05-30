@@ -2,6 +2,7 @@ package turtle.comp;
 
 import turtle.attributes.NotAttribute;
 import turtle.core.Component;
+import turtle.core.Direction;
 import turtle.core.Grid;
 
 /**
@@ -15,21 +16,9 @@ import turtle.core.Grid;
  */
 public class PlasticWrap extends Enemy
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 11;
 
-    private static final int DIRECTIONS = 4;
-
-    /**
-     * Creates a new Plastic-wrap enemy
-     */
-    public PlasticWrap()
-    {
-        setImageFrame(DEFAULT_IMAGE);
-    }
-
+    private static final long serialVersionUID = 4903268062632526294L;
 
     /**
      * Kills this actor (this sets a flag for this actor to be removed).
@@ -52,18 +41,19 @@ public class PlasticWrap extends Enemy
      */
     @Override
     @NotAttribute
-    public int getHeading()
+    public Direction getHeading()
     {
-        return NORTH;
+        return Direction.NORTH;
     }
 
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @param heading the direction of heading
      */
     @Override
     @NotAttribute
-    public void setHeading(int heading)
+    public void setHeading(Direction heading)
     {
         //Does nothing
     }
@@ -91,9 +81,9 @@ public class PlasticWrap extends Enemy
 
         if (!isMoving() && g.getCellAt(getHeadLocation()) instanceof Water)
         {
-            int[] choices = {NORTH, EAST, SOUTH, WEST};
+            Direction[] choices = Direction.values();
             shuffle(choices, g.getRNG());
-            for (int dir : choices)
+            for (Direction dir : choices)
                 if (traverseDirection(dir))
                     break;
         }

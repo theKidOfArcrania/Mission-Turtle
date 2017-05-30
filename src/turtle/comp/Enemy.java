@@ -16,6 +16,8 @@ import turtle.core.DominanceLevel;
 public abstract class Enemy extends Actor
 {
 
+    private static final long serialVersionUID = -7710628641926221592L;
+
     /**
      * Checks whether an interaction with another actor is possible.
      * This only let players go through.

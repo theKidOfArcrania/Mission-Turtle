@@ -14,21 +14,10 @@ import turtle.core.Cell;
  */
 public class Exit extends Cell
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 17;
-    private static final int EXIT_IMAGE = 17;
+    private static final long serialVersionUID = 6760499019619226276L;
 
     private Player winner;
-
-    /**
-     * Creates a new exit spot.
-     */
-    public Exit()
-    {
-        setImageFrame(EXIT_IMAGE);
-    }
 
     /**
      * Executes an actor passing this cell. This will not let any actors

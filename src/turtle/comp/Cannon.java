@@ -1,5 +1,6 @@
 package turtle.comp;
 
+import turtle.core.Direction;
 import turtle.core.Grid;
 import turtle.core.Location;
 
@@ -22,9 +23,8 @@ public class Cannon extends Mover
     public static final int DEFAULT_IMAGE = 35;
 
     private static final int DEFAULT_SHOOTING_PERIOD = 2;
-
-    private static final int STILL_IMAGE = 35;
     private static final int[] SHOOTING_ANIMATION = {36, 37, 38, 35};
+    private static final long serialVersionUID = 705243324532344078L;
 
     private int period;
 
@@ -33,7 +33,6 @@ public class Cannon extends Mover
      */
     public Cannon()
     {
-        setImageFrame(STILL_IMAGE);
         period = DEFAULT_SHOOTING_PERIOD;
     }
 
@@ -46,34 +45,16 @@ public class Cannon extends Mover
         if (parent == null)
             return;
 
-        Location loc = getHeadLocation();
-        int row = loc.getRow();
-        int col = loc.getColumn();
-
-        switch (getHeading())
-        {
-            case NORTH:
-                row--;
-                break;
-            case EAST:
-                col++;
-                break;
-            case SOUTH:
-                row++;
-                break;
-            case WEST:
-                col--;
-                break;
-            default:
-                return;
-        }
+        Direction heading = getHeading();
+        Location loc = new Location(getHeadLocation());
+        heading.traverse(loc);
 
         animateFrames(SHOOTING_ANIMATION, false);
 
         Projectile p = new Projectile();
-        p.setHeading(getHeading());
-        p.getHeadLocation().setLocation(row, col);
-        p.getTrailingLocation().setLocation(row, col);
+        p.setHeading(heading);
+        p.getHeadLocation().setLocation(loc);
+        p.getTrailingLocation().setLocation(loc);
         parent.placeActor(p);
     }
 

@@ -17,6 +17,7 @@ public class Key extends Item
      */
     public static final int DEFAULT_IMAGE = 45;
     private static final int KEY_OFFSET_IMAGE = 45;
+    private static final long serialVersionUID = 764295184211414467L;
 
     private ColorType color;
 
@@ -26,7 +27,7 @@ public class Key extends Item
      */
     public Key()
     {
-        setColor(ColorType.RED);
+        setColor(ColorType.YELLOW);
     }
 
     /**

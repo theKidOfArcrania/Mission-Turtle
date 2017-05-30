@@ -12,8 +12,11 @@ import java.util.zip.Inflater;
  * @author Henry Wang
  *
  */
-public class Recording
+public class Recording implements Serializable
 {
+    private static final int BUFFER_SIZE = 1024;
+    private static final long serialVersionUID = 256701970859720664L;
+    private static final Direction[] DIRECTIONS = Direction.values();
     /**
      * CompactMove.java
      *
@@ -73,8 +76,8 @@ public class Recording
                 throw new IOException("Illegal number of repetitions");
 
             direction = in.readByte();
-            if (direction != -1 && (direction < Actor.NORTH || direction >
-                    Actor.WEST))
+            if (direction != -1 && (direction < 0 || direction >= DIRECTIONS
+                    .length))
                 throw new IOException("Illegal direction");
         }
 
@@ -111,8 +114,6 @@ public class Recording
             return DIRECTIONS[direction + 1] + " * " + repetition;
         }
     }
-
-    private static final int BUFFER_SIZE = 1024;
 
     /**
      * Utility method for compressing data.
@@ -334,11 +335,13 @@ public class Recording
             throw new IllegalStateException("This recording has not started yet.");
         if (recording)
         {
-            moves.put(frame, grid.getLastMove());
+            Direction move = grid.getLastMove();
+            if (move != null)
+                moves.put(frame, move.ordinal());
             maxFrame = frame;
         }
         else if (moves.containsKey(frame))
-            grid.movePlayer(moves.get(frame));
+            grid.movePlayer(DIRECTIONS[moves.get(frame)]);
 
     }
 

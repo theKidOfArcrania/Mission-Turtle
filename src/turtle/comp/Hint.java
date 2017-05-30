@@ -3,6 +3,7 @@ package turtle.comp;
 import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
+import turtle.core.Direction;
 import turtle.core.DominanceLevel;
 
 /**
@@ -23,7 +24,7 @@ public class Hint extends Actor
      * The default image for this component
      */
     public static final int DEFAULT_IMAGE = 55;
-    private static final int HINT_IMAGE = 55;
+    private static final long serialVersionUID = -1928859410769286944L;
 
     private String message;
     private Player playerRead;
@@ -33,7 +34,6 @@ public class Hint extends Actor
      */
     public Hint()
     {
-        setImageFrame(HINT_IMAGE);
         playerRead = null;
         message = "";
     }
@@ -58,18 +58,19 @@ public class Hint extends Actor
      */
     @Override
     @NotAttribute
-    public int getHeading()
+    public Direction getHeading()
     {
-        return NORTH;
+        return Direction.NORTH;
     }
 
     /**
      * This overrides the Actor's setHeading since a heading does not
      * mean anything for this actor.
+     * @param heading the direction of heading
      */
     @Override
     @NotAttribute
-    public void setHeading(int heading)
+    public void setHeading(Direction heading)
     {
         //Does nothing
     }

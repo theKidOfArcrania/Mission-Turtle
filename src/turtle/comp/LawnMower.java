@@ -1,5 +1,7 @@
 package turtle.comp;
 
+import turtle.core.Direction;
+
 /**
  * LawnMower.java
  * Moves back and forth with no reason or rhyme. Kills turtles within the path.
@@ -10,19 +12,8 @@ package turtle.comp;
  */
 public class LawnMower extends Enemy
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 60;
-    private static final int DIRECTIONS = 4;
-
-    /**
-     * Creates a new lawn-mower
-     */
-    public LawnMower()
-    {
-        setImageFrame(DEFAULT_IMAGE);
-    }
+    private static final long serialVersionUID = 3529870400019445102L;
 
     /**
      * Updates frames so that the lawn-mower will move in its facing direction.
@@ -37,10 +28,10 @@ public class LawnMower extends Enemy
         if (!isMoving())
         {
             final int[] options = {0, 2};
-            int heading = getHeading();
+            Direction heading = getHeading();
             for (int turn : options)
             {
-                int newDir = (turn + heading) % DIRECTIONS;
+                Direction newDir = heading.turn(turn);
                 if (traverseDirection(newDir, true) ||
                         turn == options[options.length - 1])
                 {

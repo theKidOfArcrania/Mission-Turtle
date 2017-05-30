@@ -1,5 +1,8 @@
 package turtle.attributes;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -13,7 +16,7 @@ import java.util.*;
  * @author Henry
  * @see turtle.attributes.Attributable
  */
-public class AttributeSet<A extends Attributable>
+public class AttributeSet<A extends Attributable> implements Serializable
 {
 
     @SuppressWarnings("unused")
@@ -23,7 +26,8 @@ public class AttributeSet<A extends Attributable>
     private static final String SET_PREFIX = "set";
     private static final HashMap<Class<?>, Attribute[]> attributeCache = new
             HashMap<>();
-    private final Hashtable<String, Attribute> attrs = new Hashtable<>();
+
+    private transient Hashtable<String, Attribute> attrs;
     private final A attributable;
 
     /**
@@ -33,6 +37,7 @@ public class AttributeSet<A extends Attributable>
     public AttributeSet(A obj)
     {
         attributable = obj;
+        attrs = new Hashtable<>();
         if (!attributeCache.containsKey(obj.getClass()))
             extractAttributes(attributable);
         for (Attribute attr : attributeCache.get(obj.getClass()))
@@ -271,4 +276,22 @@ public class AttributeSet<A extends Attributable>
         attr.set(attributable, value);
     }
 
+    /**
+     * Reads this object from the provided input stream.
+     *
+     * @param in the input stream to read from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found.
+     */
+    private void readObject(ObjectInputStream in)
+         throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        attrs = new Hashtable<>();
+        Attributable obj = getAttributable();
+        if (!attributeCache.containsKey(obj.getClass()))
+            extractAttributes(attributable);
+        for (Attribute attr : attributeCache.get(obj.getClass()))
+            attrs.put(attr.getName(), attr);
+    }
 }

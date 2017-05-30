@@ -16,15 +16,7 @@ public class Food extends Item
      * The default image for this component
      */
     public static final int DEFAULT_IMAGE = 54;
-    private static final int FOOD_IMAGE = 54;
-
-    /**
-     * Constructs a new food item and initializes image.
-     */
-    public Food()
-    {
-        setImageFrame(FOOD_IMAGE);
-    }
+    private static final long serialVersionUID = -7560419489671905302L;
 
     /**
      * Checks whether an interaction with another actor is possible.
@@ -69,7 +61,7 @@ public class Food extends Item
     @Override
     public int getItemImage()
     {
-        return FOOD_IMAGE;
+        return DEFAULT_IMAGE;
     }
 
 }

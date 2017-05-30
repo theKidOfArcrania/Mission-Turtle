@@ -1,5 +1,6 @@
 package turtle.comp;
 
+import turtle.core.Direction;
 import turtle.core.Location;
 
 /**
@@ -14,22 +15,12 @@ import turtle.core.Location;
  */
 public class Bird extends Enemy
 {
-    /**
-     * The default image for this component
-     */
     public static final int DEFAULT_IMAGE = 52;
-
-    private static final int BIRD_STILL_IMAGE = 52;
+    private static final int BIRD_STILL_IMAGE = DEFAULT_IMAGE;
     private static final int BIRD_FLYING_IMAGE = 53;
 
+    private static final long serialVersionUID = -387220900586289450L;
 
-    /**
-     * Creates a new bird and initializes image.
-     */
-    public Bird()
-    {
-        setImageFrame(BIRD_STILL_IMAGE);
-    }
 
     /**
      * Updates frames so that the bird will change between flying/ still
@@ -47,9 +38,9 @@ public class Bird extends Enemy
             Player p = getParentGrid().getPlayer();
             if (p != null)
             {
-                int[] movement = calculateDirection();
+                Direction[] movement = calculateDirection();
                 boolean moved = false;
-                for (int dir : movement)
+                for (Direction dir : movement)
                 {
                     if (traverseDirection(dir))
                     {
@@ -62,7 +53,7 @@ public class Bird extends Enemy
                 if (!moved)
                 {
                     setImageFrame(BIRD_STILL_IMAGE);
-                    setHeading(NORTH);
+                    setHeading(Direction.NORTH);
                 }
             }
         }
@@ -74,45 +65,45 @@ public class Bird extends Enemy
      *
      * @return a list of possible directions to move into.
      */
-    private int[] calculateDirection()
+    private Direction[] calculateDirection()
     {
         Player player = getParentGrid().getPlayer();
         if (player == null)
-            return new int[0];
+            return new Direction[0];
 
         Location playerLoc = player.getHeadLocation();
         Location loc = getHeadLocation();
         if (!playerLoc.isValidLocation() || !loc.isValidLocation())
-            return new int[0];
+            return new Direction[0];
 
         int dr = playerLoc.getRow() - loc.getRow();
         int dc = playerLoc.getColumn() - loc.getColumn();
 
-        int rowDir = -1;
-        int colDir = -1;
+        Direction rowDir = null;
+        Direction colDir = null;
 
         if (dr < 0)
-            rowDir = NORTH;
+            rowDir = Direction.NORTH;
         else if (dr > 0)
-            rowDir = SOUTH;
+            rowDir = Direction.SOUTH;
 
         if (dc < 0)
-            colDir = WEST;
+            colDir = Direction.WEST;
         else if (dc > 0)
-            colDir = EAST;
+            colDir = Direction.EAST;
 
-        if (rowDir == -1 && colDir == -1)
-            return new int[0];
+        if (rowDir == null && colDir == null)
+            return new Direction[0];
 
-        if (rowDir == -1)
-            return new int[]{colDir};
-        if (colDir == -1)
-            return new int[]{rowDir};
+        if (rowDir == null)
+            return new Direction[]{colDir};
+        if (colDir == null)
+            return new Direction[]{rowDir};
 
         if (Math.abs(dr) > Math.abs(dc))
         {
-            return new int[]{rowDir, colDir};
+            return new Direction[]{rowDir, colDir};
         } else
-            return new int[]{colDir, rowDir};
+            return new Direction[]{colDir, rowDir};
     }
 }
