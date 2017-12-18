@@ -1,0 +1,72 @@
+/* Sets default properties (i.e. font) */
+.root {
+    -fx-font-family: "System";
+    -fx-font-size: 18px;
+    -fx-background: black;
+    -fx-focus-color: gray;
+}
+
+/* Small font-size */
+.small {
+    -fx-font-size: 12px;
+}
+
+/* Make sure all our font colors are white */
+.label {
+    -fx-text-fill: white;
+}
+
+/* Any node with this class will be italic. */
+.italic {
+    -fx-font-style: italic;
+}
+
+/* Any node with this class will be bold. */
+.bold {
+    -fx-font-weight: bold;
+}
+
+/* Bigger font */
+.big {
+    -fx-font-size: 28px;
+}
+
+/* Dialogs have a black background with a white border */
+.ldialog {
+    -fx-border-color: white;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+    -fx-background-color: black;
+}
+
+/* Light-weight button styles. Looks like a Label until you hover
+ * over it. */
+.lbutton {
+    -fx-background-radius: 5px;
+}
+
+/* Light-weight button. Highlights a button when mouse hovers over.*/
+.lbutton:hover {
+    -fx-background-color: linear-gradient(to bottom, rgba(216, 216, 216, 0.3) 0%,
+    rgba(255, 255, 255, .5) 45%, rgba(164, 164, 164, 0.4) 55%,
+    rgba(61, 61, 61, 0.3) 100%
+    );
+    -fx-font-weight: bold;
+    /*-fx-effect: dropshadow( gaussian, white, 10, 0, 0, 0);*/
+}
+
+/* When pressed, the gradient flips and text darken to reflect
+ * pressed nature. Also if this is a selected item, also pressed.*/
+.lbutton:pressed, .litem.selected {
+    -fx-background-color: linear-gradient(to top, rgba(216, 216, 216, 0.3) 0%,
+    rgba(255, 255, 255, .5) 45%, rgba(164, 164, 164, 0.4) 55%,
+    rgba(61, 61, 61, 0.3) 100%
+    );
+    -fx-text-fill: lightgray;
+    -fx-font-weight: bold;
+}
+
+/* Big light-weight buttons would have larger background radius */
+.lbutton.big {
+    -fx-background-radius: 20px;
+}
