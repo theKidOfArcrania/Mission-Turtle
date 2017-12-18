@@ -9,7 +9,8 @@ food for the level, then successfully exit in the water **portal**. Along the wa
 sucessfully avoid many obstacles and fellow creatures who all want to kill this turtle. 
 
 ## Game Encyclopedia
-The entries below will contain all the different standard maze components.
+The entries below will contain all the different standard maze components. These are not the only components that can
+used in a level. In fact, this can be extended to implement other components. 
 
 ### Obstacles
 Anything that can stand in the way of **turtle**. Some obstacles are benevolent, others not so much.
