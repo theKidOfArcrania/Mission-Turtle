@@ -92,7 +92,7 @@ public class TMXToMTP {
 
         System.out.println("Loading default levels...");
         Pattern def = Pattern.compile("Level\\d{3}.tmx");
-        for (File f : new File("").listFiles()) {
+        for (File f : new File(".").listFiles()) {
             if (def.matcher(f.getName()).matches()) {
                 try {
                     System.out.println("Adding \"" + f.getName() + "\"");
@@ -109,7 +109,7 @@ public class TMXToMTP {
 
         while (true) {
             ArrayList<File> available = new ArrayList<>();
-            for (File child : new File("").listFiles()) {
+            for (File child : new File(".").listFiles()) {
                 if (child.getName().endsWith(".tmx") && !selected.contains(child)) {
                     available.add(child);
                 }
