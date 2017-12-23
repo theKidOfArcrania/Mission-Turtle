@@ -1,5 +1,7 @@
 # Mission Turtle
 
+![Screenshot of games][23]
+
 This is a top-down maze game involving a turtle as the main character of this game. This project was 
 initially created as my end-of-year school project. 
 
@@ -152,3 +154,4 @@ Licensed under MIT.
 [20]: https://raw.githubusercontent.com/theKidOfArcrania/Mission-Turtle/master/img/Ball.png
 [21]: https://raw.githubusercontent.com/theKidOfArcrania/Mission-Turtle/master/img/Turtle.png
 [22]: https://github.com/bjorn/tiled/tree/master/util/java/libtiled-java
+[23]: https://raw.githubusercontent.com/theKidOfArcrania/Mission-Turtle/master/img/MissionTurtleScreenshot.png
