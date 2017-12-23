@@ -7,6 +7,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import turtle.attributes.Attributable;
 import turtle.attributes.AttributeSet;
+import turtle.attributes.NotAttribute;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,6 +15,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Random;
+
+import static turtle.core.Grid.CELL_SIZE;
 
 /**
  * Represents the abstract base of all grid components
@@ -183,6 +186,7 @@ public abstract class Component extends Pane implements Attributable,
     }
 
     @Override
+    @NotAttribute
     public AttributeSet<Component> getAttributeSet() {
         return attributes;
     }
@@ -190,6 +194,7 @@ public abstract class Component extends Pane implements Attributable,
     /**
      * @return the head location of the actor
      */
+    @NotAttribute
     public Location getHeadLocation() {
         return headLoc;
     }
@@ -199,14 +204,16 @@ public abstract class Component extends Pane implements Attributable,
      *
      * @return move speed in pixels per frame
      */
+    @NotAttribute
     public double getMoveSpeed() {
-        return getTileSet().getFrameSize() / BIG_FRAME;
+        return Grid.CELL_SIZE / BIG_FRAME;
     }
 
     /**
      * @return the parent grid that contains this component
      * or null if there is no parent.
      */
+    @NotAttribute
     public Grid getParentGrid() {
         return parent;
     }
@@ -214,6 +221,7 @@ public abstract class Component extends Pane implements Attributable,
     /**
      * @return the current tileset used by component
      */
+    @NotAttribute
     public TileSet getTileSet() {
         return ts;
     }
@@ -221,6 +229,7 @@ public abstract class Component extends Pane implements Attributable,
     /**
      * @return the trailing location of the actor
      */
+    @NotAttribute
     public Location getTrailingLocation() {
         return trailLoc;
     }
@@ -230,6 +239,7 @@ public abstract class Component extends Pane implements Attributable,
      *
      * @return true if moving, false if it is still
      */
+    @NotAttribute
     public boolean isMoving() {
         return !headLoc.equals(trailLoc);
     }
@@ -302,9 +312,8 @@ public abstract class Component extends Pane implements Attributable,
         }
 
         double after = from + step;
-        if (after > to ^ from > to)
-        // Incremented pass the target.
-        {
+        if (after > to ^ from > to) {
+            // Incremented pass the target.
             return to;
         } else {
             return after;
@@ -320,9 +329,8 @@ public abstract class Component extends Pane implements Attributable,
                     trailLoc.isValidLocation();
             if (validLocs) {
                 double speed = getMoveSpeed();
-                int cellSize = parent.getCellSize();
-                int xPos = cellSize * headLoc.getColumn();
-                int yPos = cellSize * headLoc.getRow();
+                int xPos = CELL_SIZE * headLoc.getColumn();
+                int yPos = CELL_SIZE * headLoc.getRow();
                 if (xPos != getTranslateX()) {
                     setTranslateX(increment(getTranslateX(), xPos, speed));
                 }

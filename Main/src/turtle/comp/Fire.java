@@ -3,6 +3,8 @@ package turtle.comp;
 import turtle.core.Actor;
 import turtle.core.Cell;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -20,6 +22,18 @@ public class Fire extends Cell {
     private static final long serialVersionUID = 8374356983860533042L;
 
     private boolean smoking;
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        if (tileInd >= DEFAULT_IMAGE && tileInd <= TRANSFORM_FRAMES[TRANSFORM_FRAMES.length - 1]) {
+            return new HashMap<>();
+        }
+        return null;
+    }
 
     /**
      * Constructs a new fire cell by initializing UI.

@@ -1,6 +1,5 @@
 package turtle.comp;
 
-import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.Direction;
@@ -51,7 +50,6 @@ public class Hint extends Actor {
      * @return always north (since it is facing that direction always).
      */
     @Override
-    @NotAttribute
     public Direction getHeading() {
         return Direction.NORTH;
     }
@@ -63,7 +61,6 @@ public class Hint extends Actor {
      * @param heading the direction of heading
      */
     @Override
-    @NotAttribute
     public void setHeading(Direction heading) {
         //Does nothing
     }

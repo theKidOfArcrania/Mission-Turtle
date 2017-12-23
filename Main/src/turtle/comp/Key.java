@@ -1,5 +1,10 @@
 package turtle.comp;
 
+import turtle.attributes.NotAttribute;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This item can be collected by the player in order to unlock a door
  * of the same color.
@@ -13,6 +18,21 @@ public class Key extends Item {
     public static final int DEFAULT_IMAGE = 45;
     private static final int KEY_OFFSET_IMAGE = 45;
     private static final long serialVersionUID = 764295184211414467L;
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        ColorType[] colors = ColorType.values();
+        if (tileInd >= DEFAULT_IMAGE && tileInd < DEFAULT_IMAGE + colors.length) {
+            HashMap<String, Object> vals = new HashMap<>();
+            vals.put("color", colors[tileInd - DEFAULT_IMAGE]);
+            return vals;
+        }
+        return null;
+    }
 
     private ColorType color;
 
@@ -61,6 +81,7 @@ public class Key extends Item {
      * @return index of image frame in tileset
      */
     @Override
+    @NotAttribute
     public int getItemImage() {
         return color.getImageFrame(KEY_OFFSET_IMAGE);
     }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="100" tileheight="100" nextobjectid="1">
+ <properties>
+  <property name="FoodReq" value="8"/>
+  <property name="Name" value="The Mission"/>
+  <property name="TimeLimit" value="-1"/>
+ </properties>
+ <tileset firstgid="1" name="tileset" tilewidth="100" tileheight="100">
+  <image source="tileset.png" width="1600" height="1600"/>
+ </tileset>
+ <layer name="Cells" width="20" height="10">
+  <properties>
+   <property name="Type" value="Cell"/>
+  </properties>
+  <data encoding="csv">
+27,27,27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,
+27,27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,13,
+27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,13,13,
+27,27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,13,
+27,27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,18,
+27,27,27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,
+27,27,27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,
+27,27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,13,
+27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,13,13,
+27,27,27,27,27,27,27,27,27,27,13,13,13,13,13,13,13,13,13,13
+</data>
+  <tileproperties/>
+ </layer>
+ <layer name="Actors" width="20" height="10">
+  <properties>
+   <property name="Type" value="Actor"/>
+  </properties>
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+41,56,0,0,0,0,0,0,0,0,56,0,0,0,0,56,0,0,56,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,55,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,55,55,55,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,55,55,56,55,55,0,0
+</data>
+  <tileproperties>
+   <tile x="1" y="4">
+    <properties>
+     <property name="message" value="string:Welcome to Mission Turtle: The Rescue, the first release in a series of fun top-down strategic games that require your strongest wits to reach the exit. Your mission, should you choose to accept it, is to rescue the turtle from its hostile environment and lead it to safety. You will have to use your best wits to avoid being snacked or overrun by your opponents! Let's go! Continue forward."/>
+    </properties>
+   </tile>
+   <tile x="10" y="4">
+    <properties>
+     <property name="message" value="string:You have reached the sea! For the most part the waters are safe for you. Hop in!"/>
+    </properties>
+   </tile>
+   <tile x="15" y="4">
+    <properties>
+     <property name="message" value="string:You will have to collect enough food before exiting. On your screen in your lower right corner is your time and the amount of food required. Go down to collect them!"/>
+    </properties>
+   </tile>
+   <tile x="18" y="4">
+    <properties>
+     <property name="message" value="string:Congratuations! You have reached the exit! Make sure you collect all the food first!"/>
+    </properties>
+   </tile>
+   <tile x="15" y="9">
+    <properties>
+     <property name="message" value="string:Nice stuff! Just the right mix of seaweed and fish, with some grain on the side!"/>
+    </properties>
+   </tile>
+  </tileproperties>
+ </layer>
+</map>

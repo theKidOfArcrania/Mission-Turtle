@@ -2,6 +2,9 @@ package turtle.comp;
 
 import turtle.core.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This will conceal everything so that the player will not be able to see the underneath
  * stuff. When the player comes within one space of the grass, the grass will fade away.
@@ -13,6 +16,18 @@ public class Grass extends Actor {
     public static final int DEFAULT_IMAGE = 6;
     private static final int[] TRANSFORM_FRAMES = {6, 7, 8, 9, 10};
     private static final long serialVersionUID = 160528400127855294L;
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        if (tileInd >= DEFAULT_IMAGE && tileInd < DEFAULT_IMAGE + TRANSFORM_FRAMES.length - 1) {
+            return new HashMap<>();
+        }
+        return null;
+    }
 
     private int fading;
 

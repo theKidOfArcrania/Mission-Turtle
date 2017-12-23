@@ -1,9 +1,11 @@
 package turtle.comp;
 
 import javafx.scene.transform.Rotate;
+import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.DominanceLevel;
+import turtle.core.Grid;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -128,6 +130,7 @@ public class Player extends Actor {
      * @return the message that the player should see now. Never returns null.
      * @see #setMessage(String, Component)
      */
+    @NotAttribute
     public String getMessage() {
         if (msg == null) {
             return "";
@@ -138,6 +141,7 @@ public class Player extends Actor {
     /**
      * @return a read-only list of items the user has stored.
      */
+    @NotAttribute
     public List<Item> getPocket() {
         return Collections.unmodifiableList(pocket);
     }
@@ -159,6 +163,7 @@ public class Player extends Actor {
      *
      * @return true if player won, false if game is still running.
      */
+    @NotAttribute
     public boolean isWinner() {
         return winner;
     }
@@ -287,7 +292,7 @@ public class Player extends Actor {
      * Layouts all the current player items within a radius circle around the player.
      */
     private void layoutSlots() {
-        double radius = getTileSet().getFrameSize() * ITEM_RADIUS;
+        double radius = Grid.CELL_SIZE * ITEM_RADIUS;
         double step = 2 * Math.PI / slots.size();
         for (int i = 0; i < slots.size(); i++) {
             ItemSlot slot = slots.get(i);

@@ -1,10 +1,12 @@
 package turtle.comp;
 
-import turtle.attributes.NotAttribute;
 import turtle.core.Actor;
 import turtle.core.Component;
 import turtle.core.Direction;
 import turtle.core.DominanceLevel;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This acts as a wall until an actor passes through this door, which contains a
@@ -17,10 +19,25 @@ public class Door extends Actor {
     private static final int LOCK_OFFSET_IMAGE = DEFAULT_IMAGE;
     private static final long serialVersionUID = 4234019785119559213L;
 
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        ColorType[] colors = ColorType.values();
+        if (tileInd >= DEFAULT_IMAGE && tileInd < DEFAULT_IMAGE + colors.length) {
+            HashMap<String, Object> vals = new HashMap<>();
+            vals.put("color", colors[tileInd - DEFAULT_IMAGE]);
+            return vals;
+        }
+        return null;
+    }
+
     private ColorType color;
 
     /**
-     * Constructs a new door, defaulting to the RED color.
+     * Constructs a new door, defaulting to the YELLOW color.
      */
     public Door() {
         setColor(ColorType.YELLOW);
@@ -117,7 +134,6 @@ public class Door extends Actor {
      * @return always north (since it is facing that direction always).
      */
     @Override
-    @NotAttribute
     public Direction getHeading() {
         return Direction.NORTH;
     }
@@ -129,7 +145,6 @@ public class Door extends Actor {
      * @param heading the direction of heading
      */
     @Override
-    @NotAttribute
     public void setHeading(Direction heading) {
         //Does nothing
     }

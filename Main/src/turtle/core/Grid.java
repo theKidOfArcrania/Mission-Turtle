@@ -15,13 +15,13 @@ import java.util.*;
  * @author Henry Wang
  */
 public class Grid extends Pane implements Serializable {
-
+    public static final int CELL_SIZE = 100;
+    
     private static final long serialVersionUID = 7918941519839716716L;
     private final StatefulRandom rng;
 
     private final int rows;
     private final int cols;
-    private final int cellSize;
     private final Cell[][] base;
     private final HashMap<Actor, Location> actorLocs;
 
@@ -44,7 +44,6 @@ public class Grid extends Pane implements Serializable {
     public Grid(int rows, int cols) {
         rng = new StatefulRandom();
         recording = new Recording();
-        cellSize = Component.DEFAULT_SET.getFrameSize();
 
         this.rows = rows;
         this.cols = cols;
@@ -99,15 +98,6 @@ public class Grid extends Pane implements Serializable {
      */
     public Cell getCellAt(Location loc) {
         return base[loc.getRow()][loc.getColumn()];
-    }
-
-    /**
-     * Gets the size of each cell
-     *
-     * @return the size of each cell in pixels
-     */
-    public int getCellSize() {
-        return cellSize;
     }
 
     /**
@@ -345,8 +335,8 @@ public class Grid extends Pane implements Serializable {
 
             comp.setParentGrid(this);
             comp.getTrailingLocation().setLocation(loc);
-            comp.setTranslateX(loc.getColumn() * cellSize);
-            comp.setTranslateY(loc.getRow() * cellSize);
+            comp.setTranslateX(loc.getColumn() * CELL_SIZE);
+            comp.setTranslateY(loc.getRow() * CELL_SIZE);
 
             List<Node> children = pnlStage.getChildren();
             DominanceLevel test = comp.dominanceLevelFor(null);
@@ -387,8 +377,8 @@ public class Grid extends Pane implements Serializable {
 
         comp.setParentGrid(this);
         comp.getTrailingLocation().setLocation(loc);
-        comp.setTranslateX(loc.getColumn() * cellSize);
-        comp.setTranslateY(loc.getRow() * cellSize);
+        comp.setTranslateX(loc.getColumn() * CELL_SIZE);
+        comp.setTranslateY(loc.getRow() * CELL_SIZE);
 
         base[loc.getRow()][loc.getColumn()] = comp;
         pnlBase.getChildren().add(comp);
@@ -475,8 +465,8 @@ public class Grid extends Pane implements Serializable {
      */
     @Override
     protected void layoutChildren() {
-        double width = cellSize * cols;
-        double height = cellSize * rows;
+        double width = CELL_SIZE * cols;
+        double height = CELL_SIZE * rows;
 
         layoutInArea(pnlBase, 0, 0, width, height, 0, HPos.CENTER,
                 VPos.CENTER);
@@ -591,7 +581,7 @@ public class Grid extends Pane implements Serializable {
         @Override
         protected void layoutChildren() {
             for (Node child : getManagedChildren()) {
-                layoutInArea(child, 0, 0, cellSize, cellSize, 0,
+                layoutInArea(child, 0, 0, CELL_SIZE, CELL_SIZE, 0,
                         HPos.CENTER, VPos.CENTER);
             }
         }

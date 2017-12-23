@@ -1,6 +1,5 @@
 package turtle.comp;
 
-import turtle.attributes.NotAttribute;
 import turtle.core.Component;
 import turtle.core.Direction;
 import turtle.core.Grid;
@@ -36,7 +35,6 @@ public class PlasticWrap extends Enemy {
      * @return always north (since it is facing that direction always).
      */
     @Override
-    @NotAttribute
     public Direction getHeading() {
         return Direction.NORTH;
     }
@@ -48,7 +46,6 @@ public class PlasticWrap extends Enemy {
      * @param heading the direction of heading
      */
     @Override
-    @NotAttribute
     public void setHeading(Direction heading) {
         //Does nothing
     }
@@ -76,10 +73,11 @@ public class PlasticWrap extends Enemy {
         if (!isMoving() && g.getCellAt(getHeadLocation()) instanceof Water) {
             Direction[] choices = Direction.values();
             shuffle(choices, g.getRNG());
-            for (Direction dir : choices)
+            for (Direction dir : choices) {
                 if (traverseDirection(dir)) {
                     break;
                 }
+            }
         }
 
     }

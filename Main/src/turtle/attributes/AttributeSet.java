@@ -252,6 +252,16 @@ public class AttributeSet<A extends Attributable> implements Serializable {
     }
 
     /**
+     * Checks whether if an attribute is a read-only attribute. Note that if this attribute does
+     * not exist this will also return <tt>false</tt>.
+     * @param name the name of the attribute
+     * @return true if read-only, false otherwise.
+     */
+    public boolean isReadOnlyAttribute(String name) {
+        return attrs.containsKey(name) && !attrs.get(name).hasSetter();
+    }
+
+    /**
      * Sets the value of a particular attribute.
      *
      * @param name  the name of the attribute.

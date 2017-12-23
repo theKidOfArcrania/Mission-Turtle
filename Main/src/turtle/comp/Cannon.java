@@ -4,6 +4,9 @@ import turtle.core.Direction;
 import turtle.core.Grid;
 import turtle.core.Location;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This will shoot cannon projectiles at fixed interval times that can be
  * configured as a period. By itself it can be moved around much similarly
@@ -20,6 +23,18 @@ public class Cannon extends Mover {
     private static final int DEFAULT_SHOOTING_PERIOD = 2;
     private static final int[] SHOOTING_ANIMATION = {36, 37, 38, 35};
     private static final long serialVersionUID = 705243324532344078L;
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        if (tileInd >= DEFAULT_IMAGE && tileInd <= SHOOTING_ANIMATION[SHOOTING_ANIMATION.length - 2]) {
+            return new HashMap<>();
+        }
+        return null;
+    }
 
     private int period;
 

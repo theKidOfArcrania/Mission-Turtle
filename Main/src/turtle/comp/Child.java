@@ -4,6 +4,9 @@ import turtle.core.Direction;
 import turtle.core.Grid;
 import turtle.core.Location;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This will at first move at half speed with random direction, but once see's player in
  * line, it will charge double speed in that direction until it hits a wall.
@@ -17,6 +20,18 @@ public class Child extends Enemy {
 
     private static final int CHARGE_DIST = 10;
     private static final long serialVersionUID = -5302146650460128654L;
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        if (tileInd >= DEFAULT_IMAGE && tileInd <= WALK_FRAMES[0]) {
+            return new HashMap<>();
+        }
+        return null;
+    }
 
     private long lastMove;
     private boolean frenzyState;

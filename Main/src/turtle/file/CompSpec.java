@@ -128,6 +128,14 @@ public class CompSpec {
     }
 
     /**
+     * Getter for all the parameter mappings.
+     * @return a {@link java.util.Map} of the parameters.
+     */
+    public Map<String, Object> getParameters() {
+        return new HashMap<>(params);
+    }
+
+    /**
      * Serializes all parameter values into binary data.
      *
      * @return a byte array of binary data.

@@ -5,6 +5,9 @@ import turtle.core.Component;
 import turtle.core.Direction;
 import turtle.core.DominanceLevel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This actor will kill any victim that happens to step over this contraption.
  * The trap will then immediately disintegrate.
@@ -15,6 +18,19 @@ public class Trap extends Actor {
     public static final int DEFAULT_IMAGE = 56;
     private static final int[] ANIMATION_IMAGE = {57, 58, 59};
     private static final long serialVersionUID = -2850122197270893076L;
+
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        if (tileInd >= DEFAULT_IMAGE && tileInd <= ANIMATION_IMAGE[ANIMATION_IMAGE.length - 1]) {
+            return new HashMap<>();
+        }
+        return null;
+    }
 
     /**
      * Checks if an actor can pass through this trap.

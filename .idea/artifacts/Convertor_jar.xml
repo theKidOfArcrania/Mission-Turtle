@@ -4,7 +4,7 @@
     <root id="archive" name="Convertor.jar">
       <element id="module-output" name="Convertor" />
       <element id="module-output" name="Main" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/libtiled-0.17.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/libtiled-1.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

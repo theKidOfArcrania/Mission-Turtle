@@ -7,6 +7,8 @@ import turtle.core.TileSet;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This embodies a cell of water, it is the safety zone of the player.
@@ -19,11 +21,24 @@ public class Water extends Cell {
      */
     public static final int DEFAULT_IMAGE = 12;
 
-    private static final int[] ANIMATION_FRAME = {DEFAULT_IMAGE, 13, 14, 15, 16};
+    private static final int[] ANIMATION_FRAMES = {DEFAULT_IMAGE, 13, 14, 15, 16};
     private static final int[] TRANSFORM_ANIMATION_FRAME = {30, 29, 28, 27, 26};
     private static final int MAX_TRANSFORM = TRANSFORM_ANIMATION_FRAME.length *
             DEF_ANIMATION_FRAME_CHANGE;
     private static final long serialVersionUID = 991189208764206004L;
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        if (tileInd >= DEFAULT_IMAGE && tileInd <= ANIMATION_FRAMES[ANIMATION_FRAMES.length - 1]) {
+            return new HashMap<>();
+        }
+        return null;
+    }
+
     private int frameCount;
     private int topFrame;
 
@@ -33,7 +48,7 @@ public class Water extends Cell {
      * Constructs a Water tile and initializes UI.
      */
     public Water() {
-        animateFrames(ANIMATION_FRAME, true);
+        animateFrames(ANIMATION_FRAMES, true);
         frameCount = -1;
 
         topFrame = -1;

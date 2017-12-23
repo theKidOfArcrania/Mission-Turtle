@@ -18,24 +18,22 @@ public class TileSet {
             Hint.class, Trap.class, LawnMower.class, Child.class,
             Button.class, Factory.class};
 
-    private static final int DEF_FRAME_SIZE = 100;
     private static final int FRAME_ROWS = 16;
     private static final int FRAME_COLS = 16;
 
     private static final double SMALL = .0001;
 
-    private final int frameSize;
     private final Image tileset;
     private final Class<Component>[] compIndex;
 
     /**
      * Constructs a new default tile-set
      */
+    //TODO: implement custom tilesets
     public TileSet() {
         tileset = new Image(ClassLoader.getSystemResourceAsStream(
                 "tileset.png"));
         compIndex = DEF_COMPS;
-        frameSize = DEF_FRAME_SIZE;
     }
 
     /**
@@ -67,7 +65,7 @@ public class TileSet {
             throw new IndexOutOfBoundsException("" + index);
         }
 
-        double s = getFrameSize();
+        double s = Grid.CELL_SIZE;
         return new Rectangle2D(col * s, row * s, s, s);
     }
 
@@ -83,13 +81,6 @@ public class TileSet {
             throw new IllegalArgumentException("Illegal component index");
         }
         return compIndex[index];
-    }
-
-    /**
-     * @return the frame size per image in this tile-set
-     */
-    public int getFrameSize() {
-        return frameSize;
     }
 
     /**

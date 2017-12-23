@@ -11,7 +11,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/libtiled-0.17.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/libtiled-1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

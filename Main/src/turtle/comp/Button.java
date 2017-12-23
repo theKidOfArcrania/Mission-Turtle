@@ -1,7 +1,9 @@
 package turtle.comp;
 
-import turtle.attributes.NotAttribute;
 import turtle.core.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * When linked to a factory, triggers a clone whenever an actor steps on this
@@ -13,6 +15,21 @@ public class Button extends Actor {
     public static final int DEFAULT_IMAGE = 64;
     private static final int BUTTON_OFFSET_IMAGE = DEFAULT_IMAGE;
     private static final long serialVersionUID = 129820630612883091L;
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        ColorType[] colors = ColorType.values();
+        if (tileInd >= DEFAULT_IMAGE && tileInd < DEFAULT_IMAGE + colors.length) {
+            HashMap<String, Object> vals = new HashMap<>();
+            vals.put("color", colors[tileInd - DEFAULT_IMAGE]);
+            return vals;
+        }
+        return null;
+    }
 
     private Location linkedLocation;
     private ColorType color;
@@ -75,8 +92,6 @@ public class Button extends Actor {
      *
      * @param heading the direction of heading
      */
-    @Override
-    @NotAttribute
     public void setHeading(Direction heading) {
         //Does nothing
     }

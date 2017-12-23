@@ -1,9 +1,10 @@
 package turtle.comp;
 
-import turtle.attributes.NotAttribute;
 import turtle.core.Component;
 import turtle.core.Direction;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -16,6 +17,20 @@ public class Bucket extends Mover {
     public static final int DEFAULT_IMAGE = 31;
     private static final int[] ANIMATE_FRAMES = {32, 33, 34};
     private static final long serialVersionUID = 3202659903623058965L;
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        if (tileInd >= DEFAULT_IMAGE && tileInd < DEFAULT_IMAGE + ANIMATE_FRAMES.length) {
+            HashMap<String, Object> vals = new HashMap<>();
+            vals.put("filled", tileInd != DEFAULT_IMAGE);
+            return vals;
+        }
+        return null;
+    }
 
     private boolean filled;
 
@@ -49,7 +64,6 @@ public class Bucket extends Mover {
      * @return always north (since it is facing that direction always).
      */
     @Override
-    @NotAttribute
     public Direction getHeading() {
         return Direction.NORTH;
     }
@@ -61,7 +75,6 @@ public class Bucket extends Mover {
      * @param heading the direction of heading
      */
     @Override
-    @NotAttribute
     public void setHeading(Direction heading) {
         //Does nothing
     }

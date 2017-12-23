@@ -3,6 +3,9 @@ package turtle.comp;
 import turtle.core.Direction;
 import turtle.core.Location;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This is an enemy that directly chases after the player. However, it will
  * not ever decide to walk around obstacles.
@@ -16,6 +19,18 @@ public class Bird extends Enemy {
 
     private static final long serialVersionUID = -387220900586289450L;
 
+
+    /**
+     * Determines the associated attributes with a tile if the tile is related to this object.
+     * @param tileInd the index of the tile within a tileset
+     * @return an mapping of the default attributes, or null if it is not related.
+     */
+    public static Map<String, ?> attributeOfTile(int tileInd) {
+        if (tileInd == DEFAULT_IMAGE || tileInd == BIRD_FLYING_IMAGE) {
+            return new HashMap<>();
+        }
+        return null;
+    }
 
     /**
      * Updates frames so that the bird will change between flying/ still

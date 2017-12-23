@@ -403,7 +403,7 @@ public class MainApp extends Application {
      */
     private void loadLevelPacks() {
         Pattern fileReg = Pattern.compile(".+\\.mtp$");
-        File dir = new File("");
+        File dir = new File(".");
         File[] packs = dir.listFiles();
         if (packs == null) {
             return;

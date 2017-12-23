@@ -13,6 +13,8 @@ import javafx.stage.Screen;
 import javafx.util.Duration;
 import turtle.comp.Player;
 
+import static turtle.core.Grid.CELL_SIZE;
+
 /**
  * Displays only a portion of the grid --- the portion that the player can
  * see at one time.
@@ -20,8 +22,6 @@ import turtle.comp.Player;
  * @author Henry Wang
  */
 public class GridView extends Pane {
-    private static final int DEF_CELL_SIZE = 100;
-
     private static final double INTERNAL_PADDING = 20;
     private static final double CORNER_RADIUS = 5.0;
     private static final double SCREEN_PADDING = 200.0;
@@ -41,12 +41,16 @@ public class GridView extends Pane {
         double width = bounds.getWidth() - SCREEN_PADDING;
         double height = bounds.getHeight() - SCREEN_PADDING;
 
-        rows = (int) (height / DEF_CELL_SIZE);
-        cols = (int) (width / DEF_CELL_SIZE);
+        rows = (int) (height / CELL_SIZE);
+        cols = (int) (width / CELL_SIZE);
         initGrid(init);
 
-        setBackground(new Background(new BackgroundFill(Color.BLACK,
-                null, null)));
+        setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+
+        Rectangle clip = new Rectangle(0, 0, CELL_SIZE * cols, CELL_SIZE * rows);
+        clip.setArcHeight(CORNER_RADIUS);
+        clip.setArcWidth(CORNER_RADIUS);
+        setClip(clip);
     }
 
     /**
@@ -113,10 +117,7 @@ public class GridView extends Pane {
      */
     @Override
     protected double computeMaxWidth(double height) {
-        if (viewed == null) {
-            return cols * DEF_CELL_SIZE;
-        }
-        return cols * viewed.getCellSize();
+        return cols * CELL_SIZE;
     }
 
     /**
@@ -127,10 +128,7 @@ public class GridView extends Pane {
      */
     @Override
     protected double computeMaxHeight(double width) {
-        if (viewed == null) {
-            return rows * DEF_CELL_SIZE;
-        }
-        return rows * viewed.getCellSize();
+        return rows * CELL_SIZE;
     }
 
     /**
@@ -141,10 +139,7 @@ public class GridView extends Pane {
      */
     @Override
     protected double computePrefWidth(double height) {
-        if (viewed == null) {
-            return cols * DEF_CELL_SIZE;
-        }
-        return cols * viewed.getCellSize();
+        return cols * CELL_SIZE;
     }
 
     /**
@@ -155,10 +150,7 @@ public class GridView extends Pane {
      */
     @Override
     protected double computePrefHeight(double width) {
-        if (viewed == null) {
-            return rows * DEF_CELL_SIZE;
-        }
-        return rows * viewed.getCellSize();
+        return rows * CELL_SIZE;
     }
 
     /**
@@ -169,10 +161,7 @@ public class GridView extends Pane {
      */
     @Override
     protected double computeMinWidth(double height) {
-        if (viewed == null) {
-            return cols * DEF_CELL_SIZE;
-        }
-        return cols * viewed.getCellSize();
+        return cols * CELL_SIZE;
     }
 
     /**
@@ -183,10 +172,7 @@ public class GridView extends Pane {
      */
     @Override
     protected double computeMinHeight(double width) {
-        if (viewed == null) {
-            return rows * DEF_CELL_SIZE;
-        }
-        return rows * viewed.getCellSize();
+        return rows * CELL_SIZE;
     }
 
     /**
@@ -198,8 +184,8 @@ public class GridView extends Pane {
             return;
         }
 
-        double width = cols * viewed.getCellSize();
-        double height = rows * viewed.getCellSize();
+        double width = cols * CELL_SIZE;
+        double height = rows * CELL_SIZE;
         layoutInArea(viewed, 0, 0, width, height, 0, HPos.CENTER, VPos.CENTER);
     }
 
@@ -228,16 +214,6 @@ public class GridView extends Pane {
      * @param grid the grid to initialize.
      */
     private void initGrid0(Grid grid) {
-        int cellSize = DEF_CELL_SIZE;
-        if (grid != null) {
-            cellSize = grid.getCellSize();
-        }
-
-        Rectangle clip = new Rectangle(0, 0, cellSize * cols, cellSize * rows);
-        clip.setArcHeight(CORNER_RADIUS);
-        clip.setArcWidth(CORNER_RADIUS);
-        setClip(clip);
-
         if (grid != null) {
             getChildren().add(0, grid);
         }
@@ -258,7 +234,7 @@ public class GridView extends Pane {
             return;
         }
 
-        double cell = viewed.getCellSize();
+        double cell = CELL_SIZE;
         viewed.setTranslateX(-calcOffset(viewed.getWidth(),
                 viewed.getColumns() * cell, p.getTranslateX()));
         viewed.setTranslateY(-calcOffset(viewed.getHeight(),

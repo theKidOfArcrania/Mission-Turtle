@@ -1,22 +1,27 @@
 package turtle.editor;
 
-import tiled.core.Map;
-import tiled.core.MapLayer;
-import tiled.core.Tile;
-import tiled.core.TileLayer;
-import tiled.io.TMXMapReader;
+import org.mapeditor.core.*;
+import org.mapeditor.io.TMXMapReader;
+
 import turtle.comp.ColorType;
 import turtle.core.*;
+import turtle.core.TileSet;
 import turtle.file.CompSpec;
 import turtle.file.Level;
 import turtle.file.LevelPack;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.util.*;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import static java.lang.String.format;
+import static java.util.Comparator.comparing;
+import static turtle.core.Component.DEFAULT_SET;
+import static turtle.core.Grid.CELL_SIZE;
+import static turtle.editor.TMXToMTP.LayerType.getLayer;
 
 /**
  * This utility class includes a interactive prompt to help convert TMX files
@@ -26,10 +31,10 @@ import java.util.regex.PatternSyntaxException;
  */
 @SuppressWarnings("unused")
 public class TMXToMTP {
-    private static final short IMAGE_TO_SLOT[] = new short[256];
     private static final Pattern LOCATION_FORMAT = Pattern.compile
-            ("R(\\d+)C(\\d+)");
+            ("R(-?\\d+)C(-?\\d+)");
     private static final TMXMapReader reader = new TMXMapReader();
+    private static final HashMap<String, LayerType> TYPES = new HashMap<>();
 
     /**
      * Enumeration representing the layer type (actor or cell)
@@ -39,6 +44,20 @@ public class TMXToMTP {
      */
     public enum LayerType {
         ACTOR(Actor.class), CELL(Cell.class);
+
+        /**
+         * Obtains the layer with the specified type name, or <tt>null</tt> if not found. The
+         * layer name is case-insensitive.
+         * @param type the <tt>String</tt> name of the layer
+         * @return the layer type
+         */
+        public static LayerType getLayer(String type) {
+            try {
+                return valueOf(type.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
 
         private final Class<? extends Component> clazz;
 
@@ -59,31 +78,8 @@ public class TMXToMTP {
         }
     }
 
-    /**
-     * Initializes all the image to comp slot index mappings.
-     *
-     * @throws Exception if unable to initialize mapping
-     */
-    @SuppressWarnings("unchecked")
-    public static void initMappings() throws Exception {
-        Arrays.fill(IMAGE_TO_SLOT, (short) -1);
-        Field fld = TileSet.class.getDeclaredField("DEF_COMPS");
-        fld.setAccessible(true);
-
-        Class<Component>[] compList = (Class[]) fld.get(null);
-        for (int i = 0; i < compList.length; i++) {
-            if (compList[i] != null) {
-                int defImg = compList[i].getField("DEFAULT_IMAGE").getInt(null);
-                IMAGE_TO_SLOT[defImg] = (short) i;
-            }
-        }
-
-    }
-
     @SuppressWarnings("javadoc")
     public static void main(String[] args) throws Exception {
-        initMappings();
-
         @SuppressWarnings("resource")
         Scanner in = new Scanner(System.in);
 
@@ -92,24 +88,16 @@ public class TMXToMTP {
 
         System.out.println("Loading default levels...");
         Pattern def = Pattern.compile("Level\\d{3}.tmx");
-        for (File f : new File(".").listFiles()) {
+        for (File f : listCurrentDir()) {
             if (def.matcher(f.getName()).matches()) {
-                try {
-                    System.out.println("Adding \"" + f.getName() + "\"");
-                    Level lvl = loadLevel(f);
-                    pck.addLevel(lvl);
+                if (addLevel(pck, f))
                     selected.add(f);
-                    System.out.println("Level " + lvl.getName() + " added.");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.out.println("Unable to load level: " + f);
-                }
             }
         }
 
         while (true) {
             ArrayList<File> available = new ArrayList<>();
-            for (File child : new File(".").listFiles()) {
+            for (File child : listCurrentDir()) {
                 if (child.getName().endsWith(".tmx") && !selected.contains(child)) {
                     available.add(child);
                 }
@@ -140,17 +128,8 @@ public class TMXToMTP {
             }
             for (File f : available) {
                 if (p.matcher(f.getName()).matches()) {
-                    try {
-                        System.out.println("Adding \"" + f.getName() + "\"");
-                        Level lvl = loadLevel(f);
-                        pck.addLevel(lvl);
+                    if (addLevel(pck, f))
                         selected.add(f);
-                        System.out.println("Level " + lvl.getName() + " added.");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        System.out.println("Unable to load level: " + f);
-                    }
-
                 }
             }
         }
@@ -181,6 +160,52 @@ public class TMXToMTP {
     }
 
     /**
+     * Converts a {@code org.mapeditor.core.Properties} object into the standard
+     * {@code java.util.Properties}.
+     * @param props the {@code org.mapeditor.core.Properties} version
+     * @return the converted Properties object.
+     */
+    private static java.util.Properties props(org.mapeditor.core.Properties props) {
+        Properties copy = new Properties();
+        for (Property prop : props.getProperties()) {
+            copy.setProperty(prop.getName(), prop.getValue());
+        }
+        return copy;
+    }
+
+    /**
+     * List all files in the current directory, sorted by file name.
+     * @return the array of files
+     */
+    private static File[] listCurrentDir() {
+        File[] list = new File(".").listFiles();
+        if (list == null)
+            list = new File[0];
+        Arrays.sort(list, comparing(File::getName));
+        return list;
+    }
+
+    /**
+     * Adds a level to the levelpack from the file
+     * @param pack the levelpack to add to.
+     * @param lvlFile the file to load
+     * @return true if successfully loaded, false if failed.
+     */
+    private static boolean addLevel(LevelPack pack, File lvlFile) {
+        try {
+            System.out.println("Adding \"" + lvlFile.getName() + "\"");
+            Level lvl = loadLevel(lvlFile);
+            pack.addLevel(lvl);
+            System.out.println("Level " + lvl.getName() + " added.");
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Unable to load level: " + lvlFile);
+            return false;
+        }
+    }
+
+    /**
      * Loads a TMX level from a file, converting it to a Level object.
      *
      * @param levelFile the TMX level file.
@@ -189,44 +214,117 @@ public class TMXToMTP {
      */
     public static Level loadLevel(File levelFile) throws Exception {
         try (FileInputStream fis = new FileInputStream(levelFile)) {
-            Map map = reader.readMap(fis);
-            Properties props = map.getProperties();
+            org.mapeditor.core.Map map = reader.readMap(fis);
+            Properties props = props(map.getProperties());
 
             Level lvl = new Level(props.getProperty("Name", ""), map.getHeight(),
                     map.getWidth());
             lvl.setFoodRequirement(parseInt(props.getProperty("FoodReq", "0"), 0));
             lvl.setTimeLimit(parseInt(props.getProperty("TimeLimit", "-1"), -1));
             for (MapLayer lay : map.getLayers()) {
-                if (!(lay instanceof TileLayer)) {
+                String typeName = lay.getProperties().getProperty("Type", "");
+                if (typeName.isEmpty()) {
+                    System.out.printf("WARNING: layer '%s' does not have a type.\n", lay.getName());
                     continue;
                 }
 
-                String type = lay.getProperties().getProperty("Type", "");
-                if (type.equals("Actor")) {
-                    loadLayer(lvl, (TileLayer) lay, LayerType.ACTOR);
-                } else if (type.equals("Cell")) {
-                    loadLayer(lvl, (TileLayer) lay, LayerType.CELL);
+                LayerType type = getLayer(typeName);
+                if (type == null) {
+                    System.out.printf("WARNING: layer '%s' does not have a valid type '%s'.\n",
+                            lay.getName(), typeName);
+                    continue;
+                }
+
+                if (lay instanceof TileLayer) {
+                    loadTileLayer(lvl, (TileLayer) lay, type);
+                } else if (lay instanceof ObjectGroup) {
+                    loadObjectLayer(lvl, (ObjectGroup) lay, type);
+                } else {
+                    System.out.println("WARNING: Invalid layer type.");
                 }
             }
             return lvl;
         }
     }
 
+
     /**
-     * Loads a specific tile-layer of this TMX file into the level object
+     * Loads an object-layer of this TMX file into the level object
      *
      * @param lvl  the level object to load to.
-     * @param lay  the layer of the tile to load
+     * @param lay  the object-layer to load
      * @param type the type of the layer to load.
      */
-    public static void loadLayer(Level lvl, TileLayer lay, LayerType type) {
+    public static void loadObjectLayer(Level lvl, ObjectGroup lay, LayerType type) {
         Objects.requireNonNull(lvl);
         Objects.requireNonNull(lay);
         Objects.requireNonNull(type);
 
-        List<CompSpec> specs = type == LayerType.ACTOR ? lvl.getActorCompSpecs() :
-                lvl.getCellCompSpecs();
+        List<CompSpec> specs = (type == LayerType.ACTOR ? lvl.getActorCompSpecs() :
+                lvl.getCellCompSpecs());
+        for (MapObject obj : lay.getObjects()) {
+            Tile tle = obj.getTile();
+            if (tle == null) {
+                continue;
+            }
 
+            //Make sure that the object snaps into one of the grid cells.
+            if (obj.getX() % CELL_SIZE != 0 || obj.getY() % CELL_SIZE != 0 || obj.getX() < 0 ||
+                    obj.getY() < CELL_SIZE || obj.getX() > (lvl.getCols() - 1) * CELL_SIZE ||
+                    obj.getY() > lvl.getRows() * CELL_SIZE) {
+                System.out.printf("WARNING: Invalid object \"%s\" position: (%.1f, %.1f)",
+                        obj.getName(), obj.getX(), obj.getY());
+                continue;
+            }
+            if (obj.getWidth() != CELL_SIZE || obj.getHeight() != CELL_SIZE) {
+                System.out.printf("WARNING: Invalid object \"%s\" size: %.1fx%.1f",
+                        obj.getName(), obj.getWidth(), obj.getHeight());
+                continue;
+            }
+
+            //Compute location of object
+            int r = (int)obj.getY() / CELL_SIZE - 1, c = (int)obj.getX() / CELL_SIZE;
+            String objLoc = format("object \"%s\" (layer %s) @R%dC%d", obj.getName(),
+                    lay.getName(), r, c);
+
+            //Find component ID
+            int id = tle.getId();
+            TileSet ts = DEFAULT_SET;
+            CompIds ids = CompIds.getCompIdsTile(ts, id);
+            if (ids == null) {
+                System.err.printf("WARNING: %s has an invalid index %d.\n", objLoc, id);
+                continue;
+            }
+
+            //Make sure that this is a valid component type.
+            if (!type.getCompType().isAssignableFrom(ids.getComponentClass())) {
+                System.err.printf("WARNING: %s is not a(n) %s (%d).\n",
+                        objLoc, type.getCompType().getSimpleName(), id);
+                continue;
+            }
+
+            //Add spec
+            Properties objProps = props(tle.getProperties());
+            objProps.putAll(props(obj.getProperties()));
+            specs.add(new CompSpec(ts, new Location(r, c), ids.getSlotID(),
+                    extractAttributes(objLoc, objProps)));
+        }
+    }
+
+    /**
+     * Loads a tile-layer of this TMX file into the level object
+     *
+     * @param lvl  the level object to load to.
+     * @param lay  the tile-layer to load
+     * @param type the type of the layer to load.
+     */
+    public static void loadTileLayer(Level lvl, TileLayer lay, LayerType type) {
+        Objects.requireNonNull(lvl);
+        Objects.requireNonNull(lay);
+        Objects.requireNonNull(type);
+
+        List<CompSpec> specs = (type == LayerType.ACTOR ? lvl.getActorCompSpecs() :
+                lvl.getCellCompSpecs());
         for (int r = 0; r < lvl.getRows(); r++) {
             for (int c = 0; c < lvl.getCols(); c++) {
                 Tile tle = lay.getTileAt(c, r);
@@ -234,58 +332,50 @@ public class TMXToMTP {
                     continue;
                 }
 
-                String tleLoc = "tile (Layer " + lay.getName() + ") @R" +
-                        r + "C" + c;
+                String tleLoc = format("tile (Layer %s) @R%dC%d", lay.getName(), r, c);
 
-                TileSet ts = Component.DEFAULT_SET;
-
-
-                HashMap<String, Object> props = new HashMap<>();
-                Properties tleProps = new Properties(tle.getProperties());
-                Properties instProps = lay.getTileInstancePropertiesAt(c, r);
-                if (instProps != null) {
-                    for (java.util.Map.Entry<Object, Object> ent : instProps.entrySet())
-                        tleProps.put(ent.getKey(), ent.getValue());
-                }
-
+                //Find component ID
                 int id = tle.getId();
-                String newId = tleProps.getProperty("LinkToImage");
-                if (newId != null) {
-                    tleProps.setProperty("LinkToImage", "");
-                    id = parseInt(newId, id);
-                }
-
-                short slot = -1;
-                if (id < IMAGE_TO_SLOT.length) {
-                    slot = IMAGE_TO_SLOT[id];
-                }
-                if (slot == -1) {
-                    System.err.println("WARNING:  " + tleLoc +
-                            " has an invalid index " + id);
-                    continue;
-                }
-                if (!type.getCompType().isAssignableFrom(ts.componentAt(slot))) {
-                    System.err.println("WARNING: " + tleLoc + " is not a(n) " +
-                            type.getCompType().getSimpleName() + " (" + id + ")");
+                TileSet ts = DEFAULT_SET;
+                CompIds ids = CompIds.getCompIdsTile(ts, id);
+                if (ids == null) {
+                    System.err.printf("WARNING: %s has an invalid index %d.\n", tleLoc, id);
                     continue;
                 }
 
-                for (String prop : tleProps.stringPropertyNames()) {
-                    String sVal = tleProps.getProperty(prop);
-                    if (sVal.isEmpty()) {
-                        continue;
-                    }
-                    Object val = parseValue(tleLoc, prop, sVal);
-                    if (val != null) {
-                        props.put(prop, val);
-                    }
+                //Make sure that this is a valid component type.
+                if (!type.getCompType().isAssignableFrom(ids.getComponentClass())) {
+                    System.err.printf("WARNING: %s is not a(n) %s (%d).\n",
+                            tleLoc, type.getCompType().getSimpleName(), id);
+                    continue;
                 }
 
-                CompSpec spec = new CompSpec(ts, new Location(r, c), slot,
-                        props);
-                specs.add(spec);
+                //Add spec
+                specs.add(new CompSpec(ts, new Location(r, c), ids.getSlotID(),
+                        extractAttributes(tleLoc, props(tle.getProperties()))));
             }
         }
+    }
+
+    /**
+     * Converts all the string attributes into its corresponding object attributes.
+     * @param loc a string identifying the location of this cell/actor (for logging errors)
+     * @param propAttrs the properties to extract
+     * @return a corresponding attribute hashmap of object attributes.
+     */
+    private static HashMap<String, Object> extractAttributes(String loc, Properties propAttrs) {
+        HashMap<String, Object> attrs = new HashMap<>();
+        for (String prop : propAttrs.stringPropertyNames()) {
+            String sVal = propAttrs.getProperty(prop);
+            if (sVal.isEmpty()) {
+                continue;
+            }
+            Object val = parseValue(loc, prop, sVal);
+            if (val != null) {
+                attrs.put(prop, val);
+            }
+        }
+        return attrs;
     }
 
     /**

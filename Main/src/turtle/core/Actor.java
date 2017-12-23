@@ -1,5 +1,7 @@
 package turtle.core;
 
+import turtle.attributes.NotAttribute;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
@@ -87,6 +89,7 @@ public abstract class Actor extends Component {
      *
      * @return true if died, false if alive.
      */
+    @NotAttribute
     public boolean isDying() {
         return dying;
     }
@@ -96,6 +99,7 @@ public abstract class Actor extends Component {
      *
      * @return true if dead, false if dying or alive.
      */
+    @NotAttribute
     public boolean isDead() {
         return dead;
     }
