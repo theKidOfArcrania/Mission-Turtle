@@ -33,6 +33,7 @@ public class Grid extends Pane implements Serializable {
     private int timeLeft;
     private Direction lastMove;
     private final Recording recording;
+    private boolean playing;
 
 
     /**
@@ -179,6 +180,14 @@ public class Grid extends Pane implements Serializable {
      */
     public int getTimeLeft() {
         return timeLeft;
+    }
+
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
     }
 
     /**

@@ -69,7 +69,10 @@ public class Fire extends Cell {
         if (smoking) {
             return true;
         }
-        visitor.die(this);
+        if (visitor.die(this)) {
+            playSound(Sounds.STEAM);
+            Sounds.GRASS.play();
+        }
         return true;
     }
 

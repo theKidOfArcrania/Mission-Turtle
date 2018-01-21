@@ -40,7 +40,7 @@ public class Trap extends Actor {
      */
     @Override
     public boolean checkInteract(Actor other) {
-        return true;
+        return !(other instanceof Trap);
     }
 
     /**
@@ -53,6 +53,7 @@ public class Trap extends Actor {
     @Override
     public boolean interact(Actor other) {
         if (other.die(this)) {
+            playSound(Sounds.WHIP);
             die(this);
         }
         return true;
@@ -67,7 +68,7 @@ public class Trap extends Actor {
      */
     @Override
     public DominanceLevel dominanceLevelFor(Actor other) {
-        return FIXTURE;
+        return FIXTURE_TRAP;
     }
 
     /**

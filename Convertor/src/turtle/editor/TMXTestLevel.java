@@ -7,6 +7,7 @@ import turtle.file.LevelPack;
 import turtle.ui.MainApp;
 
 import java.io.File;
+import java.util.UUID;
 
 /**
  * @author Henry Wang
@@ -36,10 +37,11 @@ public class TMXTestLevel {
 
         System.setProperty("user.dir", lvlFile.getParent());
 
-        Launcher.testing = new LevelPack("Testing");
+        LevelPack pack = Launcher.testing = new LevelPack("Testing");
+        pack.setLevelPackID(new UUID(0, 0));
 
         Level lvl = TMXToMTP.loadLevel(lvlFile);
-        Launcher.testing.addLevel(lvl);
+        pack.addLevel(lvl);
 
         Application.launch(Launcher.class);
     }

@@ -374,13 +374,8 @@ public class GameUI extends VBox {
      *              occurred.
      */
     private void handleKey(KeyEvent event) {
-        if (state == HALTED) {
-            return;
-        }
-        if (event.getEventType() == KeyEvent.KEY_TYPED) {
-            return;
-        }
-        if (!mappedKeys.containsKey(event.getCode())) {
+        if (state == HALTED || event.getEventType() == KeyEvent.KEY_TYPED ||
+                !mappedKeys.containsKey(event.getCode())) {
             return;
         }
 
@@ -738,6 +733,7 @@ public class GameUI extends VBox {
         runner.stop();
         if (view.getGrid() != null) {
             Recording r = view.getGrid().getRecording();
+            view.getGrid().setPlaying(false);
             if (r != null) {
                 r.stop();
             }
@@ -756,6 +752,7 @@ public class GameUI extends VBox {
             return;
         }
         state = PAUSED;
+        view.getGrid().setPlaying(false);
         runner.pause();
 
         for (int i = 0; i < moving.length; i++)
@@ -771,6 +768,7 @@ public class GameUI extends VBox {
             return;
         }
         state = RUNNING;
+        view.getGrid().setPlaying(true);
         runner.start();
     }
 
@@ -781,6 +779,7 @@ public class GameUI extends VBox {
     private void startGame() {
         if (state == STOPPED) {
             runner.start();
+            view.getGrid().setPlaying(true);
             state = RUNNING;
         }
     }

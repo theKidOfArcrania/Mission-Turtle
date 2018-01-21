@@ -1,6 +1,8 @@
 package turtle.comp;
 
+import javafx.animation.Transition;
 import javafx.scene.image.ImageView;
+import javafx.util.Duration;
 import turtle.core.Actor;
 import turtle.core.Cell;
 import turtle.core.TileSet;
@@ -26,6 +28,7 @@ public class Water extends Cell {
     private static final int MAX_TRANSFORM = TRANSFORM_ANIMATION_FRAME.length *
             DEF_ANIMATION_FRAME_CHANGE;
     private static final long serialVersionUID = 991189208764206004L;
+    private static final Duration SPLASH_DELAY = Duration.millis(100);
 
     /**
      * Determines the associated attributes with a tile if the tile is related to this object.
@@ -63,7 +66,9 @@ public class Water extends Cell {
      */
     @Override
     public boolean pass(Actor visitor) {
-        visitor.die(this);
+        if (visitor.die(this)) {
+            playSound(Sounds.SPLASH);
+        }
         return true;
     }
 

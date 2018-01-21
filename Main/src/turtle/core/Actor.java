@@ -27,6 +27,7 @@ public abstract class Actor extends Component {
     public static final DominanceLevel ENEMY = new DominanceLevel("Enemy", 100);
     public static final DominanceLevel MOVER = new DominanceLevel("Mover", 200);
     public static final DominanceLevel ITEM = new DominanceLevel("Item", 300);
+    public static final DominanceLevel FIXTURE_TRAP = new DominanceLevel("Fixture_Trap", 350);
     public static final DominanceLevel FIXTURE = new DominanceLevel("Fixture", 400);
 
     private static final long serialVersionUID = -8229684437846026366L;

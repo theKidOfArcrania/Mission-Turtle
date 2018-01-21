@@ -66,6 +66,7 @@ public class Button extends Actor {
     @Override
     public boolean interact(Actor other) {
         Grid parent = getParentGrid();
+        playSound(Sounds.CLICK);
         if (parent != null && parent.isValidLocation(linkedLocation)) {
             Cell factory = parent.getCellAt(linkedLocation);
             if (factory instanceof Factory) {

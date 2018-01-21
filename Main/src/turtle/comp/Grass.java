@@ -124,6 +124,8 @@ public class Grass extends Actor {
             if (dr + dc <= 1) {
                 fading = 0;
                 animateFrames(TRANSFORM_FRAMES, false);
+                if (!Sounds.GRASS.isPlaying())
+                    playSound(Sounds.GRASS);
             }
         }
     }

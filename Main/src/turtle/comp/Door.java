@@ -69,6 +69,7 @@ public class Door extends Actor {
         if (other instanceof Player) {
             for (Item itm : ((Player) other).getPocket()) {
                 if (itm instanceof Key && ((Key) itm).getColor() == getColor()) {
+                    playSound(Sounds.UNLOCK);
                     die(this);
                     return true;
                 }

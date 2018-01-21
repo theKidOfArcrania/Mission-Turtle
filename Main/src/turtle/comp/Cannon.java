@@ -54,6 +54,8 @@ public class Cannon extends Mover {
             return;
         }
 
+        playSound(Sounds.EXPLOSION);
+
         Direction heading = getHeading();
         Location loc = new Location(getHeadLocation());
         heading.traverse(loc);

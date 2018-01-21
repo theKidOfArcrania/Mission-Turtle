@@ -22,7 +22,7 @@ public class Factory extends Cell {
      */
     public static final int DEFAULT_IMAGE = 70;
     private static final int FACTORY_OFFSET_IMAGE = DEFAULT_IMAGE;
-    private static final double RATIO_CLONE_IMG = .8;
+    private static final double RATIO_CLONE_IMG = .7;
     private static final long serialVersionUID = -8544196441607182765L;
 
     /**

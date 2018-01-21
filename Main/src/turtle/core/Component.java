@@ -1,13 +1,16 @@
 package turtle.core;
 
+import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.AudioClip;
 import turtle.attributes.Attributable;
 import turtle.attributes.AttributeSet;
 import turtle.attributes.NotAttribute;
+import turtle.comp.Sounds;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -26,6 +29,33 @@ import static turtle.core.Grid.CELL_SIZE;
  */
 public abstract class Component extends Pane implements Attributable,
         Serializable {
+    public static final int DEFAULT_IMAGE = -1;
+
+    public static final int DEF_ANIMATION_FRAME_CHANGE = 4;
+    public static final TileSet DEFAULT_SET = new TileSet();
+    public static final int BIG_FRAME = 10;
+
+    private static final int INVALID_IMAGE_FRAME = -2;
+    private static final long serialVersionUID = -65657197093045828L;
+
+    private static final int SHUFFLE = 50;
+    private static AudioClip currentClip = null;
+
+    static {
+        //Initialize all the sounds
+        for (Field fld : Sounds.class.getFields()) {
+            try {
+                Object val = fld.get(null);
+                if (val instanceof AudioClip) {
+                    ((AudioClip) val).play(0);
+                    ((AudioClip) val).stop();
+                }
+            } catch (IllegalAccessException e) {
+                throw new Error(e);
+            }
+        }
+    }
+
     /**
      * Obtains the default image of this class. If this class does not define
      * a default image, this will search up the hierarchy until the field is
@@ -55,9 +85,9 @@ public abstract class Component extends Pane implements Attributable,
         return DEFAULT_IMAGE;
     }
 
-    public static final int DEFAULT_IMAGE = -1;
-    private static final int INVALID_IMAGE_FRAME = -2;
-    private static final long serialVersionUID = -65657197093045828L;
+    public static AudioClip getCurrentClip() {
+        return (currentClip != null && currentClip.isPlaying()) ? currentClip : null;
+    }
 
     /**
      * Utility method used to shuffle an array.
@@ -91,11 +121,6 @@ public abstract class Component extends Pane implements Attributable,
         }
     }
 
-    public static final int DEF_ANIMATION_FRAME_CHANGE = 4;
-    public static final TileSet DEFAULT_SET = new TileSet();
-    public static final int BIG_FRAME = 10;
-    private static final int SHUFFLE = 50;
-
     private final Location headLoc;
     private final Location trailLoc;
     private final AttributeSet<Component> attributes;
@@ -126,19 +151,6 @@ public abstract class Component extends Pane implements Attributable,
         curFrame = 0;
 
         attributes = new AttributeSet<>(this);
-    }
-
-    /**
-     * Initializes the tile-set and image-view. This should ONLY be called
-     * exactly once in the component's lifetime.
-     *
-     * @param ts the tileset to initialize to.
-     */
-    private void initTileSet(TileSet ts) {
-        this.ts = ts;
-        currentImage = INVALID_IMAGE_FRAME;
-        img = new ImageView(ts.getImageSet());
-        this.getChildren().add(img);
     }
 
     /**
@@ -289,6 +301,45 @@ public abstract class Component extends Pane implements Attributable,
         for (Node n : getManagedChildren())
             layoutInArea(n, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
                     VPos.CENTER);
+    }
+
+    /**
+     * Plays an audio clip sound, stopping the previous sound effect.
+     * @param sound the sound clip to play
+     */
+    protected void playSound(AudioClip sound) {
+        if (!Platform.isFxApplicationThread()) {
+            throw new IllegalStateException("Must be on Fx thread");
+        }
+
+        if (getParentGrid() == null || !getParentGrid().isPlaying()) {
+            return;
+        }
+
+        //if (currentClip != null && currentClip.isPlaying()) {
+        //    currentClip.stop();
+        //}
+        if (sound.isPlaying()) {
+            sound.stop();
+        }
+
+        //TODO: configure volume.
+
+        sound.play();
+        currentClip = sound;
+    }
+
+    /**
+     * Initializes the tile-set and image-view. This should ONLY be called
+     * exactly once in the component's lifetime.
+     *
+     * @param ts the tileset to initialize to.
+     */
+    private void initTileSet(TileSet ts) {
+        this.ts = ts;
+        currentImage = INVALID_IMAGE_FRAME;
+        img = new ImageView(ts.getImageSet());
+        this.getChildren().add(img);
     }
 
     /**

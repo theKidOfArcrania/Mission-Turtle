@@ -44,6 +44,7 @@ public class Exit extends Cell {
         super.updateFrame(frame);
         if (winner != null && winner.getTrailingLocation().equals(
                 getHeadLocation())) {
+            //TODO: sound
             winner.win();
         }
     }

@@ -23,6 +23,8 @@ public abstract class Item extends Actor {
     @Override
     public boolean interact(Actor other) {
         if (other instanceof Player) {
+            //if (getCurrentClip() == null)
+                playSound(Sounds.TAP);
             Player p = (Player) other;
             if (p.collectItem(this)) {
                 getParentGrid().removeActor(this);

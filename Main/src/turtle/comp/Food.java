@@ -35,7 +35,11 @@ public class Food extends Item {
      */
     @Override
     public boolean interact(Actor other) {
-        return other instanceof Player && super.interact(other);
+        if (other instanceof Player) {
+            //TODO: sound
+            return super.interact(other);
+        }
+        return false;
     }
 
     /**

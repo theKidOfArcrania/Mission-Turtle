@@ -45,6 +45,7 @@ public class Bucket extends Mover {
     public boolean die(Component attacker) {
         if (attacker instanceof Water) {
             if (!isFilled()) {
+                playSound(Sounds.SPLASH);
                 setFilled(true);
                 ((Water) attacker).transformToSand();
             }

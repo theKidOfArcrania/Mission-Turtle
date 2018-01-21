@@ -422,8 +422,7 @@ public class MainApp extends Application {
             }
         }
         if (!success) {
-            showDialog(new DialogBoxUI("Unable to load some level packs.",
-                    "OK"));
+            showDialog(new DialogBoxUI("Unable to load some level packs.", "OK"));
         }
     }
 
